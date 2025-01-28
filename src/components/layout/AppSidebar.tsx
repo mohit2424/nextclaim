@@ -9,8 +9,8 @@ import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
-  SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarGroupContent,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -49,7 +49,7 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarContent>
         <div className="p-4">
-          <h1 className="text-xl font-bold">Startup OS</h1>
+          <h1 className="text-xl font-bold text-blue-600">NextClaim</h1>
         </div>
         <SidebarGroup>
           <SidebarGroupLabel>Menu</SidebarGroupLabel>
