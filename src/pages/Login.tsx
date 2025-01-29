@@ -12,8 +12,8 @@ export default function Login() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Mock login - in real app would validate against backend
-    if (userCode === "analyst@example.com" && password === "password") {
+    // Check for the specified credentials
+    if (userCode === "12345" && password === "nextclaim") {
       toast.success("Login successful");
       navigate("/dashboard");
     } else {
@@ -44,7 +44,7 @@ export default function Login() {
               </label>
               <Input
                 id="userCode"
-                type="email"
+                type="text"
                 value={userCode}
                 onChange={(e) => setUserCode(e.target.value)}
                 placeholder="Enter your user code"
