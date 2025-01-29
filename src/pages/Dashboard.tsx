@@ -1,49 +1,51 @@
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
-import { ClaimsList } from "@/components/claims/ClaimsList";
+import { Input } from "@/components/ui/input";
 import { ClaimsStats } from "@/components/claims/ClaimsStats";
-import { Plus } from "lucide-react";
+import { ClaimsOverviewChart } from "@/components/dashboard/ClaimsOverviewChart";
+import { ClaimsDistributionChart } from "@/components/dashboard/ClaimsDistributionChart";
+import { Plus, Search } from "lucide-react";
 
 export default function Dashboard() {
   return (
     <DashboardLayout>
-      <div className="space-y-8">
+      <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold">Welcome to NextClaim</h1>
-            <p className="text-muted-foreground mt-1">
+            <h1 className="text-2xl font-bold text-blue-600">
+              Welcome to Dashboard
+            </h1>
+            <p className="text-muted-foreground">
               Manage and review unemployment claims
             </p>
           </div>
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            New Claim
-          </Button>
-        </div>
-        <ClaimsStats />
-        <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
-          <div className="bg-white rounded-lg border p-6">
-            <h2 className="text-lg font-semibold mb-4">Claims Trend</h2>
-            <div className="flex gap-2 mb-4">
-              <Button variant="secondary" size="sm" className="bg-blue-600 text-white hover:bg-blue-700">
-                Weekly
-              </Button>
-              <Button variant="outline" size="sm">
-                Monthly
-              </Button>
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search claims..."
+                className="pl-8 w-[300px]"
+              />
             </div>
-            {/* Chart would go here */}
-          </div>
-          <div className="bg-white rounded-lg border p-6">
-            <h2 className="text-lg font-semibold mb-4">Claims Distribution</h2>
-            {/* Pie chart would go here */}
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              New Claim
+            </Button>
           </div>
         </div>
+
+        <ClaimsStats />
+
+        <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
+          <ClaimsOverviewChart />
+          <ClaimsDistributionChart />
+        </div>
+
         <div className="bg-white rounded-lg border">
           <div className="p-6 border-b">
-            <h2 className="text-lg font-semibold">Claims Overview</h2>
+            <h2 className="text-lg font-semibold">Recent Claims</h2>
           </div>
-          <ClaimsList />
+          {/* ClaimsList component will be rendered here */}
         </div>
       </div>
     </DashboardLayout>
