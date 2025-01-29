@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Table,
   TableBody,
@@ -44,6 +45,7 @@ const mockClaims = [
 
 export function ClaimsList() {
   const [claims] = useState(mockClaims);
+  const navigate = useNavigate();
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -87,7 +89,13 @@ export function ClaimsList() {
                 </Badge>
               </TableCell>
               <TableCell>
-                <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-blue-600 hover:text-blue-700"
+                  onClick={() => navigate(`/claims/${claim.id}`)}
+                >
+                  <Eye className="h-4 w-4 mr-1" />
                   View Details
                 </Button>
               </TableCell>
