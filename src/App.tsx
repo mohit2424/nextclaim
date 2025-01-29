@@ -8,6 +8,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import ClaimDetails from "./pages/ClaimDetails";
 import NotFound from "./pages/NotFound";
+import { ClaimsList } from "./components/claims/ClaimsList";
 
 const queryClient = new QueryClient();
 
@@ -21,6 +22,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/claims" element={<ClaimsList />} />
           <Route path="/claims/:id" element={<ClaimDetails />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

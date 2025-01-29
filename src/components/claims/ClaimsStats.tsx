@@ -1,12 +1,16 @@
 import { Card } from "@/components/ui/card";
+import { useNavigate } from "react-router-dom";
 
 export function ClaimsStats() {
+  const navigate = useNavigate();
+  
   const stats = [
     {
       title: "Total Claims",
       value: "1200",
       bgColor: "bg-gradient-to-r from-blue-50 to-blue-100",
       textColor: "text-blue-900",
+      onClick: () => navigate("/claims"),
     },
     {
       title: "Pending Claims",
@@ -39,7 +43,8 @@ export function ClaimsStats() {
       {stats.map((stat) => (
         <Card
           key={stat.title}
-          className={`${stat.bgColor} border-none shadow-sm`}
+          className={`${stat.bgColor} border-none shadow-sm cursor-pointer transition-transform hover:scale-105`}
+          onClick={stat.onClick}
         >
           <div className="p-6">
             <h3 className="text-sm font-medium text-muted-foreground">
