@@ -1,11 +1,33 @@
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Bell, Search } from "lucide-react";
+import { ArrowLeft, Bell, Search } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 export function Navbar() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const showBackButton = location.pathname !== "/";
+
   return (
     <header className="border-b bg-white">
       <div className="flex h-16 items-center px-4 gap-4">
         <SidebarTrigger />
+        {showBackButton && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate("/")}
+            className="mr-2"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+        )}
+        <div 
+          className="text-xl font-bold text-primary cursor-pointer"
+          onClick={() => navigate("/")}
+        >
+          NEXTCLAIM
+        </div>
         <div className="flex-1">
           <form className="hidden sm:block">
             <div className="relative">

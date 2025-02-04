@@ -17,24 +17,28 @@ export function ClaimsStats() {
       value: "300",
       bgColor: "bg-gradient-to-r from-orange-50 to-orange-100",
       textColor: "text-orange-900",
+      onClick: () => navigate("/claims?status=pending"),
     },
     {
       title: "In Progress",
       value: "150",
       bgColor: "bg-gradient-to-r from-purple-50 to-purple-100",
       textColor: "text-purple-900",
+      onClick: () => navigate("/claims?status=in-progress"),
     },
     {
       title: "Approved Claims",
       value: "650",
       bgColor: "bg-gradient-to-r from-green-50 to-green-100",
       textColor: "text-green-900",
+      onClick: () => navigate("/claims?status=approved"),
     },
     {
       title: "Rejected Claims",
       value: "100",
       bgColor: "bg-gradient-to-r from-red-50 to-red-100",
       textColor: "text-red-900",
+      onClick: () => navigate("/claims?status=rejected"),
     },
   ];
 

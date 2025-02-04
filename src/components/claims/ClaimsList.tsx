@@ -1,7 +1,8 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 const claims = [
   {
@@ -68,6 +69,17 @@ const getStatusColor = (status: string) => {
 
 export function ClaimsList() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const [filteredClaims, setFilteredClaims] = useState(claims);
+  const statusFilter = searchParams.get("status");
+
+  useEffect(() => {
+    if (statusFilter) {
+      setFilteredClaims(claims.filter(claim => claim.status === statusFilter));
+    } else {
+      setFilteredClaims(claims);
+    }
+  }, [statusFilter]);
 
   return (
     <div className="space-y-4">
@@ -79,7 +91,18 @@ export function ClaimsList() {
             placeholder="Search claims..."
             className="px-4 py-2 border rounded-md"
           />
-          <select className="px-4 py-2 border rounded-md">
+          <select 
+            className="px-4 py-2 border rounded-md"
+            value={statusFilter || "all"}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value === "all") {
+                navigate("/claims");
+              } else {
+                navigate(`/claims?status=${value}`);
+              }
+            }}
+          >
             <option value="all">All Claims</option>
             <option value="pending">Pending</option>
             <option value="in-progress">In Progress</option>
@@ -105,7 +128,7 @@ export function ClaimsList() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {claims.map((claim) => (
+            {filteredClaims.map((claim) => (
               <TableRow key={claim.id}>
                 <TableCell className="font-medium">{claim.id}</TableCell>
                 <TableCell>{claim.claimantName}</TableCell>
