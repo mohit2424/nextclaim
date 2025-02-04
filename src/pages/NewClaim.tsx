@@ -28,6 +28,7 @@ import { Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { supabase } from "@/integrations/supabase/client";
 
 const formSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),
@@ -67,11 +68,28 @@ export default function NewClaim() {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      // TODO: Implement API call to save claim
-      console.log(values);
+      const { error } = await supabase.from('claims').insert({
+        first_name: values.firstName,
+        middle_name: values.middleName,
+        last_name: values.lastName,
+        age: values.age,
+        state: values.state,
+        pincode: values.pincode,
+        ssn: values.ssn,
+        email: values.email,
+        phone: values.phone,
+        employer_name: values.employerName,
+        claim_date: format(values.claimDate, 'yyyy-MM-dd'),
+        claim_status: values.claimStatus,
+        separation_reason: values.separationReason,
+      });
+
+      if (error) throw error;
+
       toast.success("Claim submitted successfully");
       navigate("/claims");
     } catch (error) {
+      console.error('Error submitting claim:', error);
       toast.error("Failed to submit claim");
     }
   };

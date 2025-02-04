@@ -85,7 +85,32 @@ export type Database = {
         | "severance_agreement"
     }
     CompositeTypes: {
-      [_ in never]: never
+      claims_definition: {
+        id: string | null
+        created_at: string | null
+        updated_at: string | null
+        first_name: string | null
+        middle_name: string | null
+        last_name: string | null
+        age: number | null
+        state: string | null
+        pincode: string | null
+        ssn: string | null
+        email: string | null
+        phone: string | null
+        employer_name: string | null
+        claim_date: string | null
+        claim_status: Database["public"]["Enums"]["claim_status"] | null
+        separation_reason:
+          | Database["public"]["Enums"]["separation_reason"]
+          | null
+      }
+      Database: {
+        public: Json | null
+      }
+      json: {
+        data: Json | null
+      }
     }
   }
 }
