@@ -1,3 +1,4 @@
+
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -5,8 +6,11 @@ import { ClaimsStats } from "@/components/claims/ClaimsStats";
 import { ClaimsOverviewChart } from "@/components/dashboard/ClaimsOverviewChart";
 import { ClaimsDistributionChart } from "@/components/dashboard/ClaimsDistributionChart";
 import { Plus, Search } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
+  const navigate = useNavigate();
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -27,7 +31,7 @@ export default function Dashboard() {
                 className="pl-8 w-[300px]"
               />
             </div>
-            <Button>
+            <Button onClick={() => navigate("/claims/new")}>
               <Plus className="mr-2 h-4 w-4" />
               New Claim
             </Button>

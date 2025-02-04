@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,6 +10,7 @@ import Dashboard from "./pages/Dashboard";
 import ClaimDetails from "./pages/ClaimDetails";
 import NotFound from "./pages/NotFound";
 import { ClaimsList } from "./components/claims/ClaimsList";
+import NewClaim from "./pages/NewClaim";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +25,7 @@ const App = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/claims" element={<ClaimsList />} />
+          <Route path="/claims/new" element={<NewClaim />} />
           <Route path="/claims/:id" element={<ClaimDetails />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
