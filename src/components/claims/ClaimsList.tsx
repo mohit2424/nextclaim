@@ -1,8 +1,8 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const claims = [
   {
@@ -59,103 +59,66 @@ const claims = [
 
 const getStatusColor = (status: string) => {
   const colors = {
-    pending: "bg-yellow-100 text-yellow-800",
-    "in-progress": "bg-blue-100 text-blue-800",
-    approved: "bg-green-100 text-green-800",
-    rejected: "bg-red-100 text-red-800",
+    pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
+    "in-progress": "bg-blue-100 text-blue-800 border-blue-200",
+    approved: "bg-green-100 text-green-800 border-green-200",
+    rejected: "bg-red-100 text-red-800 border-red-200",
   };
-  return colors[status as keyof typeof colors] || "bg-gray-100 text-gray-800";
+  return colors[status as keyof typeof colors] || "bg-gray-100 text-gray-800 border-gray-200";
 };
 
 export function ClaimsList() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const [filteredClaims, setFilteredClaims] = useState(claims);
-  const statusFilter = searchParams.get("status");
-
-  useEffect(() => {
-    if (statusFilter) {
-      setFilteredClaims(claims.filter(claim => claim.status === statusFilter));
-    } else {
-      setFilteredClaims(claims);
-    }
-  }, [statusFilter]);
+  const [filteredClaims] = useState(claims);
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-blue-600">Claims List</h2>
-        <div className="flex items-center gap-4">
-          <input
-            type="text"
-            placeholder="Search claims..."
-            className="px-4 py-2 border rounded-md"
-          />
-          <select 
-            className="px-4 py-2 border rounded-md"
-            value={statusFilter || "all"}
-            onChange={(e) => {
-              const value = e.target.value;
-              if (value === "all") {
-                navigate("/claims");
-              } else {
-                navigate(`/claims?status=${value}`);
-              }
-            }}
-          >
-            <option value="all">All Claims</option>
-            <option value="pending">Pending</option>
-            <option value="in-progress">In Progress</option>
-            <option value="approved">Approved</option>
-            <option value="rejected">Rejected</option>
-          </select>
-        </div>
-      </div>
-
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Claim ID</TableHead>
-              <TableHead>Claimant Name</TableHead>
-              <TableHead>Date Submitted</TableHead>
-              <TableHead>Last Updated</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Weekly Benefit</TableHead>
-              <TableHead>Employer</TableHead>
-              <TableHead>Due Date</TableHead>
-              <TableHead>Action</TableHead>
+    <div className="overflow-auto">
+      <Table>
+        <TableHeader>
+          <TableRow className="bg-gray-50">
+            <TableHead className="font-semibold">Claim ID</TableHead>
+            <TableHead className="font-semibold">Claimant Name</TableHead>
+            <TableHead className="font-semibold">Date Submitted</TableHead>
+            <TableHead className="font-semibold">Last Updated</TableHead>
+            <TableHead className="font-semibold">Status</TableHead>
+            <TableHead className="font-semibold">Weekly Benefit</TableHead>
+            <TableHead className="font-semibold">Employer</TableHead>
+            <TableHead className="font-semibold">Due Date</TableHead>
+            <TableHead className="font-semibold text-right">Action</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {filteredClaims.map((claim) => (
+            <TableRow key={claim.id} className="hover:bg-gray-50">
+              <TableCell className="font-medium">{claim.id}</TableCell>
+              <TableCell>{claim.claimantName}</TableCell>
+              <TableCell>{claim.dateSubmitted}</TableCell>
+              <TableCell>{claim.lastUpdated}</TableCell>
+              <TableCell>
+                <Badge 
+                  className={`${getStatusColor(claim.status)} border`}
+                  variant="secondary"
+                >
+                  {claim.status.charAt(0).toUpperCase() + claim.status.slice(1)}
+                </Badge>
+              </TableCell>
+              <TableCell className="font-medium">${claim.weeklyBenefit}</TableCell>
+              <TableCell>{claim.employer}</TableCell>
+              <TableCell>{claim.dueDate}</TableCell>
+              <TableCell className="text-right">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigate(`/claims/${claim.id}`)}
+                  className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                >
+                  View Details
+                </Button>
+              </TableCell>
             </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredClaims.map((claim) => (
-              <TableRow key={claim.id}>
-                <TableCell className="font-medium">{claim.id}</TableCell>
-                <TableCell>{claim.claimantName}</TableCell>
-                <TableCell>{claim.dateSubmitted}</TableCell>
-                <TableCell>{claim.lastUpdated}</TableCell>
-                <TableCell>
-                  <Badge className={getStatusColor(claim.status)} variant="secondary">
-                    {claim.status}
-                  </Badge>
-                </TableCell>
-                <TableCell>${claim.weeklyBenefit}</TableCell>
-                <TableCell>{claim.employer}</TableCell>
-                <TableCell>{claim.dueDate}</TableCell>
-                <TableCell>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => navigate(`/claims/${claim.id}`)}
-                  >
-                    View Details
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 }

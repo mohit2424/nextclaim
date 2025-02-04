@@ -5,8 +5,9 @@ import { Input } from "@/components/ui/input";
 import { ClaimsStats } from "@/components/claims/ClaimsStats";
 import { ClaimsOverviewChart } from "@/components/dashboard/ClaimsOverviewChart";
 import { ClaimsDistributionChart } from "@/components/dashboard/ClaimsDistributionChart";
-import { Plus, Search } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { ClaimsList } from "@/components/claims/ClaimsList";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -14,24 +15,17 @@ export default function Dashboard() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-blue-600">
-              Welcome to Dashboard
+            <h1 className="text-3xl font-bold text-blue-600">
+              Claims Dashboard
             </h1>
-            <p className="text-muted-foreground">
-              Manage and review unemployment claims
+            <p className="text-muted-foreground mt-1">
+              Manage and review unemployment claims efficiently
             </p>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="relative">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search claims..."
-                className="pl-8 w-[300px]"
-              />
-            </div>
-            <Button onClick={() => navigate("/claims/new")}>
+          <div className="flex items-center gap-4 w-full md:w-auto">
+            <Button onClick={() => navigate("/claims/new")} className="w-full md:w-auto">
               <Plus className="mr-2 h-4 w-4" />
               New Claim
             </Button>
@@ -45,11 +39,17 @@ export default function Dashboard() {
           <ClaimsDistributionChart />
         </div>
 
-        <div className="bg-white rounded-lg border">
-          <div className="p-6 border-b">
-            <h2 className="text-lg font-semibold">Recent Claims</h2>
+        <div className="bg-white rounded-lg border shadow-sm">
+          <div className="border-b">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-4 gap-4">
+              <h2 className="text-lg font-semibold">Recent Claims</h2>
+              <Input
+                placeholder="Search claims by SSN..."
+                className="w-full md:w-[300px]"
+              />
+            </div>
           </div>
-          {/* ClaimsList component will be rendered here */}
+          <ClaimsList />
         </div>
       </div>
     </DashboardLayout>
