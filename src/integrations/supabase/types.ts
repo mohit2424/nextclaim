@@ -9,7 +9,63 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      claims: {
+        Row: {
+          age: number
+          claim_date: string
+          claim_status: Database["public"]["Enums"]["claim_status"]
+          created_at: string
+          email: string
+          employer_name: string
+          first_name: string
+          id: string
+          last_name: string
+          middle_name: string | null
+          phone: string
+          pincode: string
+          separation_reason: Database["public"]["Enums"]["separation_reason"]
+          ssn: string
+          state: string
+          updated_at: string
+        }
+        Insert: {
+          age: number
+          claim_date: string
+          claim_status?: Database["public"]["Enums"]["claim_status"]
+          created_at?: string
+          email: string
+          employer_name: string
+          first_name: string
+          id?: string
+          last_name: string
+          middle_name?: string | null
+          phone: string
+          pincode: string
+          separation_reason: Database["public"]["Enums"]["separation_reason"]
+          ssn: string
+          state: string
+          updated_at?: string
+        }
+        Update: {
+          age?: number
+          claim_date?: string
+          claim_status?: Database["public"]["Enums"]["claim_status"]
+          created_at?: string
+          email?: string
+          employer_name?: string
+          first_name?: string
+          id?: string
+          last_name?: string
+          middle_name?: string | null
+          phone?: string
+          pincode?: string
+          separation_reason?: Database["public"]["Enums"]["separation_reason"]
+          ssn?: string
+          state?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -18,7 +74,15 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      claim_status: "initial_review" | "pending" | "approved" | "rejected"
+      separation_reason:
+        | "resignation"
+        | "termination_misconduct"
+        | "layoff"
+        | "reduction_in_force"
+        | "constructive_discharge"
+        | "job_abandonment"
+        | "severance_agreement"
     }
     CompositeTypes: {
       [_ in never]: never
