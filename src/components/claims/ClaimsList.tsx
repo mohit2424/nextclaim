@@ -10,13 +10,15 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, ArrowRight, Search } from "lucide-react";
 
+type ClaimStatus = "initial_review" | "pending" | "approved" | "rejected";
+
 type Claim = {
   id: string;
   first_name: string;
   last_name: string;
   created_at: string;
   updated_at: string;
-  claim_status: string;
+  claim_status: ClaimStatus;
   employer_name: string;
   claim_date: string;
   ssn: string;
@@ -26,7 +28,7 @@ interface ClaimsListProps {
   searchQuery: string;
 }
 
-const fetchClaims = async (searchQuery: string = "", status?: string) => {
+const fetchClaims = async (searchQuery: string = "", status?: ClaimStatus | "all") => {
   let query = supabase
     .from('claims')
     .select('*')
@@ -46,14 +48,14 @@ const fetchClaims = async (searchQuery: string = "", status?: string) => {
   return data;
 };
 
-const getStatusColor = (status: string) => {
+const getStatusColor = (status: ClaimStatus) => {
   const colors = {
     initial_review: "bg-yellow-100 text-yellow-800 border-yellow-200",
     pending: "bg-blue-100 text-blue-800 border-blue-200",
     approved: "bg-green-100 text-green-800 border-green-200",
     rejected: "bg-red-100 text-red-800 border-red-200",
   };
-  return colors[status as keyof typeof colors] || "bg-gray-100 text-gray-800 border-gray-200";
+  return colors[status] || "bg-gray-100 text-gray-800 border-gray-200";
 };
 
 export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps) {

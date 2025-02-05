@@ -75,7 +75,7 @@ export default function NewClaim() {
 
       const { error } = await supabase
         .from('claims')
-        .insert({
+        .insert([{
           first_name: values.firstName,
           middle_name: values.middleName,
           last_name: values.lastName,
@@ -90,7 +90,7 @@ export default function NewClaim() {
           claim_status: values.claimStatus,
           separation_reason: values.separationReason,
           user_id: session.user.id
-        });
+        }]);
 
       if (error) {
         console.error('Error submitting claim:', error);
