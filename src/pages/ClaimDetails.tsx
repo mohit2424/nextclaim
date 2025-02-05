@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -52,18 +52,24 @@ type DatabaseDocument = {
 export default function ClaimDetails() {
   const { id } = useParams();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [file, setFile] = useState<File | null>(null);
 
-  const { data: claim, isLoading } = useQuery({
+  const { data: claim, isLoading, error } = useQuery({
     queryKey: ['claim', id],
     queryFn: async () => {
+      if (!id) {
+        throw new Error('No claim ID provided');
+      }
+
       const { data, error } = await supabase
         .from('claims')
         .select('*')
         .eq('id', id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) throw new Error('Claim not found');
       
       // Transform the documents field to ensure it's properly typed
       const transformedDocuments = Array.isArray(data.documents) 
@@ -83,6 +89,7 @@ export default function ClaimDetails() {
       
       return transformedData;
     },
+    enabled: !!id,
   });
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -130,6 +137,23 @@ export default function ClaimDetails() {
     }
   };
 
+  if (error) {
+    return (
+      <DashboardLayout>
+        <div className="text-center py-12">
+          <h2 className="text-2xl font-bold text-red-600">Error Loading Claim</h2>
+          <p className="text-muted-foreground mt-2">{error.message}</p>
+          <Button 
+            className="mt-4"
+            onClick={() => navigate(-1)}
+          >
+            Go Back
+          </Button>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
   if (isLoading) {
     return (
       <DashboardLayout>
@@ -147,6 +171,12 @@ export default function ClaimDetails() {
         <div className="text-center py-12">
           <h2 className="text-2xl font-bold">Claim not found</h2>
           <p className="text-muted-foreground">The requested claim could not be found.</p>
+          <Button 
+            className="mt-4"
+            onClick={() => navigate(-1)}
+          >
+            Go Back
+          </Button>
         </div>
       </DashboardLayout>
     );
