@@ -78,7 +78,7 @@ export default function NewClaim() {
 
       const { data, error } = await supabase
         .from('claims')
-        .insert([{
+        .insert({
           age: values.age,
           claim_date: format(values.claimDate, 'yyyy-MM-dd'),
           claim_status: values.claimStatus,
@@ -96,7 +96,7 @@ export default function NewClaim() {
           ssn: values.ssn,
           state: values.state,
           user_id: session.user.id
-        }])
+        })
         .select()
         .single();
 

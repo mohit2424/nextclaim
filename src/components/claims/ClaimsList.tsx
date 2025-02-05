@@ -44,8 +44,13 @@ const fetchClaims = async (searchQuery: string = "", status?: ClaimStatus | "all
     ].join(','));
   }
 
+  // Handle both individual status and combined "in_progress" filter
   if (status && status !== 'all') {
-    query = query.eq('claim_status', status);
+    if (status === 'in_progress') {
+      query = query.in('claim_status', ['initial_review', 'pending']);
+    } else {
+      query = query.eq('claim_status', status);
+    }
   }
 
   const { data, error } = await query;
