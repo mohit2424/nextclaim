@@ -73,22 +73,24 @@ export default function NewClaim() {
         return;
       }
 
-      const { error } = await supabase.from('claims').insert({
-        user_id: session.user.id,
-        first_name: values.firstName,
-        middle_name: values.middleName,
-        last_name: values.lastName,
-        age: values.age,
-        state: values.state,
-        pincode: values.pincode,
-        ssn: values.ssn,
-        email: values.email,
-        phone: values.phone,
-        employer_name: values.employerName,
-        claim_date: format(values.claimDate, 'yyyy-MM-dd'),
-        claim_status: values.claimStatus,
-        separation_reason: values.separationReason,
-      });
+      const { error } = await supabase
+        .from('claims')
+        .insert({
+          first_name: values.firstName,
+          middle_name: values.middleName,
+          last_name: values.lastName,
+          age: values.age,
+          state: values.state,
+          pincode: values.pincode,
+          ssn: values.ssn,
+          email: values.email,
+          phone: values.phone,
+          employer_name: values.employerName,
+          claim_date: format(values.claimDate, 'yyyy-MM-dd'),
+          claim_status: values.claimStatus,
+          separation_reason: values.separationReason,
+          user_id: session.user.id
+        });
 
       if (error) {
         console.error('Error submitting claim:', error);

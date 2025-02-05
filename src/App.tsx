@@ -24,7 +24,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/claims" element={<ClaimsList />} />
+          <Route path="/claims" element={<ClaimsList searchQuery="" />} />
           <Route path="/claims/new" element={<NewClaim />} />
           <Route path="/claims/:id" element={<ClaimDetails />} />
           <Route path="*" element={<NotFound />} />
