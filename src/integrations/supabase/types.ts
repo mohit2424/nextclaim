@@ -15,54 +15,72 @@ export type Database = {
           claim_date: string
           claim_status: Database["public"]["Enums"]["claim_status"]
           created_at: string
+          documents: Json | null
           email: string
           employer_name: string
           first_name: string
           id: string
+          last_day_of_work: string | null
           last_name: string
           middle_name: string | null
           phone: string
           pincode: string
+          reason_for_unemployment: string | null
           separation_reason: Database["public"]["Enums"]["separation_reason"]
+          severance_amount: number | null
+          severance_package: boolean | null
           ssn: string
           state: string
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           age: number
           claim_date: string
           claim_status?: Database["public"]["Enums"]["claim_status"]
           created_at?: string
+          documents?: Json | null
           email: string
           employer_name: string
           first_name: string
           id?: string
+          last_day_of_work?: string | null
           last_name: string
           middle_name?: string | null
           phone: string
           pincode: string
+          reason_for_unemployment?: string | null
           separation_reason: Database["public"]["Enums"]["separation_reason"]
+          severance_amount?: number | null
+          severance_package?: boolean | null
           ssn: string
           state: string
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           age?: number
           claim_date?: string
           claim_status?: Database["public"]["Enums"]["claim_status"]
           created_at?: string
+          documents?: Json | null
           email?: string
           employer_name?: string
           first_name?: string
           id?: string
+          last_day_of_work?: string | null
           last_name?: string
           middle_name?: string | null
           phone?: string
           pincode?: string
+          reason_for_unemployment?: string | null
           separation_reason?: Database["public"]["Enums"]["separation_reason"]
+          severance_amount?: number | null
+          severance_package?: boolean | null
           ssn?: string
           state?: string
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
