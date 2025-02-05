@@ -40,7 +40,6 @@ type Claim = {
   severance_package: boolean | null;
   severance_amount: number | null;
   reason_for_unemployment: string | null;
-  user_id: string | null;
 };
 
 export default function ClaimDetails() {
@@ -60,17 +59,10 @@ export default function ClaimDetails() {
       if (error) throw error;
       
       // Transform the documents field to ensure it's an array of ClaimDocument
-      const transformedData: Claim = {
+      const transformedData = {
         ...data,
-        documents: Array.isArray(data.documents) 
-          ? data.documents.map((doc: any) => ({
-              name: doc.name || '',
-              path: doc.path || '',
-              type: doc.type || '',
-              size: doc.size || 0
-            }))
-          : []
-      };
+        documents: Array.isArray(data.documents) ? data.documents : []
+      } as Claim;
       
       return transformedData;
     },
