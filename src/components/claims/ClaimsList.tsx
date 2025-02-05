@@ -1,4 +1,4 @@
-```typescript
+
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -35,7 +35,12 @@ const fetchClaims = async (searchQuery: string = "", status?: ClaimStatus | "all
     .order('created_at', { ascending: false });
 
   if (searchQuery) {
-    query = query.or(`id.ilike.%${searchQuery}%,first_name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%,ssn.ilike.%${searchQuery}%`);
+    query = query.or([
+      `id.ilike.%${searchQuery}%`,
+      `first_name.ilike.%${searchQuery}%`,
+      `last_name.ilike.%${searchQuery}%`,
+      `ssn.ilike.%${searchQuery}%`
+    ].join(','));
   }
 
   if (status && status !== 'all') {
@@ -67,6 +72,11 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
   const status = statusParam === 'all' ? 'all' : statusParam as ClaimStatus;
   const itemsPerPage = 10;
 
+  const { data: claims = [], isLoading, refetch } = useQuery({
+    queryKey: ['claims', localSearchQuery, status],
+    queryFn: () => fetchClaims(localSearchQuery, status),
+  });
+
   useEffect(() => {
     const channel = supabase
       .channel('schema-db-changes')
@@ -87,11 +97,6 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
       supabase.removeChannel(channel);
     };
   }, [refetch]);
-
-  const { data: claims = [], isLoading, refetch } = useQuery({
-    queryKey: ['claims', localSearchQuery, status],
-    queryFn: () => fetchClaims(localSearchQuery, status),
-  });
 
   const totalPages = Math.ceil(claims.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -206,4 +211,3 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
     </div>
   );
 }
-```
