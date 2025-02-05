@@ -13,6 +13,7 @@ import { PersonalInfoFields } from "@/components/claims/PersonalInfoFields";
 import { ContactInfoFields } from "@/components/claims/ContactInfoFields";
 import { AddressFields } from "@/components/claims/AddressFields";
 import { ClaimDetailsFields } from "@/components/claims/ClaimDetailsFields";
+import { useEffect, useState } from "react";
 
 export const formSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),
@@ -42,6 +43,23 @@ export const formSchema = z.object({
 
 export default function NewClaim() {
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Check authentication on component mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error("Please login to submit claims");
+        navigate("/login");
+        return;
+      }
+      setIsLoading(false);
+    };
+    
+    checkAuth();
+  }, [navigate]);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -52,6 +70,14 @@ export default function NewClaim() {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
+      // Get current session to ensure user is still authenticated
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error("Authentication expired. Please login again");
+        navigate("/login");
+        return;
+      }
+
       const { error } = await supabase.from('claims').insert({
         first_name: values.firstName,
         middle_name: values.middleName,
@@ -68,7 +94,10 @@ export default function NewClaim() {
         separation_reason: values.separationReason,
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error submitting claim:', error);
+        throw error;
+      }
 
       toast.success("Claim submitted successfully");
       navigate("/claims");
@@ -77,6 +106,12 @@ export default function NewClaim() {
       toast.error("Failed to submit claim");
     }
   };
+
+  if (isLoading) {
+    return <div className="flex items-center justify-center min-h-screen">
+      <p>Loading...</p>
+    </div>;
+  }
 
   return (
     <DashboardLayout>
