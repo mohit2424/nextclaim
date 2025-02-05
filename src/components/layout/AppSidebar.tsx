@@ -20,7 +20,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
-import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast";
 
 const menuItems = [
   {
@@ -58,29 +58,20 @@ const menuItems = [
 export function AppSidebar() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { toast } = useToast();
   
   const handleSignOut = async () => {
-    try {
-      // First check if we have a session
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      // If no session, just redirect to login
-      if (!session) {
-        navigate("/login");
-        return;
-      }
-
-      const { error } = await supabase.auth.signOut();
-      if (error && error.message !== "session_not_found") {
-        throw error;
-      }
-
-      toast.success("Signed out successfully");
-      navigate("/login");
-    } catch (error: any) {
-      console.error("Error signing out:", error);
-      toast.error("Failed to sign out");
-      // Still redirect to login page if there's an error
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Error signing out",
+        description: error.message,
+      });
+    } else {
+      toast({
+        title: "Signed out successfully",
+      });
       navigate("/login");
     }
   };

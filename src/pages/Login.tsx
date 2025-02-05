@@ -62,16 +62,16 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="absolute top-8 left-8 right-8 flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-blue-600">NextClaim</h2>
-        <Button variant="outline" size="sm">Contact Us</Button>
-      </div>
-
-      <div className="max-w-md w-full space-y-8">
-        <div className="bg-white rounded-lg shadow-lg px-8 pt-8 pb-6">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="w-full max-w-md">
+        <div className="flex justify-between items-center mb-8 px-4">
+          <h2 className="text-2xl font-bold text-blue-600">NextClaim</h2>
+          <Button variant="outline">Contact Us</Button>
+        </div>
+        
+        <div className="bg-white p-8 rounded-lg shadow-sm">
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-semibold mb-2">
+            <h1 className="text-2xl font-bold mb-2">
               {resetPasswordMode ? "Reset Password" : "Welcome Back"}
             </h1>
             <p className="text-gray-600">
@@ -83,7 +83,7 @@ export default function Login() {
 
           <form onSubmit={resetPasswordMode ? handleResetPassword : handleLogin} className="space-y-6">
             <div className="space-y-2">
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="block text-sm font-medium">
                 Email
               </label>
               <Input
@@ -92,14 +92,13 @@ export default function Login() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
-                className="w-full"
                 required
               />
             </div>
 
             {!resetPasswordMode && (
               <div className="space-y-2">
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="password" className="block text-sm font-medium">
                   Password
                 </label>
                 <div className="relative">
@@ -109,7 +108,6 @@ export default function Login() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter your password"
-                    className="w-full"
                     required
                   />
                   <button
@@ -133,14 +131,14 @@ export default function Login() {
                   <Checkbox id="remember" />
                   <label
                     htmlFor="remember"
-                    className="text-sm font-medium text-gray-700 leading-none"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                   >
                     Remember me
                   </label>
                 </div>
                 <button
                   type="button"
-                  className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                  className="text-sm text-blue-600 hover:underline"
                   onClick={() => setResetPasswordMode(true)}
                 >
                   Forgot password?
