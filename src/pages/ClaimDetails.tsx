@@ -57,7 +57,14 @@ export default function ClaimDetails() {
         .single();
 
       if (error) throw error;
-      return data as Claim;
+      
+      // Transform the documents field to ensure it's an array of ClaimDocument
+      const transformedData = {
+        ...data,
+        documents: Array.isArray(data.documents) ? data.documents : []
+      } as Claim;
+      
+      return transformedData;
     },
   });
 
