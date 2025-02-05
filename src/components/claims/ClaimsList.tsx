@@ -1,3 +1,4 @@
+
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -22,7 +23,6 @@ type Claim = {
   employer_name: string;
   claim_date: string;
   ssn: string;
-  weekly_benefit?: number;
 };
 
 interface ClaimsListProps {
@@ -62,10 +62,6 @@ const getStatusColor = (status: ClaimStatus) => {
     rejected: "bg-red-100 text-red-800",
   };
   return colors[status] || "bg-gray-100 text-gray-800";
-};
-
-const formatCurrency = (amount: number = 0) => {
-  return `$${amount.toFixed(0)}`;
 };
 
 export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps) {
@@ -113,16 +109,24 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
 
   if (isLoading) {
     return (
-      <DashboardLayout>
-        <div className="p-8 text-center">Loading claims...</div>
-      </DashboardLayout>
+      <div className="p-8 text-center">Loading claims...</div>
     );
   }
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-6">
-        <h1 className="text-2xl font-semibold text-blue-600">Claims List</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-semibold text-blue-600">Claims List</h1>
+          <Button 
+            variant="outline" 
+            onClick={() => navigate('/dashboard')}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Dashboard
+          </Button>
+        </div>
         
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div className="relative w-full md:w-[300px]">
@@ -159,7 +163,6 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
               <TableHead className="font-semibold">Date Submitted</TableHead>
               <TableHead className="font-semibold">Last Updated</TableHead>
               <TableHead className="font-semibold">Status</TableHead>
-              <TableHead className="font-semibold">Weekly Benefit</TableHead>
               <TableHead className="font-semibold">Employer</TableHead>
               <TableHead className="font-semibold">Due Date</TableHead>
               <TableHead className="font-semibold w-[100px]">Action</TableHead>
@@ -182,7 +185,6 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
                     ).join(' ')}
                   </Badge>
                 </TableCell>
-                <TableCell>{formatCurrency(claim.weekly_benefit)}</TableCell>
                 <TableCell>{claim.employer_name}</TableCell>
                 <TableCell>{new Date(claim.claim_date).toLocaleDateString()}</TableCell>
                 <TableCell>
@@ -199,10 +201,6 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
             ))}
           </TableBody>
         </Table>
-      </div>
-      
-      <div className="text-center text-sm text-gray-500 mt-8">
-        Powered by Sails Software
       </div>
     </div>
   );

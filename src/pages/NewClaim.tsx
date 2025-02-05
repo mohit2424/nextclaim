@@ -78,7 +78,7 @@ export default function NewClaim() {
 
       const { error } = await supabase
         .from('claims')
-        .insert([{
+        .insert({
           first_name: values.firstName,
           middle_name: values.middleName,
           last_name: values.lastName,
@@ -96,7 +96,7 @@ export default function NewClaim() {
           user_id: session.user.id,
           documents: [],
           severance_package: false
-        }]);
+        });
 
       if (error) {
         console.error('Error submitting claim:', error);
@@ -114,7 +114,17 @@ export default function NewClaim() {
   return (
     <DashboardLayout>
       <div className="container mx-auto py-6">
-        <h1 className="text-2xl font-bold mb-6">New Unemployment Claim</h1>
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold">New Unemployment Claim</h1>
+          <Button 
+            variant="outline" 
+            onClick={() => navigate('/dashboard')}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Dashboard
+          </Button>
+        </div>
         
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
