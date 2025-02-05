@@ -1,5 +1,4 @@
 
-import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -14,13 +13,6 @@ import { PersonalInfoFields } from "@/components/claims/PersonalInfoFields";
 import { ContactInfoFields } from "@/components/claims/ContactInfoFields";
 import { AddressFields } from "@/components/claims/AddressFields";
 import { ClaimDetailsFields } from "@/components/claims/ClaimDetailsFields";
-
-export type ClaimDocument = {
-  name: string;
-  path: string;
-  type: string;
-  size: number;
-};
 
 export const formSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),
@@ -50,19 +42,6 @@ export const formSchema = z.object({
 
 export default function NewClaim() {
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        toast.error("Please login to submit a claim");
-        navigate("/login");
-      }
-    };
-    
-    checkAuth();
-  }, [navigate]);
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -73,13 +52,6 @@ export default function NewClaim() {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        toast.error("Please login to submit a claim");
-        navigate("/login");
-        return;
-      }
-
       const { error } = await supabase.from('claims').insert({
         first_name: values.firstName,
         middle_name: values.middleName,
@@ -94,7 +66,6 @@ export default function NewClaim() {
         claim_date: format(values.claimDate, 'yyyy-MM-dd'),
         claim_status: values.claimStatus,
         separation_reason: values.separationReason,
-        documents: []
       });
 
       if (error) throw error;
