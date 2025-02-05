@@ -62,52 +62,44 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F5F7FF] font-inter">
-      <div className="w-full max-w-7xl mx-auto px-4 py-6">
-        <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold text-[#1E1E1E]">NextClaim</h2>
-          <Button 
-            variant="outline" 
-            size="sm"
-            className="bg-[#1E1E1E] text-white hover:bg-[#333] border-0"
-          >
-            Contact Us
-          </Button>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 font-inter py-8">
+      <div className="w-full max-w-md mx-auto px-4">
+        <div className="flex justify-between items-center mb-8">
+          <h2 className="text-2xl font-bold text-blue-600">NextClaim</h2>
+          <Button variant="outline" size="sm">Contact Us</Button>
         </div>
-      </div>
-
-      <div className="flex-1 flex items-center justify-center px-4">
-        <div className="w-full max-w-[480px] bg-white rounded-2xl shadow-lg p-8">
+        
+        <div className="bg-white p-8 rounded-lg shadow-md w-full">
           <div className="text-center mb-8">
-            <h1 className="text-[28px] font-semibold text-[#1E1E1E] mb-3">
+            <h1 className="text-2xl font-semibold mb-2">
               {resetPasswordMode ? "Reset Password" : "Welcome Back"}
             </h1>
-            <p className="text-[#666] text-base">
+            <p className="text-gray-600">
               {resetPasswordMode 
                 ? "Enter your email to receive reset instructions"
-                : "Effortlessly manage your unemployment claims through our secure platform"}
+                : "Sign in to manage your unemployment claims"}
             </p>
           </div>
 
           <form onSubmit={resetPasswordMode ? handleResetPassword : handleLogin} className="space-y-6">
             <div className="space-y-2">
-              <label htmlFor="email" className="block text-sm font-medium text-[#1E1E1E]">
-                User Code
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                Email
               </label>
               <Input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your user code"
-                className="w-full border-gray-200 focus:border-blue-500"
+                placeholder="Enter your email"
+                className="w-full"
                 required
               />
             </div>
 
             {!resetPasswordMode && (
               <div className="space-y-2">
-                <label htmlFor="password" className="block text-sm font-medium text-[#1E1E1E]">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                   Password
                 </label>
                 <div className="relative">
@@ -117,7 +109,7 @@ export default function Login() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter your password"
-                    className="w-full border-gray-200 focus:border-blue-500"
+                    className="w-full"
                     required
                   />
                   <button
@@ -141,14 +133,14 @@ export default function Login() {
                   <Checkbox id="remember" />
                   <label
                     htmlFor="remember"
-                    className="text-sm text-[#1E1E1E] leading-none"
+                    className="text-sm font-medium text-gray-700 leading-none"
                   >
                     Remember me
                   </label>
                 </div>
                 <button
                   type="button"
-                  className="text-sm text-blue-600 hover:text-blue-700"
+                  className="text-sm text-blue-600 hover:text-blue-700 font-medium"
                   onClick={() => setResetPasswordMode(true)}
                 >
                   Forgot password?
@@ -158,7 +150,7 @@ export default function Login() {
 
             <Button 
               type="submit" 
-              className="w-full bg-[#1E1E1E] hover:bg-[#333] text-white"
+              className="w-full bg-blue-600 hover:bg-blue-700"
               disabled={isLoading}
             >
               {isLoading 
@@ -181,11 +173,11 @@ export default function Login() {
             )}
           </form>
 
-          <div className="mt-8 text-center space-y-2">
-            <p className="text-sm text-gray-600">
-              Your account activity is monitored for security purposes. Ensure your information is up to date for seamless processing of claims.
+          <div className="mt-6 text-center space-y-2">
+            <p className="text-sm text-gray-500">
+              Your account activity is monitored for security purposes
             </p>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-400">
               Powered by Sails Software
             </p>
           </div>
