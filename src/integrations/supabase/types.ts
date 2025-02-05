@@ -32,7 +32,6 @@ export type Database = {
           ssn: string
           state: string
           updated_at: string
-          user_id: string | null
         }
         Insert: {
           age: number
@@ -56,7 +55,6 @@ export type Database = {
           ssn: string
           state: string
           updated_at?: string
-          user_id?: string | null
         }
         Update: {
           age?: number
@@ -80,7 +78,6 @@ export type Database = {
           ssn?: string
           state?: string
           updated_at?: string
-          user_id?: string | null
         }
         Relationships: []
       }

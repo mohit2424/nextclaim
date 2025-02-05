@@ -1,63 +1,23 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
+  const [userCode, setUserCode] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) {
-        throw error;
-      }
-
+    // Check for the specified credentials
+    if (userCode === "12345" && password === "nextclaim") {
       toast.success("Login successful");
       navigate("/dashboard");
-    } catch (error: any) {
-      toast.error(error.message || "Failed to login");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSignUp = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: window.location.origin,
-        },
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      toast.success("Please check your email to confirm your registration");
-    } catch (error: any) {
-      toast.error(error.message || "Failed to sign up");
-    } finally {
-      setIsLoading(false);
+    } else {
+      toast.error("Invalid credentials");
     }
   };
 
@@ -79,15 +39,15 @@ export default function Login() {
 
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-2">
-              <label htmlFor="email" className="block text-sm font-medium">
-                Email
+              <label htmlFor="userCode" className="block text-sm font-medium">
+                User Code
               </label>
               <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
+                id="userCode"
+                type="text"
+                value={userCode}
+                onChange={(e) => setUserCode(e.target.value)}
+                placeholder="Enter your user code"
                 required
               />
             </div>
@@ -121,26 +81,9 @@ export default function Login() {
               </button>
             </div>
 
-            <Button 
-              type="submit" 
-              className="w-full bg-black hover:bg-black/90"
-              disabled={isLoading}
-            >
-              {isLoading ? "Signing in..." : "Sign in"}
+            <Button type="submit" className="w-full bg-black hover:bg-black/90">
+              Sign in
             </Button>
-
-            <div className="text-center">
-              <span className="text-sm text-gray-600">Don't have an account? </span>
-              <Button
-                type="button"
-                variant="link"
-                className="text-blue-600"
-                onClick={handleSignUp}
-                disabled={isLoading}
-              >
-                Sign up
-              </Button>
-            </div>
           </form>
 
           <div className="mt-6 text-center space-y-2">
