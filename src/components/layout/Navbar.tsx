@@ -1,7 +1,6 @@
 
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { ArrowLeft, Bell, Menu, Settings, User } from "lucide-react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { Bell, Menu, Settings, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -12,36 +11,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export function Navbar() {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const showBackButton = location.pathname !== "/" && location.pathname !== "/dashboard";
-
   return (
-    <header className="border-b bg-white">
-      <div className="flex h-16 items-center px-4 gap-4">
+    <header className="sticky top-0 z-50 border-b bg-white">
+      <div className="flex h-16 items-center gap-4 px-4">
         <SidebarTrigger>
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" className="shrink-0">
             <Menu className="h-5 w-5" />
           </Button>
         </SidebarTrigger>
-        
-        {showBackButton && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate(-1)}
-            className="mr-2"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-        )}
-
-        <div 
-          className="text-xl font-bold text-primary cursor-pointer"
-          onClick={() => navigate("/")}
-        >
-          NEXTCLAIM
-        </div>
 
         <div className="flex-1" />
 
