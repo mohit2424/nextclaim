@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
@@ -14,6 +13,7 @@ import { PersonalInfoFields } from "@/components/claims/PersonalInfoFields";
 import { ContactInfoFields } from "@/components/claims/ContactInfoFields";
 import { AddressFields } from "@/components/claims/AddressFields";
 import { ClaimDetailsFields } from "@/components/claims/ClaimDetailsFields";
+import { ArrowLeft } from "lucide-react";
 
 export const formSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),
@@ -76,27 +76,29 @@ export default function NewClaim() {
         return;
       }
 
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('claims')
-        .insert({
-          first_name: values.firstName,
-          middle_name: values.middleName,
-          last_name: values.lastName,
+        .insert([{
           age: values.age,
-          state: values.state,
-          pincode: values.pincode,
-          ssn: values.ssn,
-          email: values.email,
-          phone: values.phone,
-          employer_name: values.employerName,
           claim_date: format(values.claimDate, 'yyyy-MM-dd'),
-          last_day_of_work: format(values.lastDayOfWork, 'yyyy-MM-dd'),
           claim_status: values.claimStatus,
-          separation_reason: values.separationReason,
-          user_id: session.user.id,
           documents: [],
-          severance_package: false
-        });
+          email: values.email,
+          employer_name: values.employerName,
+          first_name: values.firstName,
+          last_day_of_work: format(values.lastDayOfWork, 'yyyy-MM-dd'),
+          last_name: values.lastName,
+          middle_name: values.middleName,
+          phone: values.phone,
+          pincode: values.pincode,
+          separation_reason: values.separationReason,
+          severance_package: false,
+          ssn: values.ssn,
+          state: values.state,
+          user_id: session.user.id
+        }])
+        .select()
+        .single();
 
       if (error) {
         console.error('Error submitting claim:', error);
