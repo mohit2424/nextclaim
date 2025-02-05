@@ -20,6 +20,28 @@ type ClaimDocument = {
   size: number;
 };
 
+type Claim = {
+  id: string;
+  first_name: string;
+  middle_name: string | null;
+  last_name: string;
+  age: number;
+  state: string;
+  pincode: string;
+  ssn: string;
+  email: string;
+  phone: string;
+  employer_name: string;
+  claim_date: string;
+  claim_status: string;
+  separation_reason: string;
+  documents: ClaimDocument[];
+  last_day_of_work: string | null;
+  severance_package: boolean | null;
+  severance_amount: number | null;
+  reason_for_unemployment: string | null;
+};
+
 export default function ClaimDetails() {
   const { id } = useParams();
   const { toast } = useToast();
@@ -35,7 +57,7 @@ export default function ClaimDetails() {
         .single();
 
       if (error) throw error;
-      return data;
+      return data as Claim;
     },
   });
 
@@ -51,16 +73,18 @@ export default function ClaimDetails() {
 
       if (uploadError) throw uploadError;
 
+      const newDocument: ClaimDocument = {
+        name: selectedFile.name,
+        path: filePath,
+        type: selectedFile.type,
+        size: selectedFile.size
+      };
+
       // Update the claim's documents array
       const { error: updateError } = await supabase
         .from('claims')
         .update({
-          documents: [...(claim?.documents || []), {
-            name: selectedFile.name,
-            path: filePath,
-            type: selectedFile.type,
-            size: selectedFile.size
-          }]
+          documents: [...(claim?.documents || []), newDocument]
         })
         .eq('id', id);
 
@@ -235,7 +259,7 @@ export default function ClaimDetails() {
                 </div>
                 {claim.documents && claim.documents.length > 0 ? (
                   <div className="space-y-2">
-                    {(claim.documents as ClaimDocument[]).map((doc, index) => (
+                    {claim.documents.map((doc, index) => (
                       <div key={index} className="flex items-center justify-between p-2 border rounded">
                         <span className="text-sm">{doc.name}</span>
                         <Button
