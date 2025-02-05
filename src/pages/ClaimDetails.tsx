@@ -42,6 +42,13 @@ type Claim = {
   reason_for_unemployment: string | null;
 };
 
+type DatabaseDocument = {
+  name: string;
+  path: string;
+  type: string;
+  size: number;
+};
+
 export default function ClaimDetails() {
   const { id } = useParams();
   const { toast } = useToast();
@@ -58,11 +65,21 @@ export default function ClaimDetails() {
 
       if (error) throw error;
       
-      // Transform the documents field to ensure it's an array of ClaimDocument
-      const transformedData = {
+      // Transform the documents field to ensure it's properly typed
+      const transformedDocuments = Array.isArray(data.documents) 
+        ? data.documents.map((doc: any) => ({
+            name: doc.name || '',
+            path: doc.path || '',
+            type: doc.type || '',
+            size: doc.size || 0
+          }))
+        : [];
+      
+      // Create a properly typed Claim object
+      const transformedData: Claim = {
         ...data,
-        documents: Array.isArray(data.documents) ? data.documents : []
-      } as Claim;
+        documents: transformedDocuments
+      };
       
       return transformedData;
     },
