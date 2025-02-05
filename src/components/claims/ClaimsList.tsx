@@ -122,10 +122,7 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-6">
-        <div className="flex items-center gap-4">
-          <ArrowLeft className="h-6 w-6 text-gray-500 cursor-pointer" onClick={() => navigate(-1)} />
-          <h1 className="text-2xl font-semibold text-blue-600">Claims List</h1>
-        </div>
+        <h1 className="text-2xl font-semibold text-blue-600">Claims List</h1>
         
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div className="relative w-full md:w-[300px]">
@@ -202,6 +199,10 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
             ))}
           </TableBody>
         </Table>
+      </div>
+      
+      <div className="text-center text-sm text-gray-500 mt-8">
+        Powered by Sails Software
       </div>
     </div>
   );

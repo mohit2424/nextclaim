@@ -11,6 +11,8 @@ import ClaimDetails from "./pages/ClaimDetails";
 import NotFound from "./pages/NotFound";
 import { ClaimsList } from "./components/claims/ClaimsList";
 import NewClaim from "./pages/NewClaim";
+import Messages from "./pages/Messages";
+import Deadlines from "./pages/Deadlines";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +29,8 @@ const App = () => (
           <Route path="/claims" element={<ClaimsList searchQuery="" />} />
           <Route path="/claims/new" element={<NewClaim />} />
           <Route path="/claims/:id" element={<ClaimDetails />} />
+          <Route path="/messages" element={<Messages />} />
+          <Route path="/deadlines" element={<Deadlines />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

@@ -1,12 +1,15 @@
 
 import {
   LayoutDashboard,
-  FilePlus,
   FileText,
+  FilePlus,
   Settings,
-  Gavel,
+  MessageCircle,
+  Calendar,
+  LogOut,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Sidebar,
   SidebarContent,
@@ -17,6 +20,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
 const menuItems = [
   {
@@ -35,9 +39,14 @@ const menuItems = [
     url: "/claims/new",
   },
   {
-    title: "Appellate Information",
-    icon: Gavel,
-    url: "/appellate",
+    title: "Messages",
+    icon: MessageCircle,
+    url: "/messages",
+  },
+  {
+    title: "Deadlines",
+    icon: Calendar,
+    url: "/deadlines",
   },
   {
     title: "Settings",
@@ -49,6 +58,23 @@ const menuItems = [
 export function AppSidebar() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { toast } = useToast();
+  
+  const handleSignOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Error signing out",
+        description: error.message,
+      });
+    } else {
+      toast({
+        title: "Signed out successfully",
+      });
+      navigate("/login");
+    }
+  };
   
   return (
     <Sidebar className="border-r bg-white">
@@ -75,10 +101,24 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+              
+              {/* Sign Out Button */}
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  onClick={handleSignOut}
+                  className="flex items-center gap-3 w-full px-4 py-2 rounded-md transition-colors text-red-600 hover:bg-red-50"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span>Sign Out</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <div className="absolute bottom-4 left-0 right-0 text-center text-sm text-gray-500">
+        Powered by Sails Software
+      </div>
     </Sidebar>
   );
 }

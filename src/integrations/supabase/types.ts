@@ -84,6 +84,97 @@ export type Database = {
         }
         Relationships: []
       }
+      deadlines: {
+        Row: {
+          assigned_to: string
+          claim_id: string | null
+          claimant_name: string
+          created_at: string
+          description: string
+          due_date: string
+          employer_name: string
+          id: string
+          priority: string
+          status: string
+          type: string
+        }
+        Insert: {
+          assigned_to: string
+          claim_id?: string | null
+          claimant_name: string
+          created_at?: string
+          description: string
+          due_date: string
+          employer_name: string
+          id?: string
+          priority: string
+          status?: string
+          type: string
+        }
+        Update: {
+          assigned_to?: string
+          claim_id?: string | null
+          claimant_name?: string
+          created_at?: string
+          description?: string
+          due_date?: string
+          employer_name?: string
+          id?: string
+          priority?: string
+          status?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deadlines_claim_id_fkey"
+            columns: ["claim_id"]
+            isOneToOne: false
+            referencedRelation: "claims"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          claim_id: string | null
+          created_at: string
+          id: string
+          message_text: string
+          recipient_email: string
+          sender_email: string
+          sender_name: string
+          sender_role: string
+        }
+        Insert: {
+          claim_id?: string | null
+          created_at?: string
+          id?: string
+          message_text: string
+          recipient_email: string
+          sender_email: string
+          sender_name: string
+          sender_role: string
+        }
+        Update: {
+          claim_id?: string | null
+          created_at?: string
+          id?: string
+          message_text?: string
+          recipient_email?: string
+          sender_email?: string
+          sender_name?: string
+          sender_role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_claim_id_fkey"
+            columns: ["claim_id"]
+            isOneToOne: false
+            referencedRelation: "claims"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
