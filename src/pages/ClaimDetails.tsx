@@ -12,6 +12,7 @@ import { Building2, User, Upload, FileText, BriefcaseIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Database } from "@/integrations/supabase/types";
 
 type ClaimDocument = {
   name: string;
@@ -33,7 +34,7 @@ type Claim = {
   phone: string;
   employer_name: string;
   claim_date: string;
-  claim_status: string;
+  claim_status: Database["public"]["Enums"]["claim_status"];
   separation_reason: string;
   documents: ClaimDocument[];
   last_day_of_work: string | null;
@@ -58,10 +59,17 @@ export default function ClaimDetails() {
 
       if (error) throw error;
       
-      // Transform the documents field to ensure it's an array of ClaimDocument
-      const transformedData = {
+      // Transform the documents field to ensure it's a valid ClaimDocument array
+      const transformedData: Claim = {
         ...data,
-        documents: Array.isArray(data.documents) ? data.documents : []
+        documents: Array.isArray(data.documents) 
+          ? data.documents.map((doc: any) => ({
+              name: doc.name || '',
+              path: doc.path || '',
+              type: doc.type || '',
+              size: doc.size || 0
+            }))
+          : []
       } as Claim;
       
       return transformedData;
