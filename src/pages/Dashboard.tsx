@@ -2,11 +2,13 @@
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ClaimsStats } from "@/components/claims/ClaimsStats";
 import { Plus, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ClaimsList } from "@/components/claims/ClaimsList";
 import { useState } from "react";
+import { ClaimsOverviewChart } from "@/components/dashboard/ClaimsOverviewChart";
+import { ClaimsDistributionChart } from "@/components/dashboard/ClaimsDistributionChart";
+import { ClaimsStats } from "@/components/claims/ClaimsStats";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -28,7 +30,7 @@ export default function Dashboard() {
             <div className="relative w-full md:w-[300px]">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
               <Input
-                placeholder="Search by ID, Name, or SSN..."
+                placeholder="Search claims..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -42,6 +44,11 @@ export default function Dashboard() {
         </div>
 
         <ClaimsStats />
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <ClaimsOverviewChart />
+          <ClaimsDistributionChart />
+        </div>
 
         <div className="bg-white rounded-lg border shadow-sm">
           <div className="border-b p-4">
