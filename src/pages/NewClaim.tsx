@@ -1,5 +1,4 @@
 
-import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -51,30 +50,9 @@ export default function NewClaim() {
     },
   });
 
-  useEffect(() => {
-    checkUser();
-  }, []);
-
-  const checkUser = async () => {
-    const { data: { session }, error } = await supabase.auth.getSession();
-    if (error || !session) {
-      toast.error("Please login to submit a claim");
-      navigate("/login");
-    }
-  };
-
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      
-      if (sessionError || !session) {
-        toast.error("Please login to submit a claim");
-        navigate("/login");
-        return;
-      }
-
       const { error } = await supabase.from('claims').insert({
-        user_id: session.user.id,
         first_name: values.firstName,
         middle_name: values.middleName,
         last_name: values.lastName,
