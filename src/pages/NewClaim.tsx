@@ -89,7 +89,9 @@ export default function NewClaim() {
           claim_date: format(values.claimDate, 'yyyy-MM-dd'),
           claim_status: values.claimStatus,
           separation_reason: values.separationReason,
-          user_id: session.user.id
+          user_id: session.user.id,
+          documents: [],
+          severance_package: false
         }]);
 
       if (error) {

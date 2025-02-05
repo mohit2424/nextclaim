@@ -1,4 +1,4 @@
-
+```typescript
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -63,17 +63,9 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
   const [searchParams, setSearchParams] = useSearchParams();
   const [currentPage, setCurrentPage] = useState(1);
   const [localSearchQuery, setLocalSearchQuery] = useState(initialSearchQuery);
-  const status = searchParams.get('status') || 'all';
+  const statusParam = searchParams.get('status') || 'all';
+  const status = statusParam === 'all' ? 'all' : statusParam as ClaimStatus;
   const itemsPerPage = 10;
-
-  const { data: claims = [], isLoading, refetch } = useQuery({
-    queryKey: ['claims', localSearchQuery, status],
-    queryFn: () => fetchClaims(localSearchQuery, status),
-  });
-
-  const totalPages = Math.ceil(claims.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedClaims = claims.slice(startIndex, startIndex + itemsPerPage);
 
   useEffect(() => {
     const channel = supabase
@@ -95,6 +87,15 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
       supabase.removeChannel(channel);
     };
   }, [refetch]);
+
+  const { data: claims = [], isLoading, refetch } = useQuery({
+    queryKey: ['claims', localSearchQuery, status],
+    queryFn: () => fetchClaims(localSearchQuery, status),
+  });
+
+  const totalPages = Math.ceil(claims.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedClaims = claims.slice(startIndex, startIndex + itemsPerPage);
 
   const handleStatusChange = (newStatus: string) => {
     setSearchParams({ status: newStatus });
@@ -205,3 +206,4 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
     </div>
   );
 }
+```
