@@ -1,4 +1,4 @@
-
+```typescript
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -35,7 +35,7 @@ const fetchClaims = async (searchQuery: string = "", status?: ClaimStatus | "all
     .order('created_at', { ascending: false });
 
   if (searchQuery) {
-    query = query.or('id.ilike.%' + searchQuery + '%,first_name.ilike.%' + searchQuery + '%,last_name.ilike.%' + searchQuery + '%,ssn.ilike.%' + searchQuery + '%');
+    query = query.or(`id.ilike.%${searchQuery}%,first_name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%,ssn.ilike.%${searchQuery}%`);
   }
 
   if (status && status !== 'all') {
@@ -206,3 +206,4 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
     </div>
   );
 }
+```
