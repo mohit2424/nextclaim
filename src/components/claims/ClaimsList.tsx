@@ -1,4 +1,3 @@
-
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -121,91 +120,89 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
   }
 
   return (
-    <DashboardLayout>
-      <div className="space-y-6">
-        <div className="flex flex-col gap-6">
-          <div className="flex items-center gap-4">
-            <ArrowLeft className="h-6 w-6 text-gray-500" onClick={() => navigate(-1)} />
-            <h1 className="text-2xl font-semibold text-blue-600">Claims List</h1>
-          </div>
-          
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div className="relative w-full md:w-[300px]">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
-              <Input
-                placeholder="Search claims..."
-                value={localSearchQuery}
-                onChange={(e) => setLocalSearchQuery(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            <Select value={status} onValueChange={handleStatusChange}>
-              <SelectTrigger className="w-[200px]">
-                <SelectValue placeholder="All Claims" />
-                <ChevronDown className="h-4 w-4 opacity-50" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Claims</SelectItem>
-                <SelectItem value="initial_review">Initial Review</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="approved">Approved</SelectItem>
-                <SelectItem value="rejected">Rejected</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+    <div className="space-y-6">
+      <div className="flex flex-col gap-6">
+        <div className="flex items-center gap-4">
+          <ArrowLeft className="h-6 w-6 text-gray-500 cursor-pointer" onClick={() => navigate(-1)} />
+          <h1 className="text-2xl font-semibold text-blue-600">Claims List</h1>
         </div>
-
-        <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-gray-50 hover:bg-gray-50">
-                <TableHead className="font-semibold">Claim ID</TableHead>
-                <TableHead className="font-semibold">Claimant Name</TableHead>
-                <TableHead className="font-semibold">Date Submitted</TableHead>
-                <TableHead className="font-semibold">Last Updated</TableHead>
-                <TableHead className="font-semibold">Status</TableHead>
-                <TableHead className="font-semibold">Weekly Benefit</TableHead>
-                <TableHead className="font-semibold">Employer</TableHead>
-                <TableHead className="font-semibold">Due Date</TableHead>
-                <TableHead className="font-semibold w-[100px]">Action</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {paginatedClaims.map((claim) => (
-                <TableRow key={claim.id} className="hover:bg-gray-50">
-                  <TableCell className="font-medium">{claim.id}</TableCell>
-                  <TableCell>{`${claim.first_name} ${claim.last_name}`}</TableCell>
-                  <TableCell>{new Date(claim.created_at).toLocaleDateString()}</TableCell>
-                  <TableCell>{new Date(claim.updated_at).toLocaleDateString()}</TableCell>
-                  <TableCell>
-                    <Badge 
-                      className={`${getStatusColor(claim.claim_status)}`}
-                      variant="secondary"
-                    >
-                      {claim.claim_status.split('_').map(word => 
-                        word.charAt(0).toUpperCase() + word.slice(1)
-                      ).join(' ')}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{formatCurrency(claim.weekly_benefit)}</TableCell>
-                  <TableCell>{claim.employer_name}</TableCell>
-                  <TableCell>{new Date(claim.claim_date).toLocaleDateString()}</TableCell>
-                  <TableCell>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => navigate(`/claims/${claim.id}`)}
-                      className="w-full"
-                    >
-                      View Details
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+        
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="relative w-full md:w-[300px]">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+            <Input
+              placeholder="Search claims..."
+              value={localSearchQuery}
+              onChange={(e) => setLocalSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          <Select value={status} onValueChange={handleStatusChange}>
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="All Claims" />
+              <ChevronDown className="h-4 w-4 opacity-50" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Claims</SelectItem>
+              <SelectItem value="initial_review">Initial Review</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="approved">Approved</SelectItem>
+              <SelectItem value="rejected">Rejected</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
-    </DashboardLayout>
+
+      <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-gray-50 hover:bg-gray-50">
+              <TableHead className="font-semibold">Claim ID</TableHead>
+              <TableHead className="font-semibold">Claimant Name</TableHead>
+              <TableHead className="font-semibold">Date Submitted</TableHead>
+              <TableHead className="font-semibold">Last Updated</TableHead>
+              <TableHead className="font-semibold">Status</TableHead>
+              <TableHead className="font-semibold">Weekly Benefit</TableHead>
+              <TableHead className="font-semibold">Employer</TableHead>
+              <TableHead className="font-semibold">Due Date</TableHead>
+              <TableHead className="font-semibold w-[100px]">Action</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {paginatedClaims.map((claim) => (
+              <TableRow key={claim.id} className="hover:bg-gray-50">
+                <TableCell className="font-medium">{claim.id}</TableCell>
+                <TableCell>{`${claim.first_name} ${claim.last_name}`}</TableCell>
+                <TableCell>{new Date(claim.created_at).toLocaleDateString()}</TableCell>
+                <TableCell>{new Date(claim.updated_at).toLocaleDateString()}</TableCell>
+                <TableCell>
+                  <Badge 
+                    className={`${getStatusColor(claim.claim_status)}`}
+                    variant="secondary"
+                  >
+                    {claim.claim_status.split('_').map(word => 
+                      word.charAt(0).toUpperCase() + word.slice(1)
+                    ).join(' ')}
+                  </Badge>
+                </TableCell>
+                <TableCell>{formatCurrency(claim.weekly_benefit)}</TableCell>
+                <TableCell>{claim.employer_name}</TableCell>
+                <TableCell>{new Date(claim.claim_date).toLocaleDateString()}</TableCell>
+                <TableCell>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigate(`/claims/${claim.id}`)}
+                    className="w-full"
+                  >
+                    View Details
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
   );
 }
