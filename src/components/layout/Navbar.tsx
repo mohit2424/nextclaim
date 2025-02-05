@@ -43,17 +43,7 @@ export function Navbar() {
           NEXTCLAIM
         </div>
 
-        <div className="flex-1">
-          <form className="hidden sm:block">
-            <div className="relative">
-              <input
-                type="search"
-                placeholder="Search claims..."
-                className="w-full bg-gray-50 pl-4 pr-4 py-2 text-sm rounded-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-              />
-            </div>
-          </form>
-        </div>
+        <div className="flex-1" />
 
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" className="relative">
