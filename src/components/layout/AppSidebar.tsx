@@ -6,7 +6,7 @@ import {
   Settings,
   BarChart3,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   Sidebar,
   SidebarContent,
@@ -16,6 +16,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils";
 
 const menuItems = [
   {
@@ -47,9 +48,10 @@ const menuItems = [
 
 export function AppSidebar() {
   const navigate = useNavigate();
+  const location = useLocation();
   
   return (
-    <Sidebar>
+    <Sidebar className="border-r bg-white">
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
@@ -58,7 +60,10 @@ export function AppSidebar() {
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     onClick={() => navigate(item.url)}
-                    className="flex items-center gap-3"
+                    className={cn(
+                      "flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 transition-colors",
+                      location.pathname === item.url && "bg-primary/10 text-primary"
+                    )}
                   >
                     <item.icon className="h-4 w-4" />
                     <span>{item.title}</span>
