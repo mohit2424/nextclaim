@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
@@ -76,7 +77,7 @@ export default function NewClaim() {
         return;
       }
 
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('claims')
         .insert({
           age: values.age,
@@ -97,8 +98,7 @@ export default function NewClaim() {
           state: values.state,
           user_id: session.user.id
         })
-        .select()
-        .single();
+        .select();
 
       if (error) {
         console.error('Error submitting claim:', error);
