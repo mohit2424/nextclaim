@@ -1,3 +1,4 @@
+
 import {
   LayoutDashboard,
   FileText,
@@ -20,6 +21,39 @@ import {
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+
+const menuItems = [
+  {
+    title: "Dashboard",
+    icon: LayoutDashboard,
+    url: "/dashboard",
+  },
+  {
+    title: "Claims",
+    icon: FileText,
+    url: "/claims",
+  },
+  {
+    title: "New Claim",
+    icon: FilePlus,
+    url: "/claims/new",
+  },
+  {
+    title: "Messages",
+    icon: MessageCircle,
+    url: "/messages",
+  },
+  {
+    title: "Deadlines",
+    icon: Calendar,
+    url: "/deadlines",
+  },
+  {
+    title: "Settings",
+    icon: Settings,
+    url: "/settings",
+  },
+];
 
 export function AppSidebar() {
   const navigate = useNavigate();
