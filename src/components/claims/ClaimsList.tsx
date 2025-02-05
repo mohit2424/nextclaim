@@ -1,66 +1,37 @@
+
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
-const claims = [
-  {
-    id: "CLM001",
-    claimantName: "John Doe",
-    dateSubmitted: "2024-03-15",
-    lastUpdated: "2024-03-16",
-    status: "pending",
-    weeklyBenefit: 450,
-    employer: "Tech Corp Inc",
-    dueDate: "2024-03-30",
-  },
-  {
-    id: "CLM002",
-    claimantName: "Jane Smith",
-    dateSubmitted: "2024-03-10",
-    lastUpdated: "2024-03-14",
-    status: "in-progress",
-    weeklyBenefit: 500,
-    employer: "Marketing Solutions LLC",
-    dueDate: "2024-03-25",
-  },
-  {
-    id: "CLM003",
-    claimantName: "Alice Johnson",
-    dateSubmitted: "2024-03-12",
-    lastUpdated: "2024-03-15",
-    status: "approved",
-    weeklyBenefit: 600,
-    employer: "Finance Group",
-    dueDate: "2024-03-28",
-  },
-  {
-    id: "CLM004",
-    claimantName: "Bob Brown",
-    dateSubmitted: "2024-03-11",
-    lastUpdated: "2024-03-13",
-    status: "rejected",
-    weeklyBenefit: 400,
-    employer: "Retail Co",
-    dueDate: "2024-03-20",
-  },
-  {
-    id: "CLM005",
-    claimantName: "Charlie Davis",
-    dateSubmitted: "2024-03-09",
-    lastUpdated: "2024-03-10",
-    status: "pending",
-    weeklyBenefit: 450,
-    employer: "Construction LLC",
-    dueDate: "2024-03-29",
-  },
-];
+type Claim = {
+  id: string;
+  first_name: string;
+  last_name: string;
+  created_at: string;
+  updated_at: string;
+  claim_status: string;
+  employer_name: string;
+  claim_date: string;
+};
+
+const fetchClaims = async () => {
+  const { data, error } = await supabase
+    .from('claims')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return data;
+};
 
 const getStatusColor = (status: string) => {
   const colors = {
-    pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
-    "in-progress": "bg-blue-100 text-blue-800 border-blue-200",
+    initial_review: "bg-yellow-100 text-yellow-800 border-yellow-200",
+    pending: "bg-blue-100 text-blue-800 border-blue-200",
     approved: "bg-green-100 text-green-800 border-green-200",
     rejected: "bg-red-100 text-red-800 border-red-200",
   };
@@ -69,7 +40,49 @@ const getStatusColor = (status: string) => {
 
 export function ClaimsList() {
   const navigate = useNavigate();
-  const [filteredClaims] = useState(claims);
+  const [claims, setClaims] = useState<Claim[]>([]);
+
+  const { data: initialClaims, isLoading } = useQuery({
+    queryKey: ['claims'],
+    queryFn: fetchClaims,
+  });
+
+  useEffect(() => {
+    if (initialClaims) {
+      setClaims(initialClaims);
+    }
+  }, [initialClaims]);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel('schema-db-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'claims'
+        },
+        (payload) => {
+          console.log('Real-time update received:', payload);
+          // Fetch the latest data when changes occur
+          fetchClaims().then(newClaims => {
+            if (newClaims) {
+              setClaims(newClaims);
+            }
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  if (isLoading) {
+    return <div className="p-4 text-center">Loading claims...</div>;
+  }
 
   return (
     <div className="overflow-auto">
@@ -81,30 +94,30 @@ export function ClaimsList() {
             <TableHead className="font-semibold">Date Submitted</TableHead>
             <TableHead className="font-semibold">Last Updated</TableHead>
             <TableHead className="font-semibold">Status</TableHead>
-            <TableHead className="font-semibold">Weekly Benefit</TableHead>
             <TableHead className="font-semibold">Employer</TableHead>
             <TableHead className="font-semibold">Due Date</TableHead>
             <TableHead className="font-semibold text-right">Action</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {filteredClaims.map((claim) => (
+          {claims.map((claim) => (
             <TableRow key={claim.id} className="hover:bg-gray-50">
-              <TableCell className="font-medium">{claim.id}</TableCell>
-              <TableCell>{claim.claimantName}</TableCell>
-              <TableCell>{claim.dateSubmitted}</TableCell>
-              <TableCell>{claim.lastUpdated}</TableCell>
+              <TableCell className="font-medium">{claim.id.slice(0, 8)}</TableCell>
+              <TableCell>{`${claim.first_name} ${claim.last_name}`}</TableCell>
+              <TableCell>{new Date(claim.created_at).toLocaleDateString()}</TableCell>
+              <TableCell>{new Date(claim.updated_at).toLocaleDateString()}</TableCell>
               <TableCell>
                 <Badge 
-                  className={`${getStatusColor(claim.status)} border`}
+                  className={`${getStatusColor(claim.claim_status)} border`}
                   variant="secondary"
                 >
-                  {claim.status.charAt(0).toUpperCase() + claim.status.slice(1)}
+                  {claim.claim_status.split('_').map(word => 
+                    word.charAt(0).toUpperCase() + word.slice(1)
+                  ).join(' ')}
                 </Badge>
               </TableCell>
-              <TableCell className="font-medium">${claim.weeklyBenefit}</TableCell>
-              <TableCell>{claim.employer}</TableCell>
-              <TableCell>{claim.dueDate}</TableCell>
+              <TableCell>{claim.employer_name}</TableCell>
+              <TableCell>{new Date(claim.claim_date).toLocaleDateString()}</TableCell>
               <TableCell className="text-right">
                 <Button
                   variant="outline"
