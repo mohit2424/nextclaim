@@ -62,14 +62,14 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 font-inter py-8">
-      <div className="w-full max-w-md mx-auto px-4">
-        <div className="flex justify-between items-center mb-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 font-inter">
+      <div className="w-full max-w-md mx-auto p-6">
+        <div className="absolute top-8 left-8 right-8 flex justify-between items-center">
           <h2 className="text-2xl font-bold text-blue-600">NextClaim</h2>
           <Button variant="outline" size="sm">Contact Us</Button>
         </div>
         
-        <div className="bg-white p-8 rounded-lg shadow-md w-full">
+        <div className="bg-white p-8 rounded-lg shadow-lg w-full mt-20">
           <div className="text-center mb-8">
             <h1 className="text-2xl font-semibold mb-2">
               {resetPasswordMode ? "Reset Password" : "Welcome Back"}
