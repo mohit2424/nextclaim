@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card } from "@/components/ui/card";
@@ -9,131 +8,49 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
 import { Building2, User, Upload, FileText, BriefcaseIcon } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
-import { Skeleton } from "@/components/ui/skeleton";
-
-type ClaimDocument = {
-  name: string;
-  path: string;
-  type: string;
-  size: number;
-};
-
-type Claim = {
-  id: string;
-  first_name: string;
-  middle_name: string | null;
-  last_name: string;
-  age: number;
-  state: string;
-  pincode: string;
-  ssn: string;
-  email: string;
-  phone: string;
-  employer_name: string;
-  claim_date: string;
-  claim_status: string;
-  separation_reason: string;
-  documents: ClaimDocument[];
-  last_day_of_work: string | null;
-  severance_package: boolean | null;
-  severance_amount: number | null;
-  reason_for_unemployment: string | null;
-};
 
 export default function ClaimDetails() {
   const { id } = useParams();
   const { toast } = useToast();
   const [file, setFile] = useState<File | null>(null);
 
-  const { data: claim, isLoading } = useQuery({
-    queryKey: ['claim', id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('claims')
-        .select('*')
-        .eq('id', id)
-        .single();
-
-      if (error) throw error;
-      
-      // Transform the documents field to ensure it's an array of ClaimDocument
-      const transformedData = {
-        ...data,
-        documents: Array.isArray(data.documents) ? data.documents : []
-      } as Claim;
-      
-      return transformedData;
+  // Mock data for demonstration
+  const claimData = {
+    id: id,
+    status: "Pending",
+    claimant: {
+      name: "John Doe",
+      ssn: "XXX-XX-1234",
+      dob: "1990-01-01",
+      phone: "(555) 123-4567",
+      email: "john.doe@example.com",
+      address: "123 Main St, Anytown, CA 12345"
     },
-  });
-
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-    if (!selectedFile) return;
-
-    try {
-      const filePath = `${id}/${selectedFile.name}`;
-      const { error: uploadError } = await supabase.storage
-        .from('claim_documents')
-        .upload(filePath, selectedFile);
-
-      if (uploadError) throw uploadError;
-
-      const newDocument: ClaimDocument = {
-        name: selectedFile.name,
-        path: filePath,
-        type: selectedFile.type,
-        size: selectedFile.size
-      };
-
-      // Update the claim's documents array
-      const { error: updateError } = await supabase
-        .from('claims')
-        .update({
-          documents: [...(claim?.documents || []), newDocument]
-        })
-        .eq('id', id);
-
-      if (updateError) throw updateError;
-
-      toast({
-        title: "File uploaded successfully",
-        description: `${selectedFile.name} has been uploaded.`
-      });
-
-      setFile(null);
-    } catch (error) {
-      console.error('Upload error:', error);
-      toast({
-        title: "Upload failed",
-        description: "There was an error uploading your file.",
-        variant: "destructive"
-      });
+    employer: {
+      name: "Tech Corp Inc.",
+      ein: "12-3456789",
+      contact: "HR Department",
+      phone: "(555) 987-6543",
+      address: "456 Business Ave, Commerce City, CA 12345"
+    },
+    unemployment: {
+      lastDay: "2024-02-15",
+      reason: "Company Layoff",
+      severance: "Yes",
+      severanceAmount: "$5,000"
     }
   };
 
-  if (isLoading) {
-    return (
-      <DashboardLayout>
-        <div className="space-y-6">
-          <Skeleton className="h-8 w-1/3" />
-          <Skeleton className="h-[500px]" />
-        </div>
-      </DashboardLayout>
-    );
-  }
-
-  if (!claim) {
-    return (
-      <DashboardLayout>
-        <div className="text-center py-12">
-          <h2 className="text-2xl font-bold">Claim not found</h2>
-          <p className="text-muted-foreground">The requested claim could not be found.</p>
-        </div>
-      </DashboardLayout>
-    );
-  }
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (selectedFile) {
+      setFile(selectedFile);
+      toast({
+        title: "File selected",
+        description: `${selectedFile.name} is ready to upload.`
+      });
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -166,27 +83,27 @@ export default function ClaimDetails() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label>Full Name</Label>
-                  <Input value={`${claim.first_name} ${claim.middle_name || ''} ${claim.last_name}`} readOnly />
+                  <Input value={claimData.claimant.name} readOnly />
                 </div>
                 <div>
                   <Label>SSN</Label>
-                  <Input value={claim.ssn} readOnly />
+                  <Input value={claimData.claimant.ssn} readOnly />
                 </div>
                 <div>
-                  <Label>Age</Label>
-                  <Input value={claim.age} readOnly />
+                  <Label>Date of Birth</Label>
+                  <Input value={claimData.claimant.dob} readOnly />
                 </div>
                 <div>
                   <Label>Phone</Label>
-                  <Input value={claim.phone} readOnly />
+                  <Input value={claimData.claimant.phone} readOnly />
                 </div>
                 <div className="col-span-2">
                   <Label>Email</Label>
-                  <Input value={claim.email} readOnly />
+                  <Input value={claimData.claimant.email} readOnly />
                 </div>
                 <div className="col-span-2">
                   <Label>Address</Label>
-                  <Input value={`${claim.state}, ${claim.pincode}`} readOnly />
+                  <Input value={claimData.claimant.address} readOnly />
                 </div>
               </div>
             </Card>
@@ -199,13 +116,25 @@ export default function ClaimDetails() {
                 <h2 className="text-xl font-semibold">Employer Information</h2>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-2">
+                <div>
                   <Label>Company Name</Label>
-                  <Input value={claim.employer_name} readOnly />
+                  <Input value={claimData.employer.name} readOnly />
                 </div>
                 <div>
-                  <Label>Separation Reason</Label>
-                  <Input value={claim.separation_reason} readOnly />
+                  <Label>EIN</Label>
+                  <Input value={claimData.employer.ein} readOnly />
+                </div>
+                <div>
+                  <Label>Contact Person</Label>
+                  <Input value={claimData.employer.contact} readOnly />
+                </div>
+                <div>
+                  <Label>Phone</Label>
+                  <Input value={claimData.employer.phone} readOnly />
+                </div>
+                <div className="col-span-2">
+                  <Label>Address</Label>
+                  <Input value={claimData.employer.address} readOnly />
                 </div>
               </div>
             </Card>
@@ -220,22 +149,20 @@ export default function ClaimDetails() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label>Last Day of Work</Label>
-                  <Input value={claim.last_day_of_work ? new Date(claim.last_day_of_work).toLocaleDateString() : 'Not specified'} readOnly />
+                  <Input value={claimData.unemployment.lastDay} readOnly />
                 </div>
                 <div>
                   <Label>Reason for Unemployment</Label>
-                  <Input value={claim.reason_for_unemployment || 'Not specified'} readOnly />
+                  <Input value={claimData.unemployment.reason} readOnly />
                 </div>
                 <div>
                   <Label>Severance Package</Label>
-                  <Input value={claim.severance_package ? 'Yes' : 'No'} readOnly />
+                  <Input value={claimData.unemployment.severance} readOnly />
                 </div>
-                {claim.severance_package && (
-                  <div>
-                    <Label>Severance Amount</Label>
-                    <Input value={`$${claim.severance_amount?.toFixed(2) || '0.00'}`} readOnly />
-                  </div>
-                )}
+                <div>
+                  <Label>Severance Amount</Label>
+                  <Input value={claimData.unemployment.severanceAmount} readOnly />
+                </div>
               </div>
             </Card>
           </TabsContent>
@@ -257,37 +184,23 @@ export default function ClaimDetails() {
                       type="file"
                       className="hidden"
                       onChange={handleFileUpload}
-                      accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
                     />
                   </Label>
                   <p className="text-sm text-muted-foreground mt-1">
-                    PDF, DOC, DOCX, JPG, JPEG, PNG up to 10MB
+                    PDF, DOC up to 10MB
                   </p>
                 </div>
-                {claim.documents && claim.documents.length > 0 ? (
-                  <div className="space-y-2">
-                    {claim.documents.map((doc, index) => (
-                      <div key={index} className="flex items-center justify-between p-2 border rounded">
-                        <span className="text-sm">{doc.name}</span>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            window.open(
-                              supabase.storage
-                                .from('claim_documents')
-                                .getPublicUrl(doc.path).data.publicUrl,
-                              '_blank'
-                            );
-                          }}
-                        >
-                          View
-                        </Button>
-                      </div>
-                    ))}
+                {file && (
+                  <div className="flex items-center justify-between p-2 border rounded">
+                    <span className="text-sm">{file.name}</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setFile(null)}
+                    >
+                      Remove
+                    </Button>
                   </div>
-                ) : (
-                  <p className="text-center text-muted-foreground">No documents uploaded yet.</p>
                 )}
               </div>
             </Card>
