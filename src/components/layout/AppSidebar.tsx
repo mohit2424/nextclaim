@@ -4,7 +4,7 @@ import {
   FilePlus,
   FileText,
   Settings,
-  BarChart3,
+  Gavel,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
@@ -35,14 +35,14 @@ const menuItems = [
     url: "/claims/new",
   },
   {
-    title: "Analytics",
-    icon: BarChart3,
-    url: "#analytics",
+    title: "Appellate Information",
+    icon: Gavel,
+    url: "/appellate",
   },
   {
     title: "Settings",
     icon: Settings,
-    url: "#settings",
+    url: "/settings",
   },
 ];
 
@@ -52,6 +52,9 @@ export function AppSidebar() {
   
   return (
     <Sidebar className="border-r bg-white">
+      <div className="p-4 border-b">
+        <h1 className="text-xl font-bold text-blue-600">NextClaim</h1>
+      </div>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
@@ -61,8 +64,10 @@ export function AppSidebar() {
                   <SidebarMenuButton
                     onClick={() => navigate(item.url)}
                     className={cn(
-                      "flex items-center gap-3 w-full px-3 py-2 hover:bg-gray-100 transition-colors",
-                      location.pathname === item.url && "bg-primary/10 text-primary"
+                      "flex items-center gap-3 w-full px-4 py-2 rounded-md transition-colors",
+                      location.pathname === item.url 
+                        ? "bg-blue-50 text-blue-600" 
+                        : "hover:bg-gray-100"
                     )}
                   >
                     <item.icon className="h-4 w-4" />

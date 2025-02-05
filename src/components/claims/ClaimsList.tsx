@@ -6,8 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
-import { Input } from "@/components/ui/input";
 import debounce from "lodash/debounce";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 
 type Claim = {
   id: string;
@@ -21,6 +21,10 @@ type Claim = {
   ssn: string;
 };
 
+interface ClaimsListProps {
+  searchQuery: string;
+}
+
 const fetchClaims = async (searchQuery: string = "") => {
   let query = supabase
     .from('claims')
@@ -28,7 +32,7 @@ const fetchClaims = async (searchQuery: string = "") => {
     .order('created_at', { ascending: false });
 
   if (searchQuery) {
-    query = query.or(`ssn.ilike.%${searchQuery}%,first_name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%,employer_name.ilike.%${searchQuery}%`);
+    query = query.or(`id.ilike.%${searchQuery}%,first_name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%,ssn.ilike.%${searchQuery}%`);
   }
 
   const { data, error } = await query;
@@ -47,31 +51,19 @@ const getStatusColor = (status: string) => {
   return colors[status as keyof typeof colors] || "bg-gray-100 text-gray-800 border-gray-200";
 };
 
-export function ClaimsList() {
+export function ClaimsList({ searchQuery }: ClaimsListProps) {
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [claims, setClaims] = useState<Claim[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
-  const { data: initialClaims, isLoading, refetch } = useQuery({
+  const { data: claims = [], isLoading, refetch } = useQuery({
     queryKey: ['claims', searchQuery],
     queryFn: () => fetchClaims(searchQuery),
   });
 
-  // Debounce search to avoid too many API calls
-  const debouncedSearch = debounce((value: string) => {
-    setSearchQuery(value);
-    refetch();
-  }, 300);
-
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    debouncedSearch(e.target.value);
-  };
-
-  useEffect(() => {
-    if (initialClaims) {
-      setClaims(initialClaims);
-    }
-  }, [initialClaims]);
+  const totalPages = Math.ceil(claims.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedClaims = claims.slice(startIndex, startIndex + itemsPerPage);
 
   useEffect(() => {
     const channel = supabase
@@ -83,8 +75,7 @@ export function ClaimsList() {
           schema: 'public',
           table: 'claims'
         },
-        (payload) => {
-          console.log('Real-time update received:', payload);
+        () => {
           refetch();
         }
       )
@@ -96,19 +87,12 @@ export function ClaimsList() {
   }, [refetch]);
 
   if (isLoading) {
-    return <div className="p-4 text-center">Loading claims...</div>;
+    return <div className="p-8 text-center">Loading claims...</div>;
   }
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end px-4">
-        <Input
-          placeholder="Search by SSN, name, or employer..."
-          className="max-w-sm"
-          onChange={handleSearch}
-        />
-      </div>
-      <div className="overflow-auto">
+      <div className="overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow className="bg-gray-50">
@@ -123,9 +107,9 @@ export function ClaimsList() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {claims.map((claim) => (
+            {paginatedClaims.map((claim) => (
               <TableRow key={claim.id} className="hover:bg-gray-50">
-                <TableCell className="font-medium">{claim.id.slice(0, 8)}</TableCell>
+                <TableCell className="font-medium">{claim.id}</TableCell>
                 <TableCell>{`${claim.first_name} ${claim.last_name}`}</TableCell>
                 <TableCell>{new Date(claim.created_at).toLocaleDateString()}</TableCell>
                 <TableCell>{new Date(claim.updated_at).toLocaleDateString()}</TableCell>
@@ -156,6 +140,30 @@ export function ClaimsList() {
           </TableBody>
         </Table>
       </div>
+
+      {totalPages > 1 && (
+        <div className="flex justify-center gap-2 py-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <span className="px-4 py-2">
+            Page {currentPage} of {totalPages}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+          >
+            <ArrowRight className="h-4 w-4" />
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

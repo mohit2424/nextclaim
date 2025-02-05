@@ -43,7 +43,7 @@ export type Database = {
           email: string
           employer_name: string
           first_name: string
-          id?: string
+          id: string
           last_day_of_work?: string | null
           last_name: string
           middle_name?: string | null
