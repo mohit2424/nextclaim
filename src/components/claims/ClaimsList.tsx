@@ -18,12 +18,20 @@ const fetchClaims = async (searchQuery: string = "", status?: string) => {
     .order('created_at', { ascending: false });
 
   if (searchQuery) {
-    query = query.or([
-      `id.ilike.%${searchQuery}%`,
-      `first_name.ilike.%${searchQuery}%`,
-      `last_name.ilike.%${searchQuery}%`,
-      `ssn.ilike.%${searchQuery}%`
-    ].join(','));
+    // Check if the search query matches SSN format (XXX-XX-XXXX)
+    const isSSNFormat = /^\d{3}-?\d{2}-?\d{4}$/.test(searchQuery.replace(/-/g, ''));
+    
+    if (isSSNFormat) {
+      // Format the SSN consistently for search
+      const formattedSSN = searchQuery.replace(/(\d{3})(\d{2})(\d{4})/, '$1-$2-$3');
+      query = query.eq('ssn', formattedSSN);
+    } else {
+      query = query.or([
+        `id.ilike.%${searchQuery}%`,
+        `first_name.ilike.%${searchQuery}%`,
+        `last_name.ilike.%${searchQuery}%`
+      ].join(','));
+    }
   }
 
   if (status && status !== 'all') {

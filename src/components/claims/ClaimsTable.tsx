@@ -48,6 +48,7 @@ export function ClaimsTable({ claims }: ClaimsTableProps) {
               <TableHead className="font-semibold text-gray-700">Status</TableHead>
               <TableHead className="font-semibold text-gray-700">Employer</TableHead>
               <TableHead className="font-semibold text-gray-700">Due Date</TableHead>
+              <TableHead className="font-semibold text-gray-700">SSN</TableHead>
               <TableHead className="font-semibold text-gray-700 w-[100px]">Action</TableHead>
             </TableRow>
           </TableHeader>
@@ -70,6 +71,7 @@ export function ClaimsTable({ claims }: ClaimsTableProps) {
                 </TableCell>
                 <TableCell>{claim.employer_name}</TableCell>
                 <TableCell>{new Date(claim.claim_date).toLocaleDateString()}</TableCell>
+                <TableCell>{claim.ssn}</TableCell>
                 <TableCell>
                   <Button
                     variant="outline"
