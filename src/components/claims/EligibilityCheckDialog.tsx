@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -27,11 +27,6 @@ export function EligibilityCheckDialog({
   const [rejectionReason, setRejectionReason] = useState("");
   const { toast } = useToast();
 
-  // Check eligibility when component mounts
-  useState(() => {
-    checkEligibility();
-  });
-
   const checkEligibility = async () => {
     try {
       const { data, error } = await supabase.rpc('check_claim_eligibility', {
@@ -56,6 +51,10 @@ export function EligibilityCheckDialog({
       setIsChecking(false);
     }
   };
+
+  useEffect(() => {
+    checkEligibility();
+  }, []); // Run once when component mounts
 
   const handleClaimUpdate = async () => {
     try {
