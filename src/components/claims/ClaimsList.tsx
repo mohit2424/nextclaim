@@ -1,4 +1,3 @@
-
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,6 +7,7 @@ import { ClaimsStatusFilter } from "./ClaimsStatusFilter";
 import { ClaimsTable, type ClaimStatus } from "./ClaimsTable";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
+import { startOfDay } from "date-fns";
 
 interface ClaimsListProps {
   searchQuery: string;
@@ -35,6 +35,9 @@ const fetchClaims = async (searchQuery: string = "", status?: string) => {
   if (status && status !== 'all') {
     if (status === 'in_progress') {
       query = query.in('claim_status', ['initial_review', 'pending']);
+    } else if (status === 'today') {
+      const today = startOfDay(new Date()).toISOString();
+      query = query.gte('created_at', today);
     } else {
       query = query.eq('claim_status', status as ClaimStatus);
     }

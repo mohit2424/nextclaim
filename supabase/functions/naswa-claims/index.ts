@@ -8,30 +8,43 @@ const corsHeaders = {
 }
 
 function generateMockClaims() {
+  const firstNames = ["James", "Emma", "Michael", "Sarah", "David", "Jennifer", "William", "Elizabeth", "Robert", "Patricia"];
+  const lastNames = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez"];
   const states = ["California", "New York", "Texas", "Florida", "Washington"];
-  const employers = ["Tech Corp Inc", "Finance Solutions LLC", "Healthcare Systems", "Retail Enterprises", "Manufacturing Co"];
+  const employers = [
+    "Global Technologies Inc.",
+    "Innovative Solutions LLC",
+    "Summit Industries",
+    "Evergreen Manufacturing",
+    "Advanced Systems Corp"
+  ];
   const separationReasons = ["layoff", "reduction_in_force", "constructive_discharge", "severance_agreement", "job_abandonment"];
   
-  return Array.from({ length: 5 }, (_, i) => ({
-    first_name: `TestFirst${i + 1}`,
-    middle_name: `M${i + 1}`,
-    last_name: `TestLast${i + 1}`,
-    age: Math.floor(Math.random() * (65 - 18) + 18),
-    state: states[Math.floor(Math.random() * states.length)],
-    pincode: Math.floor(Math.random() * 90000 + 10000).toString(),
-    ssn: `${Math.floor(Math.random() * 900 + 100)}-${Math.floor(Math.random() * 90 + 10)}-${Math.floor(Math.random() * 9000 + 1000)}`,
-    email: `test${i + 1}@example.com`,
-    // Format phone as exactly 10 digits without dashes
-    phone: `${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 9000 + 1000)}`,
-    employer_name: employers[Math.floor(Math.random() * employers.length)],
-    claim_date: new Date().toISOString().split('T')[0],
-    claim_status: "initial_review",
-    separation_reason: separationReasons[Math.floor(Math.random() * separationReasons.length)],
-    last_day_of_work: new Date().toISOString().split('T')[0],
-    severance_package: Math.random() > 0.5,
-    severance_amount: Math.random() > 0.5 ? Math.floor(Math.random() * 50000 + 5000) : null,
-    reason_for_unemployment: "Company restructuring"
-  }));
+  return Array.from({ length: 5 }, (_, i) => {
+    const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+    const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+    
+    return {
+      first_name: firstName,
+      middle_name: `${firstName[0]}`,
+      last_name: lastName,
+      age: Math.floor(Math.random() * (65 - 18) + 18),
+      state: states[Math.floor(Math.random() * states.length)],
+      pincode: Math.floor(Math.random() * 90000 + 10000).toString(),
+      ssn: `${Math.floor(Math.random() * 900 + 100)}-${Math.floor(Math.random() * 90 + 10)}-${Math.floor(Math.random() * 9000 + 1000)}`,
+      email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@example.com`,
+      phone: `${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 9000 + 1000)}`,
+      employer_name: employers[Math.floor(Math.random() * employers.length)],
+      claim_date: new Date().toISOString().split('T')[0],
+      claim_status: "initial_review",
+      separation_reason: separationReasons[Math.floor(Math.random() * separationReasons.length)],
+      last_day_of_work: new Date().toISOString().split('T')[0],
+      severance_package: Math.random() > 0.5,
+      severance_amount: Math.random() > 0.5 ? Math.floor(Math.random() * 50000 + 5000) : null,
+      reason_for_unemployment: "Company restructuring",
+      documents: []
+    };
+  });
 }
 
 serve(async (req) => {
@@ -62,7 +75,6 @@ serve(async (req) => {
         continue
       }
 
-      // Insert new claim without specifying the ID
       const { data, error } = await supabaseClient
         .from('claims')
         .insert(claim)
@@ -98,3 +110,4 @@ serve(async (req) => {
     )
   }
 })
+

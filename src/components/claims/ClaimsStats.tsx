@@ -62,7 +62,7 @@ export function ClaimsStats() {
       value: claimStats.newToday.toString(),
       bgColor: "bg-gradient-to-r from-green-50 to-green-100",
       textColor: "text-green-900",
-      onClick: () => navigate("/claims"),
+      onClick: () => navigate("/claims?status=today"),
     },
   ];
 
@@ -95,3 +95,4 @@ export function ClaimsStats() {
     </div>
   );
 }
+
