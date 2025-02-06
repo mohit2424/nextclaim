@@ -47,6 +47,7 @@ export const formSchema = z.object({
 });
 
 type FormValues = z.infer<typeof formSchema>;
+type ClaimInsert = Database["public"]["Tables"]["claims"]["Insert"];
 
 export default function NewClaim() {
   const navigate = useNavigate();
@@ -103,27 +104,29 @@ export default function NewClaim() {
         return;
       }
 
+      const insertData: Omit<ClaimInsert, 'id'> = {
+        age: values.age,
+        claim_date: format(values.claimDate, 'yyyy-MM-dd'),
+        claim_status: values.claimStatus,
+        documents: [],
+        email: values.email,
+        employer_name: values.employerName,
+        first_name: values.firstName,
+        last_day_of_work: format(values.lastDayOfWork, 'yyyy-MM-dd'),
+        last_name: values.lastName,
+        middle_name: values.middleName || null,
+        phone: values.phone,
+        pincode: values.pincode,
+        separation_reason: values.separationReason,
+        severance_package: false,
+        ssn: values.ssn,
+        state: values.state,
+        user_id: session.user.id
+      };
+
       const { data, error } = await supabase
         .from('claims')
-        .insert({
-          age: values.age,
-          claim_date: format(values.claimDate, 'yyyy-MM-dd'),
-          claim_status: values.claimStatus,
-          documents: [],
-          email: values.email,
-          employer_name: values.employerName,
-          first_name: values.firstName,
-          last_day_of_work: format(values.lastDayOfWork, 'yyyy-MM-dd'),
-          last_name: values.lastName,
-          middle_name: values.middleName || null,
-          phone: values.phone,
-          pincode: values.pincode,
-          separation_reason: values.separationReason,
-          severance_package: false,
-          ssn: values.ssn,
-          state: values.state,
-          user_id: session.user.id
-        })
+        .insert(insertData)
         .select()
         .single();
 
