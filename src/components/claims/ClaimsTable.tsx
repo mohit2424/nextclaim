@@ -36,6 +36,11 @@ const getStatusColor = (status: ClaimStatus) => {
 export function ClaimsTable({ claims }: ClaimsTableProps) {
   const navigate = useNavigate();
 
+  const handleCheckEligibility = (claimId: string) => {
+    // Navigate to eligibility check page
+    navigate(`/claims/${claimId}/eligibility`);
+  };
+
   return (
     <div className="bg-white rounded-lg border shadow-sm w-full">
       <div className="overflow-x-auto">
@@ -50,7 +55,7 @@ export function ClaimsTable({ claims }: ClaimsTableProps) {
               <TableHead className="font-semibold text-gray-700">Employer</TableHead>
               <TableHead className="font-semibold text-gray-700">Due Date</TableHead>
               <TableHead className="font-semibold text-gray-700">SSN</TableHead>
-              <TableHead className="font-semibold text-gray-700 w-[100px]">Action</TableHead>
+              <TableHead className="font-semibold text-gray-700 w-[200px]">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -74,14 +79,22 @@ export function ClaimsTable({ claims }: ClaimsTableProps) {
                 <TableCell>{new Date(claim.claim_date).toLocaleDateString()}</TableCell>
                 <TableCell>{claim.ssn}</TableCell>
                 <TableCell>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => navigate(`/claims/${claim.id}`)}
-                    className="w-full"
-                  >
-                    View Details
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => navigate(`/claims/${claim.id}`)}
+                    >
+                      View Details
+                    </Button>
+                    <Button
+                      variant="default"
+                      size="sm"
+                      onClick={() => handleCheckEligibility(claim.id)}
+                    >
+                      Check Eligibility
+                    </Button>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
