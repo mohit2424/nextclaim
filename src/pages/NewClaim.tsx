@@ -101,7 +101,7 @@ export default function NewClaim() {
         return;
       }
 
-      type ClaimInsert = Database['public']['Tables']['claims']['Insert'];
+      type ClaimInsert = Omit<Database['public']['Tables']['claims']['Insert'], 'id'>;
       
       const newClaim: ClaimInsert = {
         age: values.age,
