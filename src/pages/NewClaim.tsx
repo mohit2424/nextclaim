@@ -15,6 +15,7 @@ import { ContactInfoFields } from "@/components/claims/ContactInfoFields";
 import { AddressFields } from "@/components/claims/AddressFields";
 import { ClaimDetailsFields } from "@/components/claims/ClaimDetailsFields";
 import { ArrowLeft } from "lucide-react";
+import type { Database } from "@/integrations/supabase/types";
 
 export const formSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),
@@ -101,7 +102,7 @@ export default function NewClaim() {
       }
 
       // Create a new claim with the correct type structure
-      const newClaim = {
+      const newClaim: Omit<Database['public']['Tables']['claims']['Insert'], 'id' | 'created_at' | 'updated_at'> = {
         age: values.age,
         claim_date: format(values.claimDate, 'yyyy-MM-dd'),
         claim_status: values.claimStatus,
@@ -111,7 +112,7 @@ export default function NewClaim() {
         first_name: values.firstName,
         last_day_of_work: format(values.lastDayOfWork, 'yyyy-MM-dd'),
         last_name: values.lastName,
-        middle_name: values.middleName,
+        middle_name: values.middleName || null,
         phone: values.phone,
         pincode: values.pincode,
         separation_reason: values.separationReason,
