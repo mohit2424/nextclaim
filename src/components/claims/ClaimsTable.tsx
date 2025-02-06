@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
-export type ClaimStatus = "initial_review" | "pending" | "approved" | "rejected";
+export type ClaimStatus = "initial_review" | "pending" | "approved" | "rejected" | "in_progress";
 
 type Claim = {
   id: string;
@@ -28,6 +28,7 @@ const getStatusColor = (status: ClaimStatus) => {
     pending: "bg-blue-100 text-blue-800 border-blue-200",
     approved: "bg-green-100 text-green-800 border-green-200",
     rejected: "bg-red-100 text-red-800 border-red-200",
+    in_progress: "bg-purple-100 text-purple-800 border-purple-200",
   };
   return colors[status] || "bg-gray-100 text-gray-800 border-gray-200";
 };
