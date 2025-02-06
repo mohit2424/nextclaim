@@ -1,4 +1,3 @@
-
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -51,7 +50,7 @@ const fetchClaims = async (searchQuery: string = "", status?: string) => {
         break;
       default:
         if (['initial_review', 'pending', 'approved', 'rejected'].includes(status)) {
-          query = query.eq('claim_status', status);
+          query = query.eq('claim_status', status as ClaimStatus);
         }
     }
   }
