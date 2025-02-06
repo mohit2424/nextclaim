@@ -1,14 +1,21 @@
+
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
-import { ClaimsSearchBar } from "./ClaimsSearchBar";
-import { ClaimsStatusFilter } from "./ClaimsStatusFilter";
 import { ClaimsTable, type ClaimStatus } from "./ClaimsTable";
 import { Input } from "@/components/ui/input";
 import { Search, ArrowLeft } from "lucide-react";
-import { startOfDay } from "date-fns";
 import { Button } from "@/components/ui/button";
+import { ClaimsStatusFilter } from "./ClaimsStatusFilter";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 interface ClaimsListProps {
   searchQuery: string;
@@ -17,23 +24,18 @@ interface ClaimsListProps {
 const fetchClaims = async (searchQuery: string = "", status?: string) => {
   let query = supabase
     .from('claims')
-    .select('*')
+    .select('*', { count: 'exact' })
     .order('created_at', { ascending: false });
 
   if (searchQuery) {
-    // Remove any hyphens from the search query for consistent comparison
     const cleanSearchQuery = searchQuery.replace(/-/g, '');
-    
-    // If the search query contains only numbers, treat it as potential SSN
     if (/^\d+$/.test(cleanSearchQuery)) {
       query = query.ilike('ssn', `%${cleanSearchQuery}%`);
     } else {
-      // For non-numeric queries, search other fields
       query = query.or(`first_name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%,id.ilike.%${searchQuery}%`);
     }
   }
 
-  // Apply status filtering
   if (status) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -46,7 +48,6 @@ const fetchClaims = async (searchQuery: string = "", status?: string) => {
         query = query.gte('created_at', today.toISOString());
         break;
       case 'all':
-        // No filter needed for 'all'
         break;
       default:
         if (['initial_review', 'pending', 'approved', 'rejected'].includes(status)) {
@@ -55,9 +56,9 @@ const fetchClaims = async (searchQuery: string = "", status?: string) => {
     }
   }
 
-  const { data, error } = await query;
+  const { data, error, count } = await query;
   if (error) throw error;
-  return data;
+  return { data, count };
 };
 
 export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps) {
@@ -68,10 +69,13 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
   const statusParam = searchParams.get('status') || 'all';
   const itemsPerPage = 10;
 
-  const { data: claims = [], isLoading, refetch } = useQuery({
-    queryKey: ['claims', localSearchQuery, statusParam],
+  const { data: claimsData = { data: [], count: 0 }, isLoading, refetch } = useQuery({
+    queryKey: ['claims', localSearchQuery, statusParam, currentPage],
     queryFn: () => fetchClaims(localSearchQuery, statusParam),
   });
+
+  const { data: claims, count: totalClaims } = claimsData;
+  const totalPages = Math.ceil((totalClaims || 0) / itemsPerPage);
 
   useEffect(() => {
     const channel = supabase
@@ -94,12 +98,14 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
     };
   }, [refetch]);
 
-  const totalPages = Math.ceil(claims.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedClaims = claims.slice(startIndex, startIndex + itemsPerPage);
-
   const handleStatusChange = (newStatus: string) => {
     setSearchParams({ status: newStatus });
+    setCurrentPage(1); // Reset to first page when changing status
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   if (isLoading) {
@@ -107,6 +113,22 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
       <div className="p-8 text-center">Loading claims...</div>
     );
   }
+
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+    return pages;
+  };
 
   return (
     <div className="container mx-auto px-4 space-y-6">
@@ -138,7 +160,10 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
               type="text"
               placeholder="Search by SSN (XXX-XX-XXXX)"
               value={localSearchQuery}
-              onChange={(e) => setLocalSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setLocalSearchQuery(e.target.value);
+                setCurrentPage(1); // Reset to first page when searching
+              }}
               className="pl-10"
             />
             <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
@@ -151,8 +176,45 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
       </div>
 
       <div className="max-w-[1200px] mx-auto">
-        <ClaimsTable claims={paginatedClaims} />
+        <ClaimsTable claims={claims} />
       </div>
+
+      {totalPages > 1 && (
+        <div className="mt-6">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                  className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                />
+              </PaginationItem>
+
+              {getPageNumbers().map((page) => (
+                <PaginationItem key={page}>
+                  <PaginationLink
+                    isActive={currentPage === page}
+                    onClick={() => handlePageChange(page)}
+                    className="cursor-pointer"
+                  >
+                    {page}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                  className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+          <div className="text-center text-sm text-gray-500 mt-2">
+            Showing page {currentPage} of {totalPages} ({totalClaims} total claims)
+          </div>
+        </div>
+      )}
     </div>
   );
 }
