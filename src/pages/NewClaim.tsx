@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
@@ -100,7 +99,7 @@ export default function NewClaim() {
         return;
       }
 
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('claims')
         .insert({
           age: values.age,
@@ -124,10 +123,7 @@ export default function NewClaim() {
         .select()
         .single();
 
-      if (error) {
-        console.error('Error submitting claim:', error);
-        throw error;
-      }
+      if (error) throw error;
 
       toast.success("Claim submitted successfully");
       navigate("/claims");

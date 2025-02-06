@@ -20,19 +20,15 @@ const fetchClaims = async (searchQuery: string = "", status?: string) => {
     .order('created_at', { ascending: false });
 
   if (searchQuery) {
-    // Check if the search query matches SSN format (XXX-XX-XXXX)
-    const isSSNFormat = /^\d{3}-?\d{2}-?\d{4}$/.test(searchQuery.replace(/-/g, ''));
+    // Remove any hyphens from the search query for consistent comparison
+    const cleanSearchQuery = searchQuery.replace(/-/g, '');
     
-    if (isSSNFormat) {
-      // Format the SSN consistently for search
-      const formattedSSN = searchQuery.replace(/(\d{3})(\d{2})(\d{4})/, '$1-$2-$3');
-      query = query.eq('ssn', formattedSSN);
+    // If the search query contains only numbers, treat it as potential SSN
+    if (/^\d+$/.test(cleanSearchQuery)) {
+      query = query.ilike('ssn', `%${cleanSearchQuery}%`);
     } else {
-      query = query.or([
-        `id.ilike.%${searchQuery}%`,
-        `first_name.ilike.%${searchQuery}%`,
-        `last_name.ilike.%${searchQuery}%`
-      ].join(','));
+      // For non-numeric queries, search other fields
+      query = query.or(`first_name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%,id.ilike.%${searchQuery}%`);
     }
   }
 
