@@ -101,8 +101,9 @@ export default function NewClaim() {
         return;
       }
 
-      // Create a new claim with the correct type structure
-      const newClaim: Omit<Database['public']['Tables']['claims']['Insert'], 'id' | 'created_at' | 'updated_at'> = {
+      type ClaimInsert = Database['public']['Tables']['claims']['Insert'];
+      
+      const newClaim: ClaimInsert = {
         age: values.age,
         claim_date: format(values.claimDate, 'yyyy-MM-dd'),
         claim_status: values.claimStatus,
