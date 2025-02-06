@@ -58,10 +58,23 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    console.log('Inserting mock claims into database...')
+    console.log('Processing mock claims...')
     
     const results = []
     for (const claim of mockClaims) {
+      // Check if claim with this SSN already exists
+      const { data: existingClaim } = await supabaseClient
+        .from('claims')
+        .select('id')
+        .eq('ssn', claim.ssn)
+        .single()
+
+      if (existingClaim) {
+        console.log(`Claim with SSN ${claim.ssn} already exists, skipping...`)
+        continue
+      }
+
+      // Insert new claim
       const { data, error } = await supabaseClient
         .from('claims')
         .insert(claim)
@@ -75,8 +88,13 @@ serve(async (req) => {
       results.push(data[0])
     }
 
+    // Return success even if some claims were skipped
     return new Response(
-      JSON.stringify({ success: true, data: results }),
+      JSON.stringify({ 
+        success: true, 
+        data: results,
+        message: results.length === 0 ? 'All claims already exist' : `Successfully imported ${results.length} new claims`
+      }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200 
