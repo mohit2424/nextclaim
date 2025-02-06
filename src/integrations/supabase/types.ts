@@ -28,6 +28,7 @@ export type Database = {
           phone: string
           pincode: string
           reason_for_unemployment: string | null
+          rejection_reason: string | null
           separation_reason: Database["public"]["Enums"]["separation_reason"]
           severance_amount: number | null
           severance_package: boolean | null
@@ -54,6 +55,7 @@ export type Database = {
           phone: string
           pincode: string
           reason_for_unemployment?: string | null
+          rejection_reason?: string | null
           separation_reason: Database["public"]["Enums"]["separation_reason"]
           severance_amount?: number | null
           severance_package?: boolean | null
@@ -80,6 +82,7 @@ export type Database = {
           phone?: string
           pincode?: string
           reason_for_unemployment?: string | null
+          rejection_reason?: string | null
           separation_reason?: Database["public"]["Enums"]["separation_reason"]
           severance_amount?: number | null
           severance_package?: boolean | null
@@ -366,7 +369,12 @@ export type Database = {
       }
     }
     Enums: {
-      claim_status: "initial_review" | "pending" | "approved" | "rejected"
+      claim_status:
+        | "initial_review"
+        | "pending"
+        | "approved"
+        | "rejected"
+        | "in_progress"
       separation_reason:
         | "resignation"
         | "termination_misconduct"
