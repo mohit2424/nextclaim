@@ -62,7 +62,7 @@ serve(async (req) => {
         continue
       }
 
-      // Insert new claim
+      // Insert new claim without specifying the ID
       const { data, error } = await supabaseClient
         .from('claims')
         .insert(claim)
