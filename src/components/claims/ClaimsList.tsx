@@ -6,6 +6,8 @@ import { useQuery } from "@tanstack/react-query";
 import { ClaimsSearchBar } from "./ClaimsSearchBar";
 import { ClaimsStatusFilter } from "./ClaimsStatusFilter";
 import { ClaimsTable, type ClaimStatus } from "./ClaimsTable";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 
 interface ClaimsListProps {
   searchQuery: string;
@@ -95,15 +97,24 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
   }
 
   return (
-    <div className="space-y-6">
+    <div className="container mx-auto px-4 space-y-6">
       <div className="flex flex-col gap-6">
-        <h1 className="text-2xl font-semibold text-blue-600">Claims List</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-semibold text-blue-600">Claims List</h1>
+          <img src="/nextclaim-logo.png" alt="NEXTCLAIM" className="h-8" />
+        </div>
         
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <ClaimsSearchBar 
-            searchQuery={localSearchQuery}
-            onSearchChange={setLocalSearchQuery}
-          />
+          <div className="relative w-full md:w-96">
+            <Input
+              type="text"
+              placeholder="Search by SSN (XXX-XX-XXXX)"
+              value={localSearchQuery}
+              onChange={(e) => setLocalSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+            <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+          </div>
           <ClaimsStatusFilter 
             status={statusParam as any}
             onStatusChange={handleStatusChange}

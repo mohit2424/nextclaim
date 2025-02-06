@@ -67,6 +67,21 @@ export default function NewClaim() {
     }
   };
 
+  const checkExistingSSN = async (ssn: string) => {
+    const { data, error } = await supabase
+      .from('claims')
+      .select('id')
+      .eq('ssn', ssn)
+      .maybeSingle();
+
+    if (error) {
+      console.error('Error checking SSN:', error);
+      return null;
+    }
+
+    return data;
+  };
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
@@ -77,29 +92,35 @@ export default function NewClaim() {
         return;
       }
 
-      const claim = {
-        age: values.age,
-        claim_date: format(values.claimDate, 'yyyy-MM-dd'),
-        claim_status: values.claimStatus,
-        documents: [],
-        email: values.email,
-        employer_name: values.employerName,
-        first_name: values.firstName,
-        last_day_of_work: format(values.lastDayOfWork, 'yyyy-MM-dd'),
-        last_name: values.lastName,
-        middle_name: values.middleName,
-        phone: values.phone,
-        pincode: values.pincode,
-        separation_reason: values.separationReason,
-        severance_package: false,
-        ssn: values.ssn,
-        state: values.state,
-        user_id: session.user.id
-      };
+      // Check if SSN already exists
+      const existingClaim = await checkExistingSSN(values.ssn);
+      if (existingClaim) {
+        toast.info("A claim with this SSN already exists");
+        navigate(`/claims/${existingClaim.id}`);
+        return;
+      }
 
       const { error } = await supabase
         .from('claims')
-        .insert(claim)
+        .insert({
+          age: values.age,
+          claim_date: format(values.claimDate, 'yyyy-MM-dd'),
+          claim_status: values.claimStatus,
+          documents: [],
+          email: values.email,
+          employer_name: values.employerName,
+          first_name: values.firstName,
+          last_day_of_work: format(values.lastDayOfWork, 'yyyy-MM-dd'),
+          last_name: values.lastName,
+          middle_name: values.middleName,
+          phone: values.phone,
+          pincode: values.pincode,
+          separation_reason: values.separationReason,
+          severance_package: false,
+          ssn: values.ssn,
+          state: values.state,
+          user_id: session.user.id
+        })
         .select()
         .single();
 
@@ -123,11 +144,11 @@ export default function NewClaim() {
           <h1 className="text-2xl font-bold">New Unemployment Claim</h1>
           <Button 
             variant="outline" 
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate('/claims')}
             className="flex items-center gap-2"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to Dashboard
+            Back to Claims
           </Button>
         </div>
         
@@ -144,7 +165,7 @@ export default function NewClaim() {
               <Button 
                 type="button" 
                 variant="outline"
-                onClick={() => navigate(-1)}
+                onClick={() => navigate('/claims')}
               >
                 Cancel
               </Button>
