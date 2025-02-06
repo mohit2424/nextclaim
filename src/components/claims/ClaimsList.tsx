@@ -117,6 +117,9 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
               Claims List
             </h1>
           </div>
+          <h2 className="text-xl font-bold text-blue-600">
+            NEXTCLAIM
+          </h2>
         </div>
         
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -137,7 +140,9 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
         </div>
       </div>
 
-      <ClaimsTable claims={paginatedClaims} />
+      <div className="max-w-[1200px] mx-auto">
+        <ClaimsTable claims={paginatedClaims} />
+      </div>
     </div>
   );
 }

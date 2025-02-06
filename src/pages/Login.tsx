@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -72,12 +71,10 @@ export default function Login() {
         <div className="bg-white rounded-lg shadow-lg px-8 pt-8 pb-6">
           <div className="text-center mb-8">
             <h1 className="text-2xl font-semibold mb-2">
-              {resetPasswordMode ? "Reset Password" : "Welcome Back"}
+              Welcome Back
             </h1>
             <p className="text-gray-600">
-              {resetPasswordMode 
-                ? "Enter your email to receive reset instructions"
-                : "Sign in to manage your unemployment claims"}
+              Sign in to manage your unemployment claims
             </p>
           </div>
 
