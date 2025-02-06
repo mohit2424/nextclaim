@@ -1,5 +1,5 @@
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,14 @@ import { ContactInfoFields } from "@/components/claims/ContactInfoFields";
 import { AddressFields } from "@/components/claims/AddressFields";
 import { ClaimDetailsFields } from "@/components/claims/ClaimDetailsFields";
 import { ArrowLeft } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import type { Database } from "@/integrations/supabase/types";
 
 export const formSchema = z.object({
@@ -51,6 +59,11 @@ type ClaimInsert = Database["public"]["Tables"]["claims"]["Insert"];
 
 export default function NewClaim() {
   const navigate = useNavigate();
+  const [isDialogOpen, setIsDialogOpen] = useState(true);
+  const [searchSsn, setSearchSsn] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+  const [existingClaim, setExistingClaim] = useState<null | { id: string }>(null);
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -72,18 +85,44 @@ export default function NewClaim() {
   };
 
   const checkExistingSSN = async (ssn: string) => {
-    const { data, error } = await supabase
-      .from('claims')
-      .select('id')
-      .eq('ssn', ssn)
-      .maybeSingle();
+    setIsSearching(true);
+    try {
+      const { data, error } = await supabase
+        .from('claims')
+        .select('id')
+        .eq('ssn', ssn)
+        .maybeSingle();
 
-    if (error) {
-      console.error('Error checking SSN:', error);
+      if (error) {
+        console.error('Error checking SSN:', error);
+        toast.error("Error checking SSN");
+        return null;
+      }
+
+      setExistingClaim(data);
+      return data;
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error("Error checking SSN");
       return null;
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleSsnSearch = async () => {
+    if (!searchSsn) {
+      toast.error("Please enter an SSN");
+      return;
     }
 
-    return data;
+    // Format SSN if needed
+    const formattedSsn = searchSsn.replace(/(\d{3})(\d{2})(\d{4})/, '$1-$2-$3');
+    const claim = await checkExistingSSN(formattedSsn);
+    
+    if (claim) {
+      toast.info("A claim with this SSN already exists");
+    }
   };
 
   const onSubmit = async (values: FormValues) => {
@@ -96,15 +135,7 @@ export default function NewClaim() {
         return;
       }
 
-      // Check if SSN already exists
-      const existingClaim = await checkExistingSSN(values.ssn);
-      if (existingClaim) {
-        toast.info("A claim with this SSN already exists");
-        navigate(`/claims/${existingClaim.id}`);
-        return;
-      }
-
-      const insertData: Omit<ClaimInsert, 'id'> = {
+      const insertData = {
         age: values.age,
         claim_date: format(values.claimDate, 'yyyy-MM-dd'),
         claim_status: values.claimStatus,
@@ -122,7 +153,7 @@ export default function NewClaim() {
         ssn: values.ssn,
         state: values.state,
         user_id: session.user.id
-      };
+      } as const;
 
       const { data, error } = await supabase
         .from('claims')
@@ -140,8 +171,48 @@ export default function NewClaim() {
     }
   };
 
+  const handleViewExistingClaim = () => {
+    if (existingClaim) {
+      navigate(`/claims/${existingClaim.id}`);
+    }
+  };
+
   return (
     <DashboardLayout>
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Search Existing Claims</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="flex flex-col gap-4">
+              <Input
+                placeholder="Enter SSN (XXX-XX-XXXX)"
+                value={searchSsn}
+                onChange={(e) => setSearchSsn(e.target.value)}
+              />
+              <div className="flex gap-4">
+                <Button 
+                  onClick={handleSsnSearch}
+                  disabled={isSearching}
+                >
+                  {isSearching ? "Searching..." : "Search"}
+                </Button>
+                {existingClaim ? (
+                  <Button onClick={handleViewExistingClaim}>
+                    View Existing Claim
+                  </Button>
+                ) : (
+                  <Button onClick={() => setIsDialogOpen(false)}>
+                    Add New Claim
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <div className="container mx-auto py-6">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold">New Unemployment Claim</h1>

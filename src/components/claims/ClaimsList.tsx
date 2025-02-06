@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Search, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ClaimsStatusFilter } from "./ClaimsStatusFilter";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import {
   Pagination,
   PaginationContent,
@@ -21,11 +22,20 @@ interface ClaimsListProps {
   searchQuery: string;
 }
 
-const fetchClaims = async (searchQuery: string = "", status?: string) => {
+const fetchClaims = async (
+  searchQuery: string = "", 
+  status?: string, 
+  page: number = 1,
+  pageSize: number = 10
+) => {
+  const start = (page - 1) * pageSize;
+  const end = start + pageSize - 1;
+
   let query = supabase
     .from('claims')
     .select('*', { count: 'exact' })
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false })
+    .range(start, end);
 
   if (searchQuery) {
     const cleanSearchQuery = searchQuery.replace(/-/g, '');
@@ -71,7 +81,7 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
 
   const { data: claimsData = { data: [], count: 0 }, isLoading, refetch } = useQuery({
     queryKey: ['claims', localSearchQuery, statusParam, currentPage],
-    queryFn: () => fetchClaims(localSearchQuery, statusParam),
+    queryFn: () => fetchClaims(localSearchQuery, statusParam, currentPage, itemsPerPage),
   });
 
   const { data: claims, count: totalClaims } = claimsData;
@@ -100,7 +110,7 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
 
   const handleStatusChange = (newStatus: string) => {
     setSearchParams({ status: newStatus });
-    setCurrentPage(1); // Reset to first page when changing status
+    setCurrentPage(1);
   };
 
   const handlePageChange = (page: number) => {
@@ -110,7 +120,9 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
 
   if (isLoading) {
     return (
-      <div className="p-8 text-center">Loading claims...</div>
+      <DashboardLayout>
+        <div className="p-8 text-center">Loading claims...</div>
+      </DashboardLayout>
     );
   }
 
@@ -131,90 +143,92 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
   };
 
   return (
-    <div className="container mx-auto px-4 space-y-6">
-      <div className="flex flex-col gap-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button 
-              variant="ghost" 
-              size="icon"
-              onClick={() => navigate('/dashboard')}
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <h1 
-              className="text-2xl font-semibold text-blue-600 cursor-pointer"
-              onClick={() => navigate('/dashboard')}
-            >
-              Claims List
-            </h1>
+    <DashboardLayout>
+      <div className="container mx-auto px-4 space-y-6">
+        <div className="flex flex-col gap-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={() => navigate('/dashboard')}
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+              <h1 
+                className="text-2xl font-semibold text-blue-600 cursor-pointer"
+                onClick={() => navigate('/dashboard')}
+              >
+                Claims List
+              </h1>
+            </div>
+            <h2 className="text-xl font-bold text-blue-600">
+              NEXTCLAIM
+            </h2>
           </div>
-          <h2 className="text-xl font-bold text-blue-600">
-            NEXTCLAIM
-          </h2>
-        </div>
-        
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div className="relative w-full md:w-96">
-            <Input
-              type="text"
-              placeholder="Search by SSN (XXX-XX-XXXX)"
-              value={localSearchQuery}
-              onChange={(e) => {
-                setLocalSearchQuery(e.target.value);
-                setCurrentPage(1); // Reset to first page when searching
-              }}
-              className="pl-10"
+          
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div className="relative w-full md:w-96">
+              <Input
+                type="text"
+                placeholder="Search by SSN (XXX-XX-XXXX)"
+                value={localSearchQuery}
+                onChange={(e) => {
+                  setLocalSearchQuery(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="pl-10"
+              />
+              <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+            </div>
+            <ClaimsStatusFilter 
+              status={statusParam as any}
+              onStatusChange={handleStatusChange}
             />
-            <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
           </div>
-          <ClaimsStatusFilter 
-            status={statusParam as any}
-            onStatusChange={handleStatusChange}
-          />
         </div>
-      </div>
 
-      <div className="max-w-[1200px] mx-auto">
-        <ClaimsTable claims={claims} />
-      </div>
+        <div className="max-w-[1200px] mx-auto">
+          <ClaimsTable claims={claims} />
+        </div>
 
-      {totalPages > 1 && (
-        <div className="mt-6">
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-                  className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                />
-              </PaginationItem>
-
-              {getPageNumbers().map((page) => (
-                <PaginationItem key={page}>
-                  <PaginationLink
-                    isActive={currentPage === page}
-                    onClick={() => handlePageChange(page)}
-                    className="cursor-pointer"
-                  >
-                    {page}
-                  </PaginationLink>
+        {totalPages > 1 && (
+          <div className="mt-6">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                    className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  />
                 </PaginationItem>
-              ))}
 
-              <PaginationItem>
-                <PaginationNext
-                  onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
-                  className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-          <div className="text-center text-sm text-gray-500 mt-2">
-            Showing page {currentPage} of {totalPages} ({totalClaims} total claims)
+                {getPageNumbers().map((page) => (
+                  <PaginationItem key={page}>
+                    <PaginationLink
+                      isActive={currentPage === page}
+                      onClick={() => handlePageChange(page)}
+                      className="cursor-pointer"
+                    >
+                      {page}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                    className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+            <div className="text-center text-sm text-gray-500 mt-2">
+              Showing page {currentPage} of {totalPages} ({totalClaims} total claims)
+            </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </DashboardLayout>
   );
 }
