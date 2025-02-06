@@ -26,6 +26,7 @@ export function SSNSearchDialog({ isOpen, onOpenChange }: SSNSearchDialogProps) 
   const [ssnError, setSsnError] = useState("");
 
   const formatSSN = (input: string) => {
+    // Remove all non-digits
     const cleaned = input.replace(/\D/g, '');
     let formatted = cleaned;
 
@@ -33,8 +34,10 @@ export function SSNSearchDialog({ isOpen, onOpenChange }: SSNSearchDialogProps) 
       formatted = cleaned.slice(0, 3) + '-' + cleaned.slice(3);
     }
     if (cleaned.length > 5) {
-      formatted = formatted.slice(0, 6) + '-' + cleaned.slice(6);
+      formatted = formatted.slice(0, 6) + '-' + formatted.slice(6);
     }
+    
+    // Ensure we don't exceed 11 characters (XXX-XX-XXXX)
     if (cleaned.length > 9) {
       formatted = formatted.slice(0, 11);
     }
