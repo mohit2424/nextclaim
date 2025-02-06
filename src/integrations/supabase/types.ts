@@ -18,6 +18,8 @@ export type Database = {
           documents: Json | null
           email: string
           employer_name: string
+          employment_end_date: string | null
+          employment_start_date: string | null
           first_name: string
           id: string
           last_day_of_work: string | null
@@ -42,6 +44,8 @@ export type Database = {
           documents?: Json | null
           email: string
           employer_name: string
+          employment_end_date?: string | null
+          employment_start_date?: string | null
           first_name: string
           id: string
           last_day_of_work?: string | null
@@ -66,6 +70,8 @@ export type Database = {
           documents?: Json | null
           email?: string
           employer_name?: string
+          employment_end_date?: string | null
+          employment_start_date?: string | null
           first_name?: string
           id?: string
           last_day_of_work?: string | null
