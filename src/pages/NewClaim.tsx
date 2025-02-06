@@ -63,6 +63,7 @@ export default function NewClaim() {
   const [searchSsn, setSearchSsn] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [existingClaim, setExistingClaim] = useState<null | { id: string }>(null);
+  const [ssnError, setSsnError] = useState("");
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -84,13 +85,32 @@ export default function NewClaim() {
     }
   };
 
+  const formatSSN = (ssn: string) => {
+    // Remove any non-digit characters
+    const cleaned = ssn.replace(/\D/g, '');
+    
+    // Format as XXX-XX-XXXX
+    if (cleaned.length >= 9) {
+      return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 5)}-${cleaned.slice(5, 9)}`;
+    }
+    return cleaned;
+  };
+
   const checkExistingSSN = async (ssn: string) => {
     setIsSearching(true);
+    setSsnError("");
     try {
+      // Format SSN before checking
+      const formattedSsn = formatSSN(ssn);
+      if (formattedSsn.length !== 11) { // XXX-XX-XXXX = 11 characters
+        setSsnError("Invalid SSN format. Must be XXX-XX-XXXX");
+        return null;
+      }
+
       const { data, error } = await supabase
         .from('claims')
         .select('id')
-        .eq('ssn', ssn)
+        .eq('ssn', formattedSsn)
         .maybeSingle();
 
       if (error) {
@@ -112,17 +132,27 @@ export default function NewClaim() {
 
   const handleSsnSearch = async () => {
     if (!searchSsn) {
-      toast.error("Please enter an SSN");
+      setSsnError("Please enter an SSN");
       return;
     }
 
-    // Format SSN if needed
-    const formattedSsn = searchSsn.replace(/(\d{3})(\d{2})(\d{4})/, '$1-$2-$3');
-    const claim = await checkExistingSSN(formattedSsn);
+    const claim = await checkExistingSSN(searchSsn);
     
     if (claim) {
       toast.info("A claim with this SSN already exists");
     }
+  };
+
+  const handleViewExistingClaim = () => {
+    if (existingClaim) {
+      navigate(`/claims/${existingClaim.id}`);
+    }
+  };
+
+  const handleSsnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatSSN(e.target.value);
+    setSearchSsn(formatted);
+    setSsnError("");
   };
 
   const onSubmit = async (values: FormValues) => {
@@ -135,25 +165,21 @@ export default function NewClaim() {
         return;
       }
 
+      // Format SSN before submitting
+      const formattedSsn = formatSSN(values.ssn);
+      if (formattedSsn.length !== 11) {
+        toast.error("Invalid SSN format. Must be XXX-XX-XXXX");
+        return;
+      }
+
       const insertData = {
-        age: values.age,
+        ...values,
+        ssn: formattedSsn,
         claim_date: format(values.claimDate, 'yyyy-MM-dd'),
-        claim_status: values.claimStatus,
-        documents: [],
-        email: values.email,
-        employer_name: values.employerName,
-        first_name: values.firstName,
         last_day_of_work: format(values.lastDayOfWork, 'yyyy-MM-dd'),
-        last_name: values.lastName,
-        middle_name: values.middleName || null,
-        phone: values.phone,
-        pincode: values.pincode,
-        separation_reason: values.separationReason,
-        severance_package: false,
-        ssn: values.ssn,
-        state: values.state,
+        documents: [],
         user_id: session.user.id
-      } as const;
+      };
 
       const { data, error } = await supabase
         .from('claims')
@@ -161,19 +187,20 @@ export default function NewClaim() {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        if (error.code === '23505') {
+          toast.error("A claim with this SSN already exists");
+        } else {
+          throw error;
+        }
+        return;
+      }
 
       toast.success("Claim submitted successfully");
       navigate("/claims");
     } catch (error) {
       console.error('Error submitting claim:', error);
       toast.error("Failed to submit claim");
-    }
-  };
-
-  const handleViewExistingClaim = () => {
-    if (existingClaim) {
-      navigate(`/claims/${existingClaim.id}`);
     }
   };
 
@@ -186,11 +213,17 @@ export default function NewClaim() {
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="flex flex-col gap-4">
-              <Input
-                placeholder="Enter SSN (XXX-XX-XXXX)"
-                value={searchSsn}
-                onChange={(e) => setSearchSsn(e.target.value)}
-              />
+              <div>
+                <Input
+                  placeholder="Enter SSN (XXX-XX-XXXX)"
+                  value={searchSsn}
+                  onChange={handleSsnChange}
+                  maxLength={11}
+                />
+                {ssnError && (
+                  <p className="text-sm text-red-500 mt-1">{ssnError}</p>
+                )}
+              </div>
               <div className="flex gap-4">
                 <Button 
                   onClick={handleSsnSearch}
