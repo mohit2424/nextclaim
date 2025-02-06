@@ -1,29 +1,14 @@
 
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Form } from "@/components/ui/form";
 import { toast } from "sonner";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import * as z from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { supabase } from "@/integrations/supabase/client";
-import { format } from "date-fns";
-import { PersonalInfoFields } from "@/components/claims/PersonalInfoFields";
-import { ContactInfoFields } from "@/components/claims/ContactInfoFields";
-import { AddressFields } from "@/components/claims/AddressFields";
-import { ClaimDetailsFields } from "@/components/claims/ClaimDetailsFields";
 import { ArrowLeft } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import type { Database } from "@/integrations/supabase/types";
+import { SSNSearchDialog } from "@/components/claims/SSNSearchDialog";
+import { ClaimForm } from "@/components/claims/ClaimForm";
+import { supabase } from "@/integrations/supabase/client";
+import * as z from "zod";
 
 export const formSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),
@@ -54,24 +39,11 @@ export const formSchema = z.object({
   ]),
 });
 
-type FormValues = z.infer<typeof formSchema>;
-type ClaimInsert = Database["public"]["Tables"]["claims"]["Insert"];
+export type FormValues = z.infer<typeof formSchema>;
 
 export default function NewClaim() {
   const navigate = useNavigate();
   const [isDialogOpen, setIsDialogOpen] = useState(true);
-  const [searchSsn, setSearchSsn] = useState("");
-  const [isSearching, setIsSearching] = useState(false);
-  const [existingClaim, setExistingClaim] = useState<null | { id: string }>(null);
-  const [ssnError, setSsnError] = useState("");
-
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      middleName: "",
-      claimStatus: "initial_review",
-    },
-  });
 
   useEffect(() => {
     checkUser();
@@ -85,166 +57,12 @@ export default function NewClaim() {
     }
   };
 
-  const formatSSN = (ssn: string) => {
-    // Remove any non-digit characters
-    const cleaned = ssn.replace(/\D/g, '');
-    
-    // Format as XXX-XX-XXXX
-    if (cleaned.length >= 9) {
-      return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 5)}-${cleaned.slice(5, 9)}`;
-    }
-    return cleaned;
-  };
-
-  const checkExistingSSN = async (ssn: string) => {
-    setIsSearching(true);
-    setSsnError("");
-    try {
-      // Format SSN before checking
-      const formattedSsn = formatSSN(ssn);
-      if (formattedSsn.length !== 11) { // XXX-XX-XXXX = 11 characters
-        setSsnError("Invalid SSN format. Must be XXX-XX-XXXX");
-        return null;
-      }
-
-      const { data, error } = await supabase
-        .from('claims')
-        .select('id')
-        .eq('ssn', formattedSsn)
-        .maybeSingle();
-
-      if (error) {
-        console.error('Error checking SSN:', error);
-        toast.error("Error checking SSN");
-        return null;
-      }
-
-      setExistingClaim(data);
-      return data;
-    } catch (error) {
-      console.error('Error:', error);
-      toast.error("Error checking SSN");
-      return null;
-    } finally {
-      setIsSearching(false);
-    }
-  };
-
-  const handleSsnSearch = async () => {
-    if (!searchSsn) {
-      setSsnError("Please enter an SSN");
-      return;
-    }
-
-    const claim = await checkExistingSSN(searchSsn);
-    
-    if (claim) {
-      toast.info("A claim with this SSN already exists");
-    }
-  };
-
-  const handleViewExistingClaim = () => {
-    if (existingClaim) {
-      navigate(`/claims/${existingClaim.id}`);
-    }
-  };
-
-  const handleSsnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formatted = formatSSN(e.target.value);
-    setSearchSsn(formatted);
-    setSsnError("");
-  };
-
-  const onSubmit = async (values: FormValues) => {
-    try {
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      
-      if (sessionError || !session) {
-        toast.error("Please login to submit a claim");
-        navigate("/login");
-        return;
-      }
-
-      // Format SSN before submitting
-      const formattedSsn = formatSSN(values.ssn);
-      if (formattedSsn.length !== 11) {
-        toast.error("Invalid SSN format. Must be XXX-XX-XXXX");
-        return;
-      }
-
-      const insertData = {
-        ...values,
-        ssn: formattedSsn,
-        claim_date: format(values.claimDate, 'yyyy-MM-dd'),
-        last_day_of_work: format(values.lastDayOfWork, 'yyyy-MM-dd'),
-        documents: [],
-        user_id: session.user.id
-      };
-
-      const { data, error } = await supabase
-        .from('claims')
-        .insert(insertData)
-        .select()
-        .single();
-
-      if (error) {
-        if (error.code === '23505') {
-          toast.error("A claim with this SSN already exists");
-        } else {
-          throw error;
-        }
-        return;
-      }
-
-      toast.success("Claim submitted successfully");
-      navigate("/claims");
-    } catch (error) {
-      console.error('Error submitting claim:', error);
-      toast.error("Failed to submit claim");
-    }
-  };
-
   return (
     <DashboardLayout>
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Search Existing Claims</DialogTitle>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="flex flex-col gap-4">
-              <div>
-                <Input
-                  placeholder="Enter SSN (XXX-XX-XXXX)"
-                  value={searchSsn}
-                  onChange={handleSsnChange}
-                  maxLength={11}
-                />
-                {ssnError && (
-                  <p className="text-sm text-red-500 mt-1">{ssnError}</p>
-                )}
-              </div>
-              <div className="flex gap-4">
-                <Button 
-                  onClick={handleSsnSearch}
-                  disabled={isSearching}
-                >
-                  {isSearching ? "Searching..." : "Search"}
-                </Button>
-                {existingClaim ? (
-                  <Button onClick={handleViewExistingClaim}>
-                    View Existing Claim
-                  </Button>
-                ) : (
-                  <Button onClick={() => setIsDialogOpen(false)}>
-                    Add New Claim
-                  </Button>
-                )}
-              </div>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <SSNSearchDialog 
+        isOpen={isDialogOpen} 
+        onOpenChange={setIsDialogOpen} 
+      />
 
       <div className="container mx-auto py-6">
         <div className="flex items-center justify-between mb-6">
@@ -259,27 +77,7 @@ export default function NewClaim() {
           </Button>
         </div>
         
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <PersonalInfoFields form={form} />
-              <ContactInfoFields form={form} />
-              <AddressFields form={form} />
-              <ClaimDetailsFields form={form} />
-            </div>
-
-            <div className="flex justify-end gap-4">
-              <Button 
-                type="button" 
-                variant="outline"
-                onClick={() => navigate('/claims')}
-              >
-                Cancel
-              </Button>
-              <Button type="submit">Submit Claim</Button>
-            </div>
-          </form>
-        </Form>
+        <ClaimForm onCancel={() => navigate('/claims')} />
       </div>
     </DashboardLayout>
   );
