@@ -10,6 +10,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 
 interface SSNSearchDialogProps {
@@ -24,20 +25,28 @@ export function SSNSearchDialog({ isOpen, onOpenChange }: SSNSearchDialogProps) 
   const [existingClaim, setExistingClaim] = useState<null | { id: string }>(null);
   const [ssnError, setSsnError] = useState("");
 
-  const formatSSN = (ssn: string) => {
-    const cleaned = ssn.replace(/\D/g, '');
-    if (cleaned.length >= 9) {
-      return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 5)}-${cleaned.slice(5, 9)}`;
+  const formatSSN = (input: string) => {
+    const cleaned = input.replace(/\D/g, '');
+    let formatted = cleaned;
+
+    if (cleaned.length > 3) {
+      formatted = cleaned.slice(0, 3) + '-' + cleaned.slice(3);
     }
-    return cleaned;
+    if (cleaned.length > 5) {
+      formatted = formatted.slice(0, 6) + '-' + cleaned.slice(6);
+    }
+    if (cleaned.length > 9) {
+      formatted = formatted.slice(0, 11);
+    }
+    
+    return formatted;
   };
 
   const checkExistingSSN = async (ssn: string) => {
     setIsSearching(true);
     setSsnError("");
     try {
-      const formattedSsn = formatSSN(ssn);
-      if (formattedSsn.length !== 11) {
+      if (ssn.length !== 11) {
         setSsnError("Invalid SSN format. Must be XXX-XX-XXXX");
         return null;
       }
@@ -45,7 +54,7 @@ export function SSNSearchDialog({ isOpen, onOpenChange }: SSNSearchDialogProps) 
       const { data, error } = await supabase
         .from('claims')
         .select('id')
-        .eq('ssn', formattedSsn)
+        .eq('ssn', ssn)
         .maybeSingle();
 
       if (error) {
@@ -95,6 +104,9 @@ export function SSNSearchDialog({ isOpen, onOpenChange }: SSNSearchDialogProps) 
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Search Existing Claims</DialogTitle>
+          <DialogDescription>
+            Enter a Social Security Number to search for existing claims
+          </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="flex flex-col gap-4">

@@ -54,6 +54,7 @@ export function ClaimForm({ onCancel }: ClaimFormProps) {
       }
 
       const insertData: Database["public"]["Tables"]["claims"]["Insert"] = {
+        id: crypto.randomUUID(),
         age: values.age,
         claim_date: format(values.claimDate, 'yyyy-MM-dd'),
         claim_status: values.claimStatus,
@@ -73,7 +74,7 @@ export function ClaimForm({ onCancel }: ClaimFormProps) {
         user_id: session.user.id
       };
 
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('claims')
         .insert(insertData)
         .select()
