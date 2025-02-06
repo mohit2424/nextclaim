@@ -75,7 +75,7 @@ export function ClaimsTable({ claims }: ClaimsTableProps) {
                 <TableCell>{claim.ssn}</TableCell>
                 <TableCell>
                   <Button
-                    variant="default"
+                    variant="outline"
                     size="sm"
                     onClick={() => navigate(`/claims/${claim.id}`)}
                     className="w-full"
