@@ -21,7 +21,8 @@ function generateMockClaims() {
     pincode: Math.floor(Math.random() * 90000 + 10000).toString(),
     ssn: `${Math.floor(Math.random() * 900 + 100)}-${Math.floor(Math.random() * 90 + 10)}-${Math.floor(Math.random() * 9000 + 1000)}`,
     email: `test${i + 1}@example.com`,
-    phone: `${Math.floor(Math.random() * 900 + 100)}-${Math.floor(Math.random() * 900 + 100)}-${Math.floor(Math.random() * 9000 + 1000)}`,
+    // Format phone as exactly 10 digits without dashes
+    phone: `${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 9000 + 1000)}`,
     employer_name: employers[Math.floor(Math.random() * employers.length)],
     claim_date: new Date().toISOString().split('T')[0],
     claim_status: "initial_review",
