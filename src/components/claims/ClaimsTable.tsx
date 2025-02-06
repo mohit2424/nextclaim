@@ -1,8 +1,9 @@
-
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { EligibilityCheckDialog } from "./EligibilityCheckDialog";
 
 export type ClaimStatus = "initial_review" | "pending" | "approved" | "rejected" | "in_progress";
 
@@ -16,10 +17,13 @@ type Claim = {
   employer_name: string;
   claim_date: string;
   ssn: string;
+  employment_start_date: string | null;
+  employment_end_date: string | null;
 };
 
 interface ClaimsTableProps {
   claims: Claim[];
+  onStatusUpdate?: () => void;
 }
 
 const getStatusColor = (status: ClaimStatus) => {
@@ -33,74 +37,92 @@ const getStatusColor = (status: ClaimStatus) => {
   return colors[status] || "bg-gray-100 text-gray-800 border-gray-200";
 };
 
-export function ClaimsTable({ claims }: ClaimsTableProps) {
+export function ClaimsTable({ claims, onStatusUpdate }: ClaimsTableProps) {
   const navigate = useNavigate();
+  const [selectedClaim, setSelectedClaim] = useState<Claim | null>(null);
 
-  const handleCheckEligibility = (claimId: string) => {
-    // Navigate to eligibility check page
-    navigate(`/claims/${claimId}/eligibility`);
+  const handleEligibilityCheck = (claim: Claim) => {
+    setSelectedClaim(claim);
   };
 
   return (
-    <div className="bg-white rounded-lg border shadow-sm w-full">
-      <div className="overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-gray-50 hover:bg-gray-50">
-              <TableHead className="font-semibold text-gray-700">Claim ID</TableHead>
-              <TableHead className="font-semibold text-gray-700">Claimant Name</TableHead>
-              <TableHead className="font-semibold text-gray-700">Date Submitted</TableHead>
-              <TableHead className="font-semibold text-gray-700">Last Updated</TableHead>
-              <TableHead className="font-semibold text-gray-700">Status</TableHead>
-              <TableHead className="font-semibold text-gray-700">Employer</TableHead>
-              <TableHead className="font-semibold text-gray-700">Due Date</TableHead>
-              <TableHead className="font-semibold text-gray-700">SSN</TableHead>
-              <TableHead className="font-semibold text-gray-700 w-[200px]">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {claims.map((claim) => (
-              <TableRow key={claim.id} className="hover:bg-gray-50">
-                <TableCell className="font-medium">{claim.id}</TableCell>
-                <TableCell>{`${claim.first_name} ${claim.last_name}`}</TableCell>
-                <TableCell>{new Date(claim.created_at).toLocaleDateString()}</TableCell>
-                <TableCell>{new Date(claim.updated_at).toLocaleDateString()}</TableCell>
-                <TableCell>
-                  <Badge 
-                    className={`${getStatusColor(claim.claim_status)} border`}
-                    variant="secondary"
-                  >
-                    {claim.claim_status.split('_').map(word => 
-                      word.charAt(0).toUpperCase() + word.slice(1)
-                    ).join(' ')}
-                  </Badge>
-                </TableCell>
-                <TableCell>{claim.employer_name}</TableCell>
-                <TableCell>{new Date(claim.claim_date).toLocaleDateString()}</TableCell>
-                <TableCell>{claim.ssn}</TableCell>
-                <TableCell>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => navigate(`/claims/${claim.id}`)}
-                    >
-                      View Details
-                    </Button>
-                    <Button
-                      variant="default"
-                      size="sm"
-                      onClick={() => handleCheckEligibility(claim.id)}
-                    >
-                      Check Eligibility
-                    </Button>
-                  </div>
-                </TableCell>
+    <>
+      <div className="bg-white rounded-lg border shadow-sm w-full">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-gray-50 hover:bg-gray-50">
+                <TableHead className="font-semibold text-gray-700">Claim ID</TableHead>
+                <TableHead className="font-semibold text-gray-700">Claimant Name</TableHead>
+                <TableHead className="font-semibold text-gray-700">Date Submitted</TableHead>
+                <TableHead className="font-semibold text-gray-700">Last Updated</TableHead>
+                <TableHead className="font-semibold text-gray-700">Status</TableHead>
+                <TableHead className="font-semibold text-gray-700">Employer</TableHead>
+                <TableHead className="font-semibold text-gray-700">Due Date</TableHead>
+                <TableHead className="font-semibold text-gray-700">SSN</TableHead>
+                <TableHead className="font-semibold text-gray-700 w-[200px]">Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {claims.map((claim) => (
+                <TableRow key={claim.id} className="hover:bg-gray-50">
+                  <TableCell className="font-medium">{claim.id}</TableCell>
+                  <TableCell>{`${claim.first_name} ${claim.last_name}`}</TableCell>
+                  <TableCell>{new Date(claim.created_at).toLocaleDateString()}</TableCell>
+                  <TableCell>{new Date(claim.updated_at).toLocaleDateString()}</TableCell>
+                  <TableCell>
+                    <Badge 
+                      className={`${getStatusColor(claim.claim_status)} border`}
+                      variant="secondary"
+                    >
+                      {claim.claim_status.split('_').map(word => 
+                        word.charAt(0).toUpperCase() + word.slice(1)
+                      ).join(' ')}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{claim.employer_name}</TableCell>
+                  <TableCell>{new Date(claim.claim_date).toLocaleDateString()}</TableCell>
+                  <TableCell>{claim.ssn}</TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => navigate(`/claims/${claim.id}`)}
+                      >
+                        View Details
+                      </Button>
+                      {claim.claim_status === "initial_review" && (
+                        <Button
+                          variant="default"
+                          size="sm"
+                          onClick={() => handleEligibilityCheck(claim)}
+                        >
+                          Check Eligibility
+                        </Button>
+                      )}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </div>
-    </div>
+
+      {selectedClaim && (
+        <EligibilityCheckDialog
+          claimId={selectedClaim.id}
+          employmentStartDate={selectedClaim.employment_start_date}
+          employmentEndDate={selectedClaim.employment_end_date}
+          onClose={() => setSelectedClaim(null)}
+          onStatusUpdate={() => {
+            if (onStatusUpdate) {
+              onStatusUpdate();
+            }
+          }}
+        />
+      )}
+    </>
   );
 }

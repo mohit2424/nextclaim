@@ -202,6 +202,13 @@ export type Database = {
             }
             Returns: unknown
           }
+      check_claim_eligibility: {
+        Args: {
+          start_date: string
+          end_date: string
+        }
+        Returns: boolean
+      }
       halfvec_avg: {
         Args: {
           "": number[]

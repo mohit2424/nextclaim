@@ -98,7 +98,10 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
         </div>
 
         <div className="max-w-[1200px] mx-auto">
-          <ClaimsTable claims={claims} />
+          <ClaimsTable 
+            claims={claims} 
+            onStatusUpdate={refetch}
+          />
         </div>
 
         <ClaimsPagination
@@ -111,4 +114,3 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
     </DashboardLayout>
   );
 }
-
