@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
-import { Building2, User, Upload, FileText, BriefcaseIcon } from "lucide-react";
+import { Building2, User, Upload, FileText, BriefcaseIcon, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -145,7 +145,7 @@ export default function ClaimDetails() {
           <p className="text-muted-foreground mt-2">{error.message}</p>
           <Button 
             className="mt-4"
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/dashboard')}
           >
             Go Back
           </Button>
@@ -173,7 +173,7 @@ export default function ClaimDetails() {
           <p className="text-muted-foreground">The requested claim could not be found.</p>
           <Button 
             className="mt-4"
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/dashboard')}
           >
             Go Back
           </Button>
@@ -185,6 +185,17 @@ export default function ClaimDetails() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate('/dashboard')}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Dashboard
+          </Button>
+        </div>
+
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold">Claim Details</h1>

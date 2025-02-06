@@ -1,4 +1,3 @@
-
 import {
   LayoutDashboard,
   FileText,
@@ -87,8 +86,11 @@ export function AppSidebar() {
   
   return (
     <Sidebar className="border-r bg-white">
-      <div className="p-4 border-b">
-        <h1 className="text-xl font-bold text-blue-600">NextClaim</h1>
+      <div 
+        className="p-4 border-b cursor-pointer hover:bg-gray-50 transition-colors"
+        onClick={() => navigate('/dashboard')}
+      >
+        <h1 className="text-xl font-bold text-blue-600">NEXTCLAIM</h1>
       </div>
       <SidebarContent>
         <SidebarGroup>
