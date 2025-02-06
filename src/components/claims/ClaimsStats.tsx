@@ -55,7 +55,7 @@ export function ClaimsStats() {
       value: claimStats.inProgress.toString(),
       bgColor: "bg-gradient-to-r from-purple-50 to-purple-100",
       textColor: "text-purple-900",
-      onClick: () => navigate("/claims?status=initial_review"), // Changed from in_progress to initial_review
+      onClick: () => navigate("/claims?status=in_progress"),
     },
     {
       title: "New Claims Today",

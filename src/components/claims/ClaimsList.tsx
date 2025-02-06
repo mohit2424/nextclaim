@@ -3,8 +3,6 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { ClaimsSearchBar } from "./ClaimsSearchBar";
 import { ClaimsStatusFilter } from "./ClaimsStatusFilter";
 import { ClaimsTable, type ClaimStatus } from "./ClaimsTable";
@@ -42,7 +40,6 @@ const fetchClaims = async (searchQuery: string = "", status?: string) => {
 };
 
 export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps) {
-  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [currentPage, setCurrentPage] = useState(1);
   const [localSearchQuery, setLocalSearchQuery] = useState(initialSearchQuery);
@@ -92,17 +89,7 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold text-blue-600">Claims List</h1>
-          <Button 
-            variant="outline" 
-            onClick={() => navigate('/dashboard')}
-            className="flex items-center gap-2"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Dashboard
-          </Button>
-        </div>
+        <h1 className="text-2xl font-semibold text-blue-600">Claims List</h1>
         
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <ClaimsSearchBar 

@@ -7,45 +7,31 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-const mockClaims = [
-  {
-    first_name: "John",
-    middle_name: "Robert",
-    last_name: "Doe",
-    age: 35,
-    state: "California",
-    pincode: "90210",
-    ssn: "123-45-6789",
-    email: "john.doe@example.com",
-    phone: "1234567890",
-    employer_name: "Tech Corp Inc",
+function generateMockClaims() {
+  const states = ["California", "New York", "Texas", "Florida", "Washington"];
+  const employers = ["Tech Corp Inc", "Finance Solutions LLC", "Healthcare Systems", "Retail Enterprises", "Manufacturing Co"];
+  const separationReasons = ["layoff", "reduction_in_force", "constructive_discharge", "severance_agreement", "job_abandonment"];
+  
+  return Array.from({ length: 5 }, (_, i) => ({
+    first_name: `TestFirst${i + 1}`,
+    middle_name: `M${i + 1}`,
+    last_name: `TestLast${i + 1}`,
+    age: Math.floor(Math.random() * (65 - 18) + 18),
+    state: states[Math.floor(Math.random() * states.length)],
+    pincode: Math.floor(Math.random() * 90000 + 10000).toString(),
+    ssn: `${Math.floor(Math.random() * 900 + 100)}-${Math.floor(Math.random() * 90 + 10)}-${Math.floor(Math.random() * 9000 + 1000)}`,
+    email: `test${i + 1}@example.com`,
+    phone: `${Math.floor(Math.random() * 900 + 100)}-${Math.floor(Math.random() * 900 + 100)}-${Math.floor(Math.random() * 9000 + 1000)}`,
+    employer_name: employers[Math.floor(Math.random() * employers.length)],
     claim_date: new Date().toISOString().split('T')[0],
     claim_status: "initial_review",
-    separation_reason: "layoff",
+    separation_reason: separationReasons[Math.floor(Math.random() * separationReasons.length)],
     last_day_of_work: new Date().toISOString().split('T')[0],
-    severance_package: false,
+    severance_package: Math.random() > 0.5,
+    severance_amount: Math.random() > 0.5 ? Math.floor(Math.random() * 50000 + 5000) : null,
     reason_for_unemployment: "Company restructuring"
-  },
-  {
-    first_name: "Jane",
-    middle_name: "Marie",
-    last_name: "Smith",
-    age: 42,
-    state: "California",
-    pincode: "94105",
-    ssn: "987-65-4321",
-    email: "jane.smith@example.com",
-    phone: "9876543210",
-    employer_name: "Finance Solutions LLC",
-    claim_date: new Date().toISOString().split('T')[0],
-    claim_status: "initial_review",
-    separation_reason: "reduction_in_force",
-    last_day_of_work: new Date().toISOString().split('T')[0],
-    severance_package: true,
-    severance_amount: 10000,
-    reason_for_unemployment: "Position eliminated"
-  }
-];
+  }));
+}
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -58,7 +44,8 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    console.log('Processing mock claims...')
+    console.log('Generating and processing new mock claims...')
+    const mockClaims = generateMockClaims();
     
     const results = []
     for (const claim of mockClaims) {
@@ -88,7 +75,6 @@ serve(async (req) => {
       results.push(data[0])
     }
 
-    // Return success even if some claims were skipped
     return new Response(
       JSON.stringify({ 
         success: true, 
