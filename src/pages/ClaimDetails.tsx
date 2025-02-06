@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
@@ -40,6 +39,8 @@ type Claim = {
   severance_package: boolean | null;
   severance_amount: number | null;
   reason_for_unemployment: string | null;
+  employment_start_date: string | null;
+  employment_end_date: string | null;
 };
 
 type DatabaseDocument = {
@@ -277,8 +278,18 @@ export default function ClaimDetails() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
+                  <Label>First Day of Work</Label>
+                  <Input 
+                    value={claim.employment_start_date ? new Date(claim.employment_start_date).toLocaleDateString() : 'Not specified'} 
+                    readOnly 
+                  />
+                </div>
+                <div>
                   <Label>Last Day of Work</Label>
-                  <Input value={claim.last_day_of_work ? new Date(claim.last_day_of_work).toLocaleDateString() : 'Not specified'} readOnly />
+                  <Input 
+                    value={claim.employment_end_date ? new Date(claim.employment_end_date).toLocaleDateString() : 'Not specified'} 
+                    readOnly 
+                  />
                 </div>
                 <div>
                   <Label>Reason for Unemployment</Label>
