@@ -46,11 +46,11 @@ export const formSchema = z.object({
   ]),
 });
 
-type ClaimInsert = Database["public"]["Tables"]["claims"]["Insert"];
+type FormValues = z.infer<typeof formSchema>;
 
 export default function NewClaim() {
   const navigate = useNavigate();
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       middleName: "",
@@ -85,7 +85,7 @@ export default function NewClaim() {
     return data;
   };
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: FormValues) => {
     try {
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
@@ -103,29 +103,27 @@ export default function NewClaim() {
         return;
       }
 
-      const claimData: Omit<ClaimInsert, "id"> = {
-        age: values.age,
-        claim_date: format(values.claimDate, 'yyyy-MM-dd'),
-        claim_status: values.claimStatus,
-        documents: [],
-        email: values.email,
-        employer_name: values.employerName,
-        first_name: values.firstName,
-        last_day_of_work: format(values.lastDayOfWork, 'yyyy-MM-dd'),
-        last_name: values.lastName,
-        middle_name: values.middleName || null,
-        phone: values.phone,
-        pincode: values.pincode,
-        separation_reason: values.separationReason,
-        severance_package: false,
-        ssn: values.ssn,
-        state: values.state,
-        user_id: session.user.id
-      };
-
       const { data, error } = await supabase
         .from('claims')
-        .insert(claimData)
+        .insert({
+          age: values.age,
+          claim_date: format(values.claimDate, 'yyyy-MM-dd'),
+          claim_status: values.claimStatus,
+          documents: [],
+          email: values.email,
+          employer_name: values.employerName,
+          first_name: values.firstName,
+          last_day_of_work: format(values.lastDayOfWork, 'yyyy-MM-dd'),
+          last_name: values.lastName,
+          middle_name: values.middleName || null,
+          phone: values.phone,
+          pincode: values.pincode,
+          separation_reason: values.separationReason,
+          severance_package: false,
+          ssn: values.ssn,
+          state: values.state,
+          user_id: session.user.id
+        })
         .select()
         .single();
 
