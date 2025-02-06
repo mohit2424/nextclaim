@@ -1,3 +1,4 @@
+
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -6,8 +7,9 @@ import { ClaimsSearchBar } from "./ClaimsSearchBar";
 import { ClaimsStatusFilter } from "./ClaimsStatusFilter";
 import { ClaimsTable, type ClaimStatus } from "./ClaimsTable";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { Search, ArrowLeft } from "lucide-react";
 import { startOfDay } from "date-fns";
+import { Button } from "@/components/ui/button";
 
 interface ClaimsListProps {
   searchQuery: string;
@@ -49,6 +51,7 @@ const fetchClaims = async (searchQuery: string = "", status?: string) => {
 };
 
 export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps) {
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [currentPage, setCurrentPage] = useState(1);
   const [localSearchQuery, setLocalSearchQuery] = useState(initialSearchQuery);
@@ -99,8 +102,21 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
     <div className="container mx-auto px-4 space-y-6">
       <div className="flex flex-col gap-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold text-blue-600">Claims List</h1>
-          <img src="/nextclaim-logo.png" alt="NEXTCLAIM" className="h-8" />
+          <div className="flex items-center gap-4">
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={() => navigate('/dashboard')}
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <h1 
+              className="text-2xl font-semibold text-blue-600 cursor-pointer"
+              onClick={() => navigate('/dashboard')}
+            >
+              Claims List
+            </h1>
+          </div>
         </div>
         
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
