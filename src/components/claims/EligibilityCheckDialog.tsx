@@ -60,9 +60,9 @@ export function EligibilityCheckDialog({
 
   const handleClaimUpdate = async () => {
     try {
-      // First, update the claim status
+      // First, update the claim status with the correct type
       const updateData = {
-        claim_status: isEligible ? 'in_progress' : 'rejected',
+        claim_status: isEligible ? 'in_progress' : 'rejected' as const,
         ...(isEligible ? {} : { rejection_reason: rejectionReason })
       };
 
