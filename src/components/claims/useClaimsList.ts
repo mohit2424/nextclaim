@@ -71,3 +71,4 @@ export const useClaimsList = (
     refetchInterval: 5000, // Poll every 5 seconds for real-time updates
   });
 };
+
