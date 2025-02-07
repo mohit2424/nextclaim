@@ -20,9 +20,34 @@ function generateMockClaims() {
   ];
   const separationReasons = ["layoff", "reduction_in_force", "constructive_discharge", "severance_agreement", "job_abandonment"];
   
+  // Current date for reference
+  const currentDate = new Date();
+  
+  // Helper function to generate dates
+  const generateEmploymentDates = (isEligible: boolean) => {
+    const endDate = new Date(currentDate);
+    endDate.setDate(endDate.getDate() - Math.floor(Math.random() * 30)); // End date within last 30 days
+    
+    const startDate = new Date(endDate);
+    if (isEligible) {
+      // For eligible claims: 120-365 days of employment
+      startDate.setDate(startDate.getDate() - (120 + Math.floor(Math.random() * 245)));
+    } else {
+      // For ineligible claims: 30-119 days of employment
+      startDate.setDate(startDate.getDate() - (30 + Math.floor(Math.random() * 89)));
+    }
+    
+    return {
+      startDate: startDate.toISOString().split('T')[0],
+      endDate: endDate.toISOString().split('T')[0]
+    };
+  };
+  
   return Array.from({ length: 5 }, (_, i) => {
     const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
     const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+    const isEligible = i < 2; // First 2 claims will be eligible, last 3 won't
+    const { startDate, endDate } = generateEmploymentDates(isEligible);
     
     return {
       first_name: firstName,
@@ -38,10 +63,11 @@ function generateMockClaims() {
       claim_date: new Date().toISOString().split('T')[0],
       claim_status: "initial_review",
       separation_reason: separationReasons[Math.floor(Math.random() * separationReasons.length)],
-      last_day_of_work: new Date().toISOString().split('T')[0],
+      employment_start_date: startDate,
+      employment_end_date: endDate,
       severance_package: Math.random() > 0.5,
       severance_amount: Math.random() > 0.5 ? Math.floor(Math.random() * 50000 + 5000) : null,
-      reason_for_unemployment: "Company restructuring",
+      reason_for_unemployment: "Company restructuring due to market conditions",
       documents: []
     };
   });
