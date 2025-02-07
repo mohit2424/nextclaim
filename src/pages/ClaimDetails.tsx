@@ -36,7 +36,7 @@ export type Claim = {
   employer_name: string;
   claim_date: string;
   claim_status: string;
-  separation_reason: string;
+  separation_reason: "resignation" | "termination_misconduct" | "layoff" | "reduction_in_force" | "constructive_discharge" | "job_abandonment" | "severance_agreement";
   documents: ClaimDocument[];
   last_day_of_work: string | null;
   severance_package: boolean | null;
@@ -126,8 +126,10 @@ export default function ClaimDetails() {
 
       if (error) throw error;
 
+      // Force a refetch of the claim data
+      await queryClient.invalidateQueries({ queryKey: ['claim', id] });
+      
       toast.success('Claim updated successfully');
-      queryClient.invalidateQueries({ queryKey: ['claim', id] });
       setIsEditing(false);
       setEditedClaim(null);
     } catch (error) {
@@ -253,3 +255,4 @@ export default function ClaimDetails() {
     </DashboardLayout>
   );
 }
+

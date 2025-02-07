@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Building2 } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { Claim } from "@/pages/ClaimDetails";
 
 interface EmployerDetailsTabProps {
@@ -12,7 +13,7 @@ interface EmployerDetailsTabProps {
 }
 
 export function EmployerDetailsTab({ claim, isEditing, onUpdate }: EmployerDetailsTabProps) {
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: string, value: any) => {
     onUpdate({
       ...claim,
       [field]: value
@@ -37,12 +38,31 @@ export function EmployerDetailsTab({ claim, isEditing, onUpdate }: EmployerDetai
         </div>
         <div>
           <Label>Separation Reason</Label>
-          <Input 
-            value={claim.separation_reason} 
-            readOnly={!isEditing}
-            onChange={(e) => handleInputChange('separation_reason', e.target.value)}
-            className={!isEditing ? 'bg-gray-50' : ''}
-          />
+          {isEditing ? (
+            <Select
+              value={claim.separation_reason}
+              onValueChange={(value: any) => handleInputChange('separation_reason', value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select reason" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="resignation">Resignation</SelectItem>
+                <SelectItem value="termination_misconduct">Termination for Misconduct</SelectItem>
+                <SelectItem value="layoff">Layoff</SelectItem>
+                <SelectItem value="reduction_in_force">Reduction in Force (RIF)</SelectItem>
+                <SelectItem value="constructive_discharge">Constructive Discharge</SelectItem>
+                <SelectItem value="job_abandonment">Job Abandonment</SelectItem>
+                <SelectItem value="severance_agreement">Severance Agreement</SelectItem>
+              </SelectContent>
+            </Select>
+          ) : (
+            <Input 
+              value={claim.separation_reason.replace(/_/g, ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')} 
+              readOnly
+              className="bg-gray-50"
+            />
+          )}
         </div>
       </div>
     </Card>
