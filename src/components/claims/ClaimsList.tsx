@@ -10,6 +10,7 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { ClaimsListHeader } from "./ClaimsListHeader";
 import { ClaimsPagination } from "./ClaimsPagination";
 import { useClaimsList } from "./useClaimsList";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface ClaimsListProps {
   searchQuery: string;
@@ -21,8 +22,9 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
   const [localSearchQuery, setLocalSearchQuery] = useState(initialSearchQuery);
   const statusParam = searchParams.get('status') || 'all';
   const itemsPerPage = 10;
+  const queryClient = useQueryClient();
 
-  const { data: claimsData = { data: [], count: 0 }, isLoading, refetch } = useClaimsList(
+  const { data: claimsData = { data: [], count: 0 }, isLoading } = useClaimsList(
     localSearchQuery,
     statusParam,
     currentPage
@@ -42,7 +44,8 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
           table: 'claims'
         },
         () => {
-          refetch();
+          // Invalidate and refetch claims data when any change occurs
+          queryClient.invalidateQueries({ queryKey: ['claims'] });
         }
       )
       .subscribe();
@@ -50,7 +53,7 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [refetch]);
+  }, [queryClient]);
 
   const handleStatusChange = (newStatus: string) => {
     setSearchParams({ status: newStatus });
@@ -100,7 +103,9 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
         <div className="max-w-[1200px] mx-auto">
           <ClaimsTable 
             claims={claims} 
-            onStatusUpdate={refetch}
+            onStatusUpdate={() => {
+              queryClient.invalidateQueries({ queryKey: ['claims'] });
+            }}
           />
         </div>
 

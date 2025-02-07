@@ -60,6 +60,7 @@ export const useClaimsList = (
   return useQuery({
     queryKey: ['claims', searchQuery, status, currentPage],
     queryFn: () => fetchClaims(searchQuery, status, currentPage),
+    staleTime: 0, // This ensures we always get fresh data
+    refetchOnWindowFocus: true // Refetch when window regains focus
   });
 };
-

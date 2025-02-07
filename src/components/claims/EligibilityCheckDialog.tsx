@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2 } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface EligibilityCheckDialogProps {
   claimId: string;
@@ -26,6 +27,7 @@ export function EligibilityCheckDialog({
   const [isEligible, setIsEligible] = useState<boolean | null>(null);
   const [rejectionReason, setRejectionReason] = useState("");
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const checkEligibility = async () => {
     try {
@@ -73,6 +75,9 @@ export function EligibilityCheckDialog({
         .eq('id', claimId);
 
       if (error) throw error;
+
+      // Invalidate all queries that include claims data
+      await queryClient.invalidateQueries({ queryKey: ['claims'] });
 
       toast({
         title: "Success",
