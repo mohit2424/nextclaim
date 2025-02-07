@@ -60,20 +60,15 @@ export function EligibilityCheckDialog({
 
   const handleClaimUpdate = async () => {
     try {
-      // Prepare update data
-      const updateData: {
-        claim_status: 'in_progress' | 'rejected';
-        rejection_reason?: string;
-      } = {
-        claim_status: isEligible ? 'in_progress' : 'rejected'
-      };
+      console.log('Starting claim update for ID:', claimId); // Debug log
 
-      // Only include rejection reason if claim is rejected
-      if (!isEligible) {
-        updateData.rejection_reason = rejectionReason;
-      }
+      // Type-safe update data
+      const updateData = {
+        claim_status: isEligible ? 'in_progress' : 'rejected',
+        ...(isEligible ? {} : { rejection_reason: rejectionReason })
+      } as const;
 
-      console.log('Updating claim with data:', updateData); // Debug log
+      console.log('Update payload:', updateData); // Debug log
 
       const { error } = await supabase
         .from('claims')
@@ -81,9 +76,11 @@ export function EligibilityCheckDialog({
         .eq('id', claimId);
 
       if (error) {
-        console.error('Supabase update error:', error); // Debug log
+        console.error('Update error:', error); // Debug log
         throw error;
       }
+
+      console.log('Update successful'); // Debug log
 
       // Invalidate and refetch claims queries
       await queryClient.invalidateQueries({ queryKey: ['claims'] });
@@ -159,4 +156,3 @@ export function EligibilityCheckDialog({
     </AlertDialog>
   );
 }
-
