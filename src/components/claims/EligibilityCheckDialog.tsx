@@ -60,29 +60,34 @@ export function EligibilityCheckDialog({
 
   const handleClaimUpdate = async () => {
     try {
-      const newStatus = isEligible ? 'in_progress' : 'rejected';
-      const updateData: any = {
-        claim_status: newStatus
+      // Prepare update data
+      const updateData: {
+        claim_status: 'in_progress' | 'rejected';
+        rejection_reason?: string;
+      } = {
+        claim_status: isEligible ? 'in_progress' : 'rejected'
       };
 
+      // Only include rejection reason if claim is rejected
       if (!isEligible) {
         updateData.rejection_reason = rejectionReason;
       }
 
+      console.log('Updating claim with data:', updateData); // Debug log
+
       const { error } = await supabase
         .from('claims')
         .update(updateData)
-        .eq('id', claimId)
-        .select();
+        .eq('id', claimId);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase update error:', error); // Debug log
+        throw error;
+      }
 
-      // Invalidate claims queries immediately
+      // Invalidate and refetch claims queries
       await queryClient.invalidateQueries({ queryKey: ['claims'] });
       
-      // Force an immediate refetch
-      await queryClient.refetchQueries({ queryKey: ['claims'] });
-
       toast({
         title: "Success",
         description: `Claim has been marked as ${isEligible ? 'in progress' : 'rejected'}.`
