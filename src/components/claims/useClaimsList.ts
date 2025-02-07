@@ -33,9 +33,10 @@ export const fetchClaims = async (
 
     switch (status) {
       case 'in_progress':
-        query = query.in('claim_status', ['initial_review', 'pending']);
+        query = query.eq('claim_status', 'in_progress');
         break;
       case 'today':
+        // Use gte with the start of today in ISO format
         query = query.gte('created_at', today.toISOString());
         break;
       case 'all':
@@ -65,4 +66,3 @@ export const useClaimsList = (
     refetchInterval: 1000, // Poll every second to ensure we catch all updates
   });
 };
-
