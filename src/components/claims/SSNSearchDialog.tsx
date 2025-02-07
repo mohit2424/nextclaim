@@ -26,7 +26,6 @@ export function SSNSearchDialog({ isOpen, onOpenChange }: SSNSearchDialogProps) 
   const [ssnError, setSsnError] = useState("");
 
   const formatSSN = (input: string) => {
-    // Remove all non-digits
     const cleaned = input.replace(/\D/g, '');
     let formatted = cleaned;
 
@@ -37,7 +36,6 @@ export function SSNSearchDialog({ isOpen, onOpenChange }: SSNSearchDialogProps) 
       formatted = formatted.slice(0, 6) + '-' + formatted.slice(6);
     }
     
-    // Ensure we don't exceed 11 characters (XXX-XX-XXXX)
     if (cleaned.length > 9) {
       formatted = formatted.slice(0, 11);
     }
@@ -67,6 +65,9 @@ export function SSNSearchDialog({ isOpen, onOpenChange }: SSNSearchDialogProps) 
       }
 
       setExistingClaim(data);
+      if (!data) {
+        toast.info("Claim with that SSN doesn't exist");
+      }
       return data;
     } catch (error) {
       console.error('Error:', error);

@@ -136,7 +136,7 @@ export function EligibilityCheckDialog({
                 Cancel
               </Button>
               <Button onClick={handleClaimUpdate}>
-                {isEligible ? "Close" : "Close Claim"}
+                {isEligible ? "Proceed" : "Reject Claim"}
               </Button>
             </>
           )}

@@ -12,6 +12,7 @@ import { ClaimantInformationTab } from "@/components/claims/ClaimantInformationT
 import { EmployerDetailsTab } from "@/components/claims/EmployerDetailsTab";
 import { UnemploymentDetailsTab } from "@/components/claims/UnemploymentDetailsTab";
 import { DocumentsTab } from "@/components/claims/DocumentsTab";
+import { toast } from "sonner";
 
 export type ClaimDocument = {
   name: string;
@@ -83,6 +84,11 @@ export default function ClaimDetails() {
     enabled: !!id,
   });
 
+  const handleEditClick = () => {
+    // Navigate to edit page
+    navigate(`/claims/${id}/edit`);
+  };
+
   if (error) {
     return (
       <DashboardLayout>
@@ -149,7 +155,7 @@ export default function ClaimDetails() {
           </div>
           <div className="flex gap-4">
             <Button variant="outline">Print Claim</Button>
-            <Button>Update Status</Button>
+            <Button onClick={handleEditClick}>Edit Claim</Button>
           </div>
         </div>
 
