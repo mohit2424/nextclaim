@@ -60,10 +60,11 @@ export function EligibilityCheckDialog({
 
   const handleClaimUpdate = async () => {
     try {
+      // First, update the claim status
       const updateData = {
         claim_status: isEligible ? 'in_progress' : 'rejected',
         ...(isEligible ? {} : { rejection_reason: rejectionReason })
-      } as const;
+      };
 
       const { error } = await supabase
         .from('claims')
@@ -72,18 +73,18 @@ export function EligibilityCheckDialog({
 
       if (error) throw error;
 
-      // Invalidate both claims list and stats queries
+      // Invalidate and immediately refetch both queries
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['claims'] }),
-        queryClient.invalidateQueries({ queryKey: ['claimStats'] }),
+        queryClient.invalidateQueries({ queryKey: ['claimStats'] })
       ]);
 
-      // Force an immediate refetch
+      // Force immediate refetch to update UI
       await Promise.all([
-        queryClient.refetchQueries({ queryKey: ['claims'] }),
-        queryClient.refetchQueries({ queryKey: ['claimStats'] }),
+        queryClient.refetchQueries({ queryKey: ['claims'], exact: true }),
+        queryClient.refetchQueries({ queryKey: ['claimStats'], exact: true })
       ]);
-      
+
       toast({
         title: "Success",
         description: `Claim has been marked as ${isEligible ? 'in progress' : 'rejected'}.`
