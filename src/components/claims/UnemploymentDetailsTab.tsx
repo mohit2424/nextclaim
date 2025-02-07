@@ -3,13 +3,23 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { BriefcaseIcon } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import type { Claim } from "@/pages/ClaimDetails";
 
 interface UnemploymentDetailsTabProps {
   claim: Claim;
+  isEditing: boolean;
+  onUpdate: (updatedClaim: Claim) => void;
 }
 
-export function UnemploymentDetailsTab({ claim }: UnemploymentDetailsTabProps) {
+export function UnemploymentDetailsTab({ claim, isEditing, onUpdate }: UnemploymentDetailsTabProps) {
+  const handleInputChange = (field: string, value: any) => {
+    onUpdate({
+      ...claim,
+      [field]: value
+    });
+  };
+
   return (
     <Card className="p-6">
       <div className="flex items-center gap-2 mb-4">
@@ -20,29 +30,50 @@ export function UnemploymentDetailsTab({ claim }: UnemploymentDetailsTabProps) {
         <div>
           <Label>First Day of Work</Label>
           <Input 
-            value={claim.employment_start_date ? new Date(claim.employment_start_date).toLocaleDateString() : 'Not specified'} 
-            readOnly 
+            type="date"
+            value={claim.employment_start_date || ''} 
+            readOnly={!isEditing}
+            onChange={(e) => handleInputChange('employment_start_date', e.target.value)}
+            className={!isEditing ? 'bg-gray-50' : ''}
           />
         </div>
         <div>
           <Label>Last Day of Work</Label>
           <Input 
-            value={claim.employment_end_date ? new Date(claim.employment_end_date).toLocaleDateString() : 'Not specified'} 
-            readOnly 
+            type="date"
+            value={claim.employment_end_date || ''} 
+            readOnly={!isEditing}
+            onChange={(e) => handleInputChange('employment_end_date', e.target.value)}
+            className={!isEditing ? 'bg-gray-50' : ''}
           />
         </div>
-        <div>
+        <div className="col-span-2">
           <Label>Reason for Unemployment</Label>
-          <Input value={claim.reason_for_unemployment || 'Not specified'} readOnly />
+          <Input 
+            value={claim.reason_for_unemployment || ''} 
+            readOnly={!isEditing}
+            onChange={(e) => handleInputChange('reason_for_unemployment', e.target.value)}
+            className={!isEditing ? 'bg-gray-50' : ''}
+          />
         </div>
-        <div>
+        <div className="flex items-center gap-2">
           <Label>Severance Package</Label>
-          <Input value={claim.severance_package ? 'Yes' : 'No'} readOnly />
+          <Switch
+            checked={claim.severance_package || false}
+            disabled={!isEditing}
+            onCheckedChange={(checked) => handleInputChange('severance_package', checked)}
+          />
         </div>
         {claim.severance_package && (
           <div>
             <Label>Severance Amount</Label>
-            <Input value={`$${claim.severance_amount?.toFixed(2) || '0.00'}`} readOnly />
+            <Input 
+              type="number"
+              value={claim.severance_amount || ''} 
+              readOnly={!isEditing}
+              onChange={(e) => handleInputChange('severance_amount', parseFloat(e.target.value))}
+              className={!isEditing ? 'bg-gray-50' : ''}
+            />
           </div>
         )}
       </div>

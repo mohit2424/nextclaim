@@ -6,13 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ClaimantInformationTab } from "@/components/claims/ClaimantInformationTab";
 import { EmployerDetailsTab } from "@/components/claims/EmployerDetailsTab";
 import { UnemploymentDetailsTab } from "@/components/claims/UnemploymentDetailsTab";
 import { DocumentsTab } from "@/components/claims/DocumentsTab";
 import { toast } from "sonner";
+import { useState } from "react";
 
 export type ClaimDocument = {
   name: string;
@@ -48,6 +49,9 @@ export type Claim = {
 export default function ClaimDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedClaim, setEditedClaim] = useState<Claim | null>(null);
 
   const { data: claim, isLoading, error } = useQuery({
     queryKey: ['claim', id],
@@ -85,8 +89,51 @@ export default function ClaimDetails() {
   });
 
   const handleEditClick = () => {
-    // Navigate to edit page
-    navigate(`/claims/${id}/edit`);
+    setIsEditing(true);
+    setEditedClaim(claim!);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setEditedClaim(null);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editedClaim) return;
+
+    try {
+      const { error } = await supabase
+        .from('claims')
+        .update({
+          first_name: editedClaim.first_name,
+          middle_name: editedClaim.middle_name,
+          last_name: editedClaim.last_name,
+          age: editedClaim.age,
+          state: editedClaim.state,
+          pincode: editedClaim.pincode,
+          ssn: editedClaim.ssn,
+          email: editedClaim.email,
+          phone: editedClaim.phone,
+          employer_name: editedClaim.employer_name,
+          separation_reason: editedClaim.separation_reason,
+          employment_start_date: editedClaim.employment_start_date,
+          employment_end_date: editedClaim.employment_end_date,
+          reason_for_unemployment: editedClaim.reason_for_unemployment,
+          severance_package: editedClaim.severance_package,
+          severance_amount: editedClaim.severance_amount,
+        })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast.success('Claim updated successfully');
+      queryClient.invalidateQueries({ queryKey: ['claim', id] });
+      setIsEditing(false);
+      setEditedClaim(null);
+    } catch (error) {
+      console.error('Error updating claim:', error);
+      toast.error('Failed to update claim');
+    }
   };
 
   if (error) {
@@ -155,7 +202,14 @@ export default function ClaimDetails() {
           </div>
           <div className="flex gap-4">
             <Button variant="outline">Print Claim</Button>
-            <Button onClick={handleEditClick}>Edit Claim</Button>
+            {isEditing ? (
+              <>
+                <Button variant="outline" onClick={handleCancelEdit}>Cancel</Button>
+                <Button onClick={handleSaveEdit}>Save Changes</Button>
+              </>
+            ) : (
+              <Button onClick={handleEditClick}>Edit Claim</Button>
+            )}
           </div>
         </div>
 
@@ -168,15 +222,27 @@ export default function ClaimDetails() {
           </TabsList>
 
           <TabsContent value="claimant">
-            <ClaimantInformationTab claim={claim} />
+            <ClaimantInformationTab 
+              claim={editedClaim || claim} 
+              isEditing={isEditing}
+              onUpdate={setEditedClaim}
+            />
           </TabsContent>
 
           <TabsContent value="employer">
-            <EmployerDetailsTab claim={claim} />
+            <EmployerDetailsTab 
+              claim={editedClaim || claim}
+              isEditing={isEditing}
+              onUpdate={setEditedClaim}
+            />
           </TabsContent>
 
           <TabsContent value="unemployment">
-            <UnemploymentDetailsTab claim={claim} />
+            <UnemploymentDetailsTab 
+              claim={editedClaim || claim}
+              isEditing={isEditing}
+              onUpdate={setEditedClaim}
+            />
           </TabsContent>
 
           <TabsContent value="documents">
