@@ -60,30 +60,29 @@ export function EligibilityCheckDialog({
 
   const handleClaimUpdate = async () => {
     try {
-      console.log('Starting claim update for ID:', claimId); // Debug log
-
-      // Type-safe update data
       const updateData = {
         claim_status: isEligible ? 'in_progress' : 'rejected',
         ...(isEligible ? {} : { rejection_reason: rejectionReason })
       } as const;
-
-      console.log('Update payload:', updateData); // Debug log
 
       const { error } = await supabase
         .from('claims')
         .update(updateData)
         .eq('id', claimId);
 
-      if (error) {
-        console.error('Update error:', error); // Debug log
-        throw error;
-      }
+      if (error) throw error;
 
-      console.log('Update successful'); // Debug log
+      // Invalidate both claims list and stats queries
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['claims'] }),
+        queryClient.invalidateQueries({ queryKey: ['claimStats'] }),
+      ]);
 
-      // Invalidate and refetch claims queries
-      await queryClient.invalidateQueries({ queryKey: ['claims'] });
+      // Force an immediate refetch
+      await Promise.all([
+        queryClient.refetchQueries({ queryKey: ['claims'] }),
+        queryClient.refetchQueries({ queryKey: ['claimStats'] }),
+      ]);
       
       toast({
         title: "Success",
