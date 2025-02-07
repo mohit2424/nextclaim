@@ -47,7 +47,7 @@ export const fetchClaims = async (
       case 'all':
         break;
       default:
-        if (['initial_review', 'pending', 'approved', 'rejected'].includes(status)) {
+        if (['initial_review'].includes(status)) {
           query = query.eq('claim_status', status as ClaimStatus);
         }
     }

@@ -40,7 +40,7 @@ export type Database = {
         Insert: {
           age: number
           claim_date: string
-          claim_status?: Database["public"]["Enums"]["claim_status"]
+          claim_status: Database["public"]["Enums"]["claim_status"]
           created_at?: string
           documents?: Json | null
           email: string
@@ -376,12 +376,7 @@ export type Database = {
       }
     }
     Enums: {
-      claim_status:
-        | "initial_review"
-        | "pending"
-        | "approved"
-        | "rejected"
-        | "in_progress"
+      claim_status: "initial_review" | "in_progress" | "rejected"
       separation_reason:
         | "resignation"
         | "termination_misconduct"
