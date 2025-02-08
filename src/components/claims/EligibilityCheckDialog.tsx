@@ -58,7 +58,7 @@ export function EligibilityCheckDialog({
 
   useEffect(() => {
     checkEligibility();
-  }, []); // Run once when component mounts
+  }, []);
 
   const handleClaimUpdate = async () => {
     try {
@@ -76,16 +76,32 @@ export function EligibilityCheckDialog({
 
       if (error) throw error;
 
-      // Invalidate both queries immediately
+      // Invalidate and refetch with exact matching to ensure proper cache updates
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['claims'] }),
-        queryClient.invalidateQueries({ queryKey: ['claimStats'] })
+        queryClient.invalidateQueries({ 
+          queryKey: ['claims'],
+          exact: true,
+          refetchType: 'all'
+        }),
+        queryClient.invalidateQueries({ 
+          queryKey: ['claimStats'],
+          exact: true,
+          refetchType: 'all'
+        })
       ]);
 
-      // Force immediate refetch
+      // Force immediate refetch with exact matching
       await Promise.all([
-        queryClient.refetchQueries({ queryKey: ['claims'] }),
-        queryClient.refetchQueries({ queryKey: ['claimStats'] })
+        queryClient.refetchQueries({ 
+          queryKey: ['claims'],
+          exact: true,
+          refetchType: 'all'
+        }),
+        queryClient.refetchQueries({ 
+          queryKey: ['claimStats'],
+          exact: true,
+          refetchType: 'all'
+        })
       ]);
 
       toast({
@@ -159,4 +175,3 @@ export function EligibilityCheckDialog({
     </AlertDialog>
   );
 }
-
