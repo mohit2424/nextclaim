@@ -175,22 +175,73 @@ export type Database = {
       }
       in_progress_claims: {
         Row: {
+          age: number
+          claim_date: string
           claim_id: string | null
+          documents: Json | null
+          email: string
+          employer_name: string
+          employment_end_date: string | null
+          employment_start_date: string | null
+          first_name: string
           id: string
+          last_name: string
+          middle_name: string | null
           moved_at: string | null
           moved_from: string
+          phone: string
+          pincode: string
+          reason_for_unemployment: string | null
+          severance_amount: number | null
+          severance_package: boolean | null
+          ssn: string
+          state: string
         }
         Insert: {
+          age: number
+          claim_date: string
           claim_id?: string | null
+          documents?: Json | null
+          email: string
+          employer_name: string
+          employment_end_date?: string | null
+          employment_start_date?: string | null
+          first_name: string
           id?: string
+          last_name: string
+          middle_name?: string | null
           moved_at?: string | null
           moved_from: string
+          phone: string
+          pincode: string
+          reason_for_unemployment?: string | null
+          severance_amount?: number | null
+          severance_package?: boolean | null
+          ssn: string
+          state: string
         }
         Update: {
+          age?: number
+          claim_date?: string
           claim_id?: string | null
+          documents?: Json | null
+          email?: string
+          employer_name?: string
+          employment_end_date?: string | null
+          employment_start_date?: string | null
+          first_name?: string
           id?: string
+          last_name?: string
+          middle_name?: string | null
           moved_at?: string | null
           moved_from?: string
+          phone?: string
+          pincode?: string
+          reason_for_unemployment?: string | null
+          severance_amount?: number | null
+          severance_package?: boolean | null
+          ssn?: string
+          state?: string
         }
         Relationships: [
           {
@@ -245,25 +296,76 @@ export type Database = {
       }
       rejected_claims: {
         Row: {
+          age: number
+          claim_date: string
           claim_id: string | null
+          documents: Json | null
+          email: string
+          employer_name: string
+          employment_end_date: string | null
+          employment_start_date: string | null
+          first_name: string
           id: string
+          last_name: string
+          middle_name: string | null
           moved_at: string | null
           moved_from: string
+          phone: string
+          pincode: string
+          reason_for_unemployment: string | null
           rejection_reason: string | null
+          severance_amount: number | null
+          severance_package: boolean | null
+          ssn: string
+          state: string
         }
         Insert: {
+          age: number
+          claim_date: string
           claim_id?: string | null
+          documents?: Json | null
+          email: string
+          employer_name: string
+          employment_end_date?: string | null
+          employment_start_date?: string | null
+          first_name: string
           id?: string
+          last_name: string
+          middle_name?: string | null
           moved_at?: string | null
           moved_from: string
+          phone: string
+          pincode: string
+          reason_for_unemployment?: string | null
           rejection_reason?: string | null
+          severance_amount?: number | null
+          severance_package?: boolean | null
+          ssn: string
+          state: string
         }
         Update: {
+          age?: number
+          claim_date?: string
           claim_id?: string | null
+          documents?: Json | null
+          email?: string
+          employer_name?: string
+          employment_end_date?: string | null
+          employment_start_date?: string | null
+          first_name?: string
           id?: string
+          last_name?: string
+          middle_name?: string | null
           moved_at?: string | null
           moved_from?: string
+          phone?: string
+          pincode?: string
+          reason_for_unemployment?: string | null
           rejection_reason?: string | null
+          severance_amount?: number | null
+          severance_package?: boolean | null
+          ssn?: string
+          state?: string
         }
         Relationships: [
           {
@@ -277,19 +379,70 @@ export type Database = {
       }
       todays_claims: {
         Row: {
+          age: number
+          claim_date: string
           claim_id: string | null
           created_at: string | null
+          documents: Json | null
+          email: string
+          employer_name: string
+          employment_end_date: string | null
+          employment_start_date: string | null
+          first_name: string
           id: string
+          last_name: string
+          middle_name: string | null
+          phone: string
+          pincode: string
+          reason_for_unemployment: string | null
+          severance_amount: number | null
+          severance_package: boolean | null
+          ssn: string
+          state: string
         }
         Insert: {
+          age: number
+          claim_date: string
           claim_id?: string | null
           created_at?: string | null
+          documents?: Json | null
+          email: string
+          employer_name: string
+          employment_end_date?: string | null
+          employment_start_date?: string | null
+          first_name: string
           id?: string
+          last_name: string
+          middle_name?: string | null
+          phone: string
+          pincode: string
+          reason_for_unemployment?: string | null
+          severance_amount?: number | null
+          severance_package?: boolean | null
+          ssn: string
+          state: string
         }
         Update: {
+          age?: number
+          claim_date?: string
           claim_id?: string | null
           created_at?: string | null
+          documents?: Json | null
+          email?: string
+          employer_name?: string
+          employment_end_date?: string | null
+          employment_start_date?: string | null
+          first_name?: string
           id?: string
+          last_name?: string
+          middle_name?: string | null
+          phone?: string
+          pincode?: string
+          reason_for_unemployment?: string | null
+          severance_amount?: number | null
+          severance_package?: boolean | null
+          ssn?: string
+          state?: string
         }
         Relationships: [
           {

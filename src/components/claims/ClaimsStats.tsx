@@ -3,7 +3,6 @@ import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { startOfDay } from "date-fns";
 
 const fetchClaimStats = async () => {
   // Get total claims count

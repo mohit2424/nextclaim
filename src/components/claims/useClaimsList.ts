@@ -2,7 +2,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { ClaimStatus } from "./ClaimsTable";
-import { startOfDay } from "date-fns";
 
 export const fetchClaims = async (
   searchQuery: string = "", 
