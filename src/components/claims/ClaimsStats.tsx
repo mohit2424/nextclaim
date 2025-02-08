@@ -13,18 +13,23 @@ const fetchClaimStats = async () => {
 
   // Get in progress claims count
   const { count: inProgressCount } = await supabase
-    .from('in_progress_claims')
-    .select('*', { count: 'exact', head: true });
+    .from('claims')
+    .select('*', { count: 'exact', head: true })
+    .eq('claim_status', 'in_progress');
 
   // Get rejected claims count
   const { count: rejectedCount } = await supabase
-    .from('rejected_claims')
-    .select('*', { count: 'exact', head: true });
+    .from('claims')
+    .select('*', { count: 'exact', head: true })
+    .eq('claim_status', 'rejected');
 
   // Get new claims today count
+  const today = startOfDay(new Date()).toISOString();
   const { count: newTodayCount } = await supabase
-    .from('todays_claims')
-    .select('*', { count: 'exact', head: true });
+    .from('claims')
+    .select('*', { count: 'exact', head: true })
+    .eq('claim_status', 'initial_review')
+    .gte('created_at', today);
 
   return {
     total: totalCount || 0,
@@ -39,8 +44,8 @@ export function ClaimsStats() {
   const { data: claimStats = { total: 0, inProgress: 0, rejected: 0, newToday: 0 }, isLoading } = useQuery({
     queryKey: ['claimStats'],
     queryFn: fetchClaimStats,
-    refetchInterval: 3000, // Poll more frequently
-    staleTime: 0, // Consider data always stale to enable immediate refetches
+    refetchInterval: 3000, // Poll more frequently for dashboard
+    staleTime: 0,
   });
   
   const stats = [
@@ -49,7 +54,7 @@ export function ClaimsStats() {
       value: claimStats.total.toString(),
       bgColor: "bg-gradient-to-r from-[#9b87f5] to-[#7E69AB]",
       textColor: "text-white",
-      onClick: () => navigate("/claims"),
+      onClick: () => navigate("/claims?status=all"),
     },
     {
       title: "In Progress",

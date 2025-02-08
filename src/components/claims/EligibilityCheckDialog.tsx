@@ -16,8 +16,6 @@ interface EligibilityCheckDialogProps {
   onStatusUpdate: () => void;
 }
 
-type ClaimStatus = "initial_review" | "in_progress" | "rejected";
-
 export function EligibilityCheckDialog({ 
   claimId,
   employmentStartDate,
@@ -62,7 +60,7 @@ export function EligibilityCheckDialog({
 
   const handleClaimUpdate = async () => {
     try {
-      const newStatus: ClaimStatus = isEligible ? "in_progress" : "rejected";
+      const newStatus = isEligible ? "in_progress" : "rejected";
       
       const updateData = {
         claim_status: newStatus,
