@@ -253,47 +253,6 @@ export type Database = {
           },
         ]
       }
-      messages: {
-        Row: {
-          claim_id: string | null
-          created_at: string
-          id: string
-          message_text: string
-          recipient_email: string
-          sender_email: string
-          sender_name: string
-          sender_role: string
-        }
-        Insert: {
-          claim_id?: string | null
-          created_at?: string
-          id?: string
-          message_text: string
-          recipient_email: string
-          sender_email: string
-          sender_name: string
-          sender_role: string
-        }
-        Update: {
-          claim_id?: string | null
-          created_at?: string
-          id?: string
-          message_text?: string
-          recipient_email?: string
-          sender_email?: string
-          sender_name?: string
-          sender_role?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "messages_claim_id_fkey"
-            columns: ["claim_id"]
-            isOneToOne: false
-            referencedRelation: "claims"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       rejected_claims: {
         Row: {
           age: number
