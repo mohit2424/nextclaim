@@ -16,6 +16,8 @@ interface EligibilityCheckDialogProps {
   onStatusUpdate: () => void;
 }
 
+type ClaimStatus = "initial_review" | "in_progress" | "rejected";
+
 export function EligibilityCheckDialog({ 
   claimId,
   employmentStartDate,
@@ -60,9 +62,10 @@ export function EligibilityCheckDialog({
 
   const handleClaimUpdate = async () => {
     try {
-      // First, update the claim status with the correct type
+      const newStatus: ClaimStatus = isEligible ? "in_progress" : "rejected";
+      
       const updateData = {
-        claim_status: isEligible ? 'in_progress' : 'rejected' as const,
+        claim_status: newStatus,
         ...(isEligible ? {} : { rejection_reason: rejectionReason })
       };
 
@@ -73,16 +76,16 @@ export function EligibilityCheckDialog({
 
       if (error) throw error;
 
-      // Invalidate and immediately refetch both queries
+      // Invalidate both queries immediately
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['claims'] }),
         queryClient.invalidateQueries({ queryKey: ['claimStats'] })
       ]);
 
-      // Force immediate refetch to update UI
+      // Force immediate refetch
       await Promise.all([
-        queryClient.refetchQueries({ queryKey: ['claims'], exact: true }),
-        queryClient.refetchQueries({ queryKey: ['claimStats'], exact: true })
+        queryClient.refetchQueries({ queryKey: ['claims'] }),
+        queryClient.refetchQueries({ queryKey: ['claimStats'] })
       ]);
 
       toast({
@@ -156,3 +159,4 @@ export function EligibilityCheckDialog({
     </AlertDialog>
   );
 }
+
