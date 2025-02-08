@@ -3,34 +3,42 @@ import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { startOfDay } from "date-fns";
 
 const fetchClaimStats = async () => {
-  // Get total claims count
-  const { count: totalClaims } = await supabase
+  const { data: claims, error } = await supabase
     .from('claims')
-    .select('*', { count: 'exact', head: true });
+    .select('claim_status, created_at');
 
-  // Get in progress claims count
-  const { count: inProgressCount } = await supabase
-    .from('in_progress_claims')
-    .select('*', { count: 'exact', head: true });
+  if (error) throw error;
+  if (!claims) return { total: 0, inProgress: 0, newToday: 0, rejected: 0 };
 
-  // Get rejected claims count
-  const { count: rejectedCount } = await supabase
-    .from('rejected_claims')
-    .select('*', { count: 'exact', head: true });
+  const today = startOfDay(new Date());
+  
+  const stats = claims.reduce((acc: any, claim) => {
+    // Total claims
+    acc.total++;
+    
+    // In progress claims
+    if (claim.claim_status === 'in_progress') {
+      acc.inProgress++;
+    }
+    
+    // Rejected claims
+    if (claim.claim_status === 'rejected') {
+      acc.rejected++;
+    }
+    
+    // New claims today (only include initial_review status created today)
+    const claimDate = startOfDay(new Date(claim.created_at));
+    if (claimDate >= today && claim.claim_status === 'initial_review') {
+      acc.newToday++;
+    }
+    
+    return acc;
+  }, { total: 0, inProgress: 0, rejected: 0, newToday: 0 });
 
-  // Get new claims today count
-  const { count: newTodayCount } = await supabase
-    .from('todays_claims')
-    .select('*', { count: 'exact', head: true });
-
-  return {
-    total: totalClaims || 0,
-    inProgress: inProgressCount || 0,
-    rejected: rejectedCount || 0,
-    newToday: newTodayCount || 0
-  };
+  return stats;
 };
 
 export function ClaimsStats() {
@@ -38,8 +46,8 @@ export function ClaimsStats() {
   const { data: claimStats = { total: 0, inProgress: 0, rejected: 0, newToday: 0 }, isLoading } = useQuery({
     queryKey: ['claimStats'],
     queryFn: fetchClaimStats,
-    refetchInterval: 3000,
-    staleTime: 0,
+    refetchInterval: 3000, // Poll more frequently
+    staleTime: 0, // Consider data always stale to enable immediate refetches
   });
   
   const stats = [

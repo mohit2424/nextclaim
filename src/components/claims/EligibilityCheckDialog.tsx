@@ -66,30 +66,41 @@ export function EligibilityCheckDialog({
       
       const updateData = {
         claim_status: newStatus,
-        ...(newStatus === "rejected" ? { rejection_reason: rejectionReason } : {})
+        ...(isEligible ? {} : { rejection_reason: rejectionReason })
       };
 
-      const { error: updateError } = await supabase
+      const { error } = await supabase
         .from('claims')
         .update(updateData)
         .eq('id', claimId);
 
-      if (updateError) throw updateError;
+      if (error) throw error;
 
-      // Invalidate and refetch relevant queries
+      // Invalidate and refetch with exact matching to ensure proper cache updates
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['claims'] }),
-        queryClient.invalidateQueries({ queryKey: ['claimStats'] }),
+        queryClient.invalidateQueries({ 
+          queryKey: ['claims'],
+          exact: true,
+          refetchType: 'all'
+        }),
+        queryClient.invalidateQueries({ 
+          queryKey: ['claimStats'],
+          exact: true,
+          refetchType: 'all'
+        })
       ]);
 
+      // Force immediate refetch with exact matching
       await Promise.all([
         queryClient.refetchQueries({ 
           queryKey: ['claims'],
-          exact: true 
+          exact: true,
+          refetchType: 'all'
         }),
         queryClient.refetchQueries({ 
           queryKey: ['claimStats'],
-          exact: true 
+          exact: true,
+          refetchType: 'all'
         })
       ]);
 
