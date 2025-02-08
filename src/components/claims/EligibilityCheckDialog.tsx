@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
+import type { ClaimStatus } from "@/types/claim";
 
 interface EligibilityCheckDialogProps {
   claimId: string;
@@ -60,7 +61,7 @@ export function EligibilityCheckDialog({
 
   const handleClaimUpdate = async () => {
     try {
-      const newStatus = isEligible ? "in_progress" : "rejected";
+      const newStatus: ClaimStatus = isEligible ? "in_progress" : "rejected";
       
       const updateData = {
         claim_status: newStatus,
