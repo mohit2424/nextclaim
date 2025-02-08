@@ -69,30 +69,29 @@ export function EligibilityCheckDialog({
         ...(newStatus === "rejected" ? { rejection_reason: rejectionReason } : {})
       };
 
-      const { error } = await supabase
+      const { error: updateError } = await supabase
         .from('claims')
         .update(updateData)
         .eq('id', claimId);
 
-      if (error) throw error;
+      if (updateError) throw updateError;
 
-      // Invalidate queries
-      await queryClient.invalidateQueries({ 
-        queryKey: ['claims']
-      });
-      await queryClient.invalidateQueries({ 
-        queryKey: ['claimStats']
-      });
+      // Invalidate and refetch relevant queries
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['claims'] }),
+        queryClient.invalidateQueries({ queryKey: ['claimStats'] }),
+      ]);
 
-      // Force immediate refetch
-      await queryClient.refetchQueries({ 
-        queryKey: ['claims'],
-        exact: true
-      });
-      await queryClient.refetchQueries({ 
-        queryKey: ['claimStats'],
-        exact: true 
-      });
+      await Promise.all([
+        queryClient.refetchQueries({ 
+          queryKey: ['claims'],
+          exact: true 
+        }),
+        queryClient.refetchQueries({ 
+          queryKey: ['claimStats'],
+          exact: true 
+        })
+      ]);
 
       toast({
         title: "Success",

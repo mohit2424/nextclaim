@@ -173,6 +173,35 @@ export type Database = {
         }
         Relationships: []
       }
+      in_progress_claims: {
+        Row: {
+          claim_id: string | null
+          id: string
+          moved_at: string | null
+          moved_from: string
+        }
+        Insert: {
+          claim_id?: string | null
+          id?: string
+          moved_at?: string | null
+          moved_from: string
+        }
+        Update: {
+          claim_id?: string | null
+          id?: string
+          moved_at?: string | null
+          moved_from?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "in_progress_claims_claim_id_fkey"
+            columns: ["claim_id"]
+            isOneToOne: false
+            referencedRelation: "claims"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       messages: {
         Row: {
           claim_id: string | null
@@ -207,6 +236,64 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "messages_claim_id_fkey"
+            columns: ["claim_id"]
+            isOneToOne: false
+            referencedRelation: "claims"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rejected_claims: {
+        Row: {
+          claim_id: string | null
+          id: string
+          moved_at: string | null
+          moved_from: string
+          rejection_reason: string | null
+        }
+        Insert: {
+          claim_id?: string | null
+          id?: string
+          moved_at?: string | null
+          moved_from: string
+          rejection_reason?: string | null
+        }
+        Update: {
+          claim_id?: string | null
+          id?: string
+          moved_at?: string | null
+          moved_from?: string
+          rejection_reason?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rejected_claims_claim_id_fkey"
+            columns: ["claim_id"]
+            isOneToOne: false
+            referencedRelation: "claims"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      todays_claims: {
+        Row: {
+          claim_id: string | null
+          created_at: string | null
+          id: string
+        }
+        Insert: {
+          claim_id?: string | null
+          created_at?: string | null
+          id?: string
+        }
+        Update: {
+          claim_id?: string | null
+          created_at?: string | null
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "todays_claims_claim_id_fkey"
             columns: ["claim_id"]
             isOneToOne: false
             referencedRelation: "claims"

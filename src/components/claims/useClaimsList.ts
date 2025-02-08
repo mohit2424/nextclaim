@@ -15,10 +15,9 @@ export const fetchClaims = async (
 
   let query = supabase
     .from('claims')
-    .select('*', { count: 'exact' })
-    .order('created_at', { ascending: false })
-    .range(start, end);
+    .select('*', { count: 'exact' });
 
+  // Base search functionality
   if (searchQuery) {
     const cleanSearchQuery = searchQuery.replace(/-/g, '');
     if (/^\d+$/.test(cleanSearchQuery)) {
@@ -28,22 +27,33 @@ export const fetchClaims = async (
     }
   }
 
+  // Handle different status filters
   if (status) {
-    const today = startOfDay(new Date()).toISOString();
-
     switch (status) {
-      case 'in_progress':
-        query = query.eq('claim_status', 'in_progress');
+      case 'in_progress': {
+        const { data: inProgressIds } = await supabase
+          .from('in_progress_claims')
+          .select('claim_id');
+        const ids = inProgressIds?.map(record => record.claim_id) || [];
+        query = query.in('id', ids);
         break;
-      case 'rejected':
-        query = query.eq('claim_status', 'rejected');
+      }
+      case 'rejected': {
+        const { data: rejectedIds } = await supabase
+          .from('rejected_claims')
+          .select('claim_id');
+        const ids = rejectedIds?.map(record => record.claim_id) || [];
+        query = query.in('id', ids);
         break;
-      case 'today':
-        // Only show initial_review claims from today
-        query = query
-          .eq('claim_status', 'initial_review')
-          .gte('created_at', today);
+      }
+      case 'today': {
+        const { data: todayIds } = await supabase
+          .from('todays_claims')
+          .select('claim_id');
+        const ids = todayIds?.map(record => record.claim_id) || [];
+        query = query.in('id', ids);
         break;
+      }
       case 'all':
         break;
       default:
@@ -53,8 +63,12 @@ export const fetchClaims = async (
     }
   }
 
+  // Apply pagination
+  query = query.range(start, end).order('created_at', { ascending: false });
+
   const { data, error, count } = await query;
   if (error) throw error;
+  
   return { data, count };
 };
 
@@ -68,6 +82,6 @@ export const useClaimsList = (
     queryFn: () => fetchClaims(searchQuery, status, currentPage),
     staleTime: 0,
     refetchOnWindowFocus: true,
-    refetchInterval: 5000, // Poll every 5 seconds for real-time updates
+    refetchInterval: 5000,
   });
 };
