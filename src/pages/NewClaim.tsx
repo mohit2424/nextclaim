@@ -17,7 +17,7 @@ export const formSchema = z.object({
   phone: z.string().regex(/^\d{10}$/, "Invalid phone number"),
   state: z.string().min(2, "State is required"),
   pincode: z.string().regex(/^\d{5,6}$/, "Invalid pincode"),
-  ssn: z.string().regex(/^\d{2}-\d{3}-\d{4}$/, "Invalid SSN format"),
+  ssn: z.string().regex(/^\d{3}-\d{2}-\d{4}$/, "Invalid SSN format (XXX-XX-XXXX)"),
   employerName: z.string().min(2, "Employer name is required"),
   employmentStartDate: z.date({
     required_error: "Employment start date is required",

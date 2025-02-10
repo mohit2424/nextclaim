@@ -32,7 +32,7 @@ export function ClaimForm({ onCancel }: ClaimFormProps) {
   const formatSSN = (ssn: string) => {
     const cleaned = ssn.replace(/\D/g, '');
     if (cleaned.length >= 9) {
-      return `${cleaned.slice(0, 2)}-${cleaned.slice(2, 5)}-${cleaned.slice(5, 9)}`;
+      return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 5)}-${cleaned.slice(5, 9)}`;
     }
     return cleaned;
   };
@@ -49,7 +49,7 @@ export function ClaimForm({ onCancel }: ClaimFormProps) {
 
       const formattedSsn = formatSSN(values.ssn);
       if (formattedSsn.length !== 11) {
-        toast.error("Invalid SSN format. Must be XX-XXX-XXXX");
+        toast.error("Invalid SSN format. Must be XXX-XX-XXXX");
         return;
       }
 
