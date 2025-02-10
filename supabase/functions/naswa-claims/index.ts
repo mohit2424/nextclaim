@@ -63,7 +63,7 @@ function generateMockClaims() {
       phone: `${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 9000 + 1000)}`,
       employer_name: employers[Math.floor(Math.random() * employers.length)],
       claim_date: new Date().toISOString().split('T')[0],
-      claim_status: "initial_review", // Explicitly set without type assertion
+      claim_status: 'initial_review' as 'initial_review' | 'in_progress' | 'rejected', // Properly typed enum value
       separation_reason: separationReason,
       employment_start_date: startDate,
       employment_end_date: endDate,
@@ -140,3 +140,4 @@ serve(async (req) => {
     )
   }
 })
+
