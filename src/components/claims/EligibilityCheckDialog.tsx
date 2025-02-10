@@ -81,18 +81,18 @@ export function EligibilityCheckDialog({
 
       if (error) throw error;
 
-      // Invalidate all relevant queries
+      // Invalidate and immediately refetch all relevant queries
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['claims'] }),
-        queryClient.invalidateQueries({ queryKey: ['claimStats'] }),
-        queryClient.invalidateQueries({ queryKey: ['claim', claimId] })
+        queryClient.invalidateQueries({ queryKey: ['claim', claimId] }),
+        queryClient.invalidateQueries({ queryKey: ['claimStats'] })
       ]);
 
-      // Force immediate refetch
+      // Force immediate refetch to ensure UI is updated
       await Promise.all([
-        queryClient.refetchQueries({ queryKey: ['claims'] }),
-        queryClient.refetchQueries({ queryKey: ['claimStats'] }),
-        queryClient.refetchQueries({ queryKey: ['claim', claimId] })
+        queryClient.refetchQueries({ queryKey: ['claims'], exact: false }),
+        queryClient.refetchQueries({ queryKey: ['claim', claimId] }),
+        queryClient.refetchQueries({ queryKey: ['claimStats'] })
       ]);
 
       toast({
@@ -120,7 +120,7 @@ export function EligibilityCheckDialog({
             {isChecking ? "Checking Eligibility..." : 
               isEligible ? "Claim is Eligible" : "Claim not Eligible"}
           </AlertDialogTitle>
-          <AlertDialogDescription className="space-y-4">
+          <AlertDialogDescription>
             {isChecking ? (
               <div className="flex items-center justify-center py-4">
                 <Loader2 className="h-8 w-8 animate-spin" />
@@ -132,16 +132,11 @@ export function EligibilityCheckDialog({
                 <p>The claim does not meet the eligibility criteria.</p>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">
-                    Rejection Reason (max 250 words):
+                    Rejection Reason:
                   </label>
                   <Textarea
                     value={rejectionReason}
-                    onChange={(e) => {
-                      const words = e.target.value.trim().split(/\s+/);
-                      if (words.length <= 250) {
-                        setRejectionReason(e.target.value);
-                      }
-                    }}
+                    onChange={(e) => setRejectionReason(e.target.value)}
                     className="h-32"
                     placeholder="Enter rejection reason..."
                   />
