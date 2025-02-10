@@ -41,7 +41,10 @@ export function ClaimsTable({ claims, onStatusUpdate }: ClaimsTableProps) {
   const [selectedClaim, setSelectedClaim] = useState<Claim | null>(null);
 
   const handleEligibilityCheck = (claim: Claim) => {
-    setSelectedClaim(claim);
+    // Set claim status to rejected if necessary
+    if (claim.claim_status === "initial_review") {
+      setSelectedClaim(claim);
+    }
   };
 
   return (
