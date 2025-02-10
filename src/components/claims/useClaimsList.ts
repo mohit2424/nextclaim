@@ -2,6 +2,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { ClaimStatus } from "./ClaimsTable";
+import { startOfDay } from "date-fns";
 
 export const fetchClaims = async (
   searchQuery: string = "", 
@@ -28,8 +29,7 @@ export const fetchClaims = async (
   }
 
   if (status) {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const today = startOfDay(new Date()).toISOString();
 
     switch (status) {
       case 'in_progress':
@@ -42,12 +42,12 @@ export const fetchClaims = async (
         // Only show initial_review claims from today
         query = query
           .eq('claim_status', 'initial_review')
-          .gte('created_at', today.toISOString());
+          .gte('created_at', today);
         break;
       case 'all':
         break;
       default:
-        if (['initial_review', 'pending', 'approved', 'rejected'].includes(status)) {
+        if (['initial_review'].includes(status)) {
           query = query.eq('claim_status', status as ClaimStatus);
         }
     }

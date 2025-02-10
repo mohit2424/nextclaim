@@ -18,7 +18,7 @@ function generateMockClaims() {
     "Evergreen Manufacturing",
     "Advanced Systems Corp"
   ];
-  const separationReasons = ["layoff", "reduction_in_force", "constructive_discharge", "severance_agreement", "job_abandonment"] as const;
+  const separationReasons = ["layoff", "reduction_in_force", "constructive_discharge", "severance_agreement", "job_abandonment"];
   
   // Current date for reference
   const currentDate = new Date();
@@ -48,10 +48,8 @@ function generateMockClaims() {
     const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
     const isEligible = i < 2; // First 2 claims will be eligible, last 3 won't
     const { startDate, endDate } = generateEmploymentDates(isEligible);
-    const separationReason = separationReasons[Math.floor(Math.random() * separationReasons.length)];
     
     return {
-      id: crypto.randomUUID(),
       first_name: firstName,
       middle_name: `${firstName[0]}`,
       last_name: lastName,
@@ -63,13 +61,11 @@ function generateMockClaims() {
       phone: `${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 9000 + 1000)}`,
       employer_name: employers[Math.floor(Math.random() * employers.length)],
       claim_date: new Date().toISOString().split('T')[0],
-      claim_status: "initial_review",
-      separation_reason: separationReason,
+      claim_status: "initial_review", // Always set to initial_review
+      separation_reason: separationReasons[Math.floor(Math.random() * separationReasons.length)],
       employment_start_date: startDate,
       employment_end_date: endDate,
       severance_package: Math.random() > 0.5,
-      severance_amount: Math.random() > 0.5 ? Math.floor(Math.random() * 50000 + 5000) : null,
-      reason_for_unemployment: "Company restructuring due to market conditions",
       documents: []
     };
   });

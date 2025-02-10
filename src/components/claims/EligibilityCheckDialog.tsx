@@ -16,6 +16,8 @@ interface EligibilityCheckDialogProps {
   onStatusUpdate: () => void;
 }
 
+type ClaimStatus = "initial_review" | "in_progress" | "rejected";
+
 export function EligibilityCheckDialog({ 
   claimId,
   employmentStartDate,
@@ -60,28 +62,31 @@ export function EligibilityCheckDialog({
 
   const handleClaimUpdate = async () => {
     try {
-      const newStatus = isEligible ? 'in_progress' : 'rejected';
-      const updateData: any = {
-        claim_status: newStatus
+      const newStatus: ClaimStatus = isEligible ? "in_progress" : "rejected";
+      
+      const updateData = {
+        claim_status: newStatus,
+        ...(isEligible ? {} : { rejection_reason: rejectionReason })
       };
-
-      if (!isEligible) {
-        updateData.rejection_reason = rejectionReason;
-      }
 
       const { error } = await supabase
         .from('claims')
         .update(updateData)
-        .eq('id', claimId)
-        .select();
+        .eq('id', claimId);
 
       if (error) throw error;
 
-      // Invalidate claims queries immediately
-      await queryClient.invalidateQueries({ queryKey: ['claims'] });
-      
-      // Force an immediate refetch
-      await queryClient.refetchQueries({ queryKey: ['claims'] });
+      // Invalidate both queries immediately
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['claims'] }),
+        queryClient.invalidateQueries({ queryKey: ['claimStats'] })
+      ]);
+
+      // Force immediate refetch
+      await Promise.all([
+        queryClient.refetchQueries({ queryKey: ['claims'] }),
+        queryClient.refetchQueries({ queryKey: ['claimStats'] })
+      ]);
 
       toast({
         title: "Success",
