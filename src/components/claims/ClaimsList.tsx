@@ -43,7 +43,7 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
           schema: 'public',
           table: 'claims'
         },
-        async () => {
+        async (payload) => {
           // Immediately invalidate and refetch
           await queryClient.invalidateQueries({ queryKey: ['claims'] });
           await queryClient.refetchQueries({ queryKey: ['claims'] });
@@ -104,9 +104,9 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
         <div className="max-w-[1200px] mx-auto">
           <ClaimsTable 
             claims={claims} 
-            onStatusUpdate={() => {
-              queryClient.invalidateQueries({ queryKey: ['claims'] });
-              queryClient.refetchQueries({ queryKey: ['claims'] });
+            onStatusUpdate={async () => {
+              await queryClient.invalidateQueries({ queryKey: ['claims'] });
+              await queryClient.refetchQueries({ queryKey: ['claims'] });
             }}
           />
         </div>
@@ -121,4 +121,3 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
     </DashboardLayout>
   );
 }
-
