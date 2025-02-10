@@ -26,6 +26,7 @@ export function ClaimForm({ onCancel }: ClaimFormProps) {
     defaultValues: {
       middleName: "",
       claimStatus: "initial_review",
+      severancePackage: false,
     },
   });
 
@@ -70,7 +71,10 @@ export function ClaimForm({ onCancel }: ClaimFormProps) {
         separation_reason: values.separationReason,
         ssn: formattedSsn,
         state: values.state,
-        user_id: session.user.id
+        user_id: session.user.id,
+        reason_for_unemployment: values.reasonForUnemployment,
+        severance_package: values.severancePackage,
+        severance_amount: values.severanceAmount || null,
       };
 
       const { error } = await supabase
@@ -102,6 +106,7 @@ export function ClaimForm({ onCancel }: ClaimFormProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <PersonalInfoFields form={form} />
           <AddressFields form={form} />
+          <ContactInfoFields form={form} />
           <ClaimDetailsFields form={form} />
         </div>
 

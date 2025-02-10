@@ -25,8 +25,11 @@ export type Database = {
           middle_name: string | null
           phone: string
           pincode: string
+          reason_for_unemployment: string | null
           rejection_reason: string | null
           separation_reason: Database["public"]["Enums"]["separation_reason"]
+          severance_amount: number | null
+          severance_package: boolean | null
           ssn: string
           state: string
           updated_at: string
@@ -47,8 +50,11 @@ export type Database = {
           middle_name?: string | null
           phone: string
           pincode: string
+          reason_for_unemployment?: string | null
           rejection_reason?: string | null
           separation_reason: Database["public"]["Enums"]["separation_reason"]
+          severance_amount?: number | null
+          severance_package?: boolean | null
           ssn: string
           state: string
           updated_at?: string
@@ -69,8 +75,11 @@ export type Database = {
           middle_name?: string | null
           phone?: string
           pincode?: string
+          reason_for_unemployment?: string | null
           rejection_reason?: string | null
           separation_reason?: Database["public"]["Enums"]["separation_reason"]
+          severance_amount?: number | null
+          severance_package?: boolean | null
           ssn?: string
           state?: string
           updated_at?: string
@@ -200,9 +209,12 @@ export type Database = {
           middle_name: string | null
           phone: string | null
           pincode: string | null
+          reason_for_unemployment: string | null
           separation_reason:
             | Database["public"]["Enums"]["separation_reason"]
             | null
+          severance_amount: number | null
+          severance_package: boolean | null
           ssn: string | null
           state: string | null
           updated_at: string | null
@@ -223,9 +235,12 @@ export type Database = {
           middle_name?: string | null
           phone?: string | null
           pincode?: string | null
+          reason_for_unemployment?: string | null
           separation_reason?:
             | Database["public"]["Enums"]["separation_reason"]
             | null
+          severance_amount?: number | null
+          severance_package?: boolean | null
           ssn?: string | null
           state?: string | null
           updated_at?: string | null
@@ -246,9 +261,12 @@ export type Database = {
           middle_name?: string | null
           phone?: string | null
           pincode?: string | null
+          reason_for_unemployment?: string | null
           separation_reason?:
             | Database["public"]["Enums"]["separation_reason"]
             | null
+          severance_amount?: number | null
+          severance_package?: boolean | null
           ssn?: string | null
           state?: string | null
           updated_at?: string | null
@@ -272,10 +290,13 @@ export type Database = {
           middle_name: string | null
           phone: string | null
           pincode: string | null
+          reason_for_unemployment: string | null
           rejection_reason: string | null
           separation_reason:
             | Database["public"]["Enums"]["separation_reason"]
             | null
+          severance_amount: number | null
+          severance_package: boolean | null
           ssn: string | null
           state: string | null
           updated_at: string | null
@@ -296,10 +317,13 @@ export type Database = {
           middle_name?: string | null
           phone?: string | null
           pincode?: string | null
+          reason_for_unemployment?: string | null
           rejection_reason?: string | null
           separation_reason?:
             | Database["public"]["Enums"]["separation_reason"]
             | null
+          severance_amount?: number | null
+          severance_package?: boolean | null
           ssn?: string | null
           state?: string | null
           updated_at?: string | null
@@ -320,10 +344,13 @@ export type Database = {
           middle_name?: string | null
           phone?: string | null
           pincode?: string | null
+          reason_for_unemployment?: string | null
           rejection_reason?: string | null
           separation_reason?:
             | Database["public"]["Enums"]["separation_reason"]
             | null
+          severance_amount?: number | null
+          severance_package?: boolean | null
           ssn?: string | null
           state?: string | null
           updated_at?: string | null
@@ -347,9 +374,12 @@ export type Database = {
           middle_name: string | null
           phone: string | null
           pincode: string | null
+          reason_for_unemployment: string | null
           separation_reason:
             | Database["public"]["Enums"]["separation_reason"]
             | null
+          severance_amount: number | null
+          severance_package: boolean | null
           ssn: string | null
           state: string | null
           updated_at: string | null
@@ -370,9 +400,12 @@ export type Database = {
           middle_name?: string | null
           phone?: string | null
           pincode?: string | null
+          reason_for_unemployment?: string | null
           separation_reason?:
             | Database["public"]["Enums"]["separation_reason"]
             | null
+          severance_amount?: number | null
+          severance_package?: boolean | null
           ssn?: string | null
           state?: string | null
           updated_at?: string | null
@@ -393,9 +426,12 @@ export type Database = {
           middle_name?: string | null
           phone?: string | null
           pincode?: string | null
+          reason_for_unemployment?: string | null
           separation_reason?:
             | Database["public"]["Enums"]["separation_reason"]
             | null
+          severance_amount?: number | null
+          severance_package?: boolean | null
           ssn?: string | null
           state?: string | null
           updated_at?: string | null

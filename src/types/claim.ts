@@ -16,5 +16,7 @@ export type Claim = {
   claim_status: string;
   separation_reason: "resignation" | "termination_misconduct" | "layoff" | "reduction_in_force" | "constructive_discharge" | "job_abandonment" | "severance_agreement";
   employer_name: string;
+  reason_for_unemployment?: string;
+  severance_package?: boolean;
+  severance_amount?: number | null;
 };
-

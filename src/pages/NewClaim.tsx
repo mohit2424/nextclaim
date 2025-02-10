@@ -37,6 +37,9 @@ export const formSchema = z.object({
     "job_abandonment",
     "severance_agreement"
   ]),
+  reasonForUnemployment: z.string().min(1, "Reason for unemployment is required"),
+  severancePackage: z.boolean().default(false),
+  severanceAmount: z.number().optional(),
   claimStatus: z.enum(["initial_review", "pending", "approved", "rejected"]),
 });
 
