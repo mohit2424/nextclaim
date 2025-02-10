@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { ClaimsList } from "@/components/claims/ClaimsList";
 import { useState } from "react";
 import { ClaimsOverviewChart } from "@/components/dashboard/ClaimsOverviewChart";
 import { ClaimsDistributionChart } from "@/components/dashboard/ClaimsDistributionChart";
@@ -24,15 +23,20 @@ export default function Dashboard() {
       setIsImporting(true);
       const { data, error } = await supabase.functions.invoke('naswa-claims');
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error importing NASWA claims:', error);
+        toast.error('Failed to import NASWA claims. Please try again.');
+        return;
+      }
       
       if (data.success) {
-        toast.success('Successfully imported NASWA claims');
-        // Invalidate the claims query to refresh the data
+        toast.success(`${data.message}`);
+        // Invalidate and refetch claims data
         await queryClient.invalidateQueries({ queryKey: ['claims'] });
+        await queryClient.refetchQueries({ queryKey: ['claims'] });
         await queryClient.invalidateQueries({ queryKey: ['claimStats'] });
       } else {
-        throw new Error('Failed to import claims');
+        toast.error(data.error || 'Failed to import claims');
       }
     } catch (error) {
       console.error('Error importing NASWA claims:', error);
@@ -84,13 +88,6 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <ClaimsOverviewChart />
           <ClaimsDistributionChart />
-        </div>
-
-        <div className="bg-white rounded-lg border shadow-sm">
-          <div className="border-b p-4">
-            <h2 className="text-lg font-semibold">Recent Claims</h2>
-          </div>
-          <ClaimsList searchQuery={searchQuery} />
         </div>
       </div>
     </DashboardLayout>

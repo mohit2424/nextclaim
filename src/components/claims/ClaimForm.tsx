@@ -25,7 +25,7 @@ export function ClaimForm({ onCancel }: ClaimFormProps) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       middleName: "",
-      claimStatus: "initial_review",
+      claimStatus: "initial_review", // Set default but don't show in form
     },
   });
 
@@ -53,16 +53,35 @@ export function ClaimForm({ onCancel }: ClaimFormProps) {
         return;
       }
 
+      // First check if a claim with this SSN already exists
+      const { data: existingClaim, error: checkError } = await supabase
+        .from('claims')
+        .select('id')
+        .eq('ssn', formattedSsn)
+        .maybeSingle();
+
+      if (checkError) {
+        console.error('Error checking existing claim:', checkError);
+        toast.error("Error checking existing claim");
+        return;
+      }
+
+      if (existingClaim) {
+        toast.error("A claim with this SSN already exists");
+        return;
+      }
+
       const insertData: Database["public"]["Tables"]["claims"]["Insert"] = {
         id: crypto.randomUUID(),
         age: values.age,
         claim_date: format(values.claimDate, 'yyyy-MM-dd'),
-        claim_status: values.claimStatus,
+        claim_status: "initial_review", // Always set to initial_review
         documents: [],
         email: values.email,
         employer_name: values.employerName,
         first_name: values.firstName,
-        last_day_of_work: format(values.lastDayOfWork, 'yyyy-MM-dd'),
+        employment_start_date: format(values.employmentStartDate, 'yyyy-MM-dd'),
+        employment_end_date: format(values.employmentEndDate, 'yyyy-MM-dd'),
         last_name: values.lastName,
         middle_name: values.middleName || null,
         phone: values.phone,
@@ -81,11 +100,8 @@ export function ClaimForm({ onCancel }: ClaimFormProps) {
         .single();
 
       if (error) {
-        if (error.code === '23505') {
-          toast.error("A claim with this SSN already exists");
-        } else {
-          throw error;
-        }
+        console.error('Error submitting claim:', error);
+        toast.error("Failed to submit claim");
         return;
       }
 
