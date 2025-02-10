@@ -1,9 +1,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import type { Database } from "@/integrations/supabase/types";
-
-export type ClaimStatus = Database["public"]["Enums"]["claim_status"];
+import type { ClaimStatus } from "./ClaimsTable";
 
 export const fetchClaims = async (
   searchQuery: string = "", 
@@ -49,7 +47,7 @@ export const fetchClaims = async (
       case 'all':
         break;
       default:
-        if (['initial_review', 'in_progress', 'rejected'].includes(status)) {
+        if (['initial_review', 'pending', 'approved', 'rejected'].includes(status)) {
           query = query.eq('claim_status', status as ClaimStatus);
         }
     }
