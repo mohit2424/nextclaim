@@ -20,20 +20,16 @@ function generateMockClaims() {
   ];
   const separationReasons = ["layoff", "reduction_in_force", "constructive_discharge", "severance_agreement", "job_abandonment"];
   
-  // Current date for reference
   const currentDate = new Date();
   
-  // Helper function to generate dates
   const generateEmploymentDates = (isEligible: boolean) => {
     const endDate = new Date(currentDate);
-    endDate.setDate(endDate.getDate() - Math.floor(Math.random() * 30)); // End date within last 30 days
+    endDate.setDate(endDate.getDate() - Math.floor(Math.random() * 30));
     
     const startDate = new Date(endDate);
     if (isEligible) {
-      // For eligible claims: 120-365 days of employment
       startDate.setDate(startDate.getDate() - (120 + Math.floor(Math.random() * 245)));
     } else {
-      // For ineligible claims: 30-119 days of employment
       startDate.setDate(startDate.getDate() - (30 + Math.floor(Math.random() * 89)));
     }
     
@@ -42,12 +38,20 @@ function generateMockClaims() {
       endDate: endDate.toISOString().split('T')[0]
     };
   };
+
+  const generateSSN = () => {
+    const area = String(Math.floor(Math.random() * 900 + 100));
+    const group = String(Math.floor(Math.random() * 90 + 10));
+    const serial = String(Math.floor(Math.random() * 9000 + 1000));
+    return `${area}-${group}-${serial}`;
+  };
   
   return Array.from({ length: 10 }, (_, i) => {
     const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
     const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-    const isEligible = i < 4; // First 4 claims will be eligible
+    const isEligible = i < 4;
     const { startDate, endDate } = generateEmploymentDates(isEligible);
+    const uniqueSSN = generateSSN();
     
     return {
       first_name: firstName,
@@ -56,7 +60,7 @@ function generateMockClaims() {
       age: Math.floor(Math.random() * (65 - 18) + 18),
       state: states[Math.floor(Math.random() * states.length)],
       pincode: Math.floor(Math.random() * 90000 + 10000).toString(),
-      ssn: `${Math.floor(Math.random() * 900 + 100)}-${Math.floor(Math.random() * 90 + 10)}-${Math.floor(Math.random() * 9000 + 1000)}`,
+      ssn: uniqueSSN,
       email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@example.com`,
       phone: `${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 9000 + 1000)}`,
       employer_name: employers[Math.floor(Math.random() * employers.length)],
@@ -67,7 +71,9 @@ function generateMockClaims() {
       employment_end_date: endDate,
       severance_package: Math.random() > 0.5,
       documents: [],
-      id: crypto.randomUUID()
+      id: crypto.randomUUID(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
     };
   });
 }
@@ -91,7 +97,6 @@ serve(async (req) => {
     
     for (const claim of mockClaims) {
       try {
-        // Check if claim with this SSN already exists
         const { data: existingClaim, error: checkError } = await supabaseClient
           .from('claims')
           .select('id, ssn')
@@ -109,6 +114,7 @@ serve(async (req) => {
           continue
         }
 
+        // Insert the new claim
         const { data, error: insertError } = await supabaseClient
           .from('claims')
           .insert(claim)
@@ -120,6 +126,7 @@ serve(async (req) => {
         }
         
         results.push(data[0])
+        console.log(`Successfully inserted claim for ${claim.first_name} ${claim.last_name}`)
       } catch (error) {
         console.error('Error processing claim:', error)
         continue

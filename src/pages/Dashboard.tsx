@@ -23,15 +23,20 @@ export default function Dashboard() {
       setIsImporting(true);
       const { data, error } = await supabase.functions.invoke('naswa-claims');
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error importing NASWA claims:', error);
+        toast.error('Failed to import NASWA claims. Please try again.');
+        return;
+      }
       
       if (data.success) {
-        toast.success('Successfully imported NASWA claims');
-        // Invalidate the claims query to refresh the data
+        toast.success(`${data.message}`);
+        // Invalidate and refetch claims data
         await queryClient.invalidateQueries({ queryKey: ['claims'] });
+        await queryClient.refetchQueries({ queryKey: ['claims'] });
         await queryClient.invalidateQueries({ queryKey: ['claimStats'] });
       } else {
-        throw new Error('Failed to import claims');
+        toast.error(data.error || 'Failed to import claims');
       }
     } catch (error) {
       console.error('Error importing NASWA claims:', error);
