@@ -43,10 +43,10 @@ function generateMockClaims() {
     };
   };
   
-  return Array.from({ length: 5 }, (_, i) => {
+  return Array.from({ length: 10 }, (_, i) => {
     const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
     const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-    const isEligible = i < 2; // First 2 claims will be eligible, last 3 won't
+    const isEligible = i < 4; // First 4 claims will be eligible
     const { startDate, endDate } = generateEmploymentDates(isEligible);
     
     return {
@@ -61,12 +61,13 @@ function generateMockClaims() {
       phone: `${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 9000 + 1000)}`,
       employer_name: employers[Math.floor(Math.random() * employers.length)],
       claim_date: new Date().toISOString().split('T')[0],
-      claim_status: "initial_review", // Always set to initial_review
+      claim_status: "initial_review",
       separation_reason: separationReasons[Math.floor(Math.random() * separationReasons.length)],
       employment_start_date: startDate,
       employment_end_date: endDate,
       severance_package: Math.random() > 0.5,
-      documents: []
+      documents: [],
+      id: crypto.randomUUID()
     };
   });
 }
@@ -86,37 +87,51 @@ serve(async (req) => {
     const mockClaims = generateMockClaims();
     
     const results = []
+    const skipped = []
+    
     for (const claim of mockClaims) {
-      // Check if claim with this SSN already exists
-      const { data: existingClaim } = await supabaseClient
-        .from('claims')
-        .select('id')
-        .eq('ssn', claim.ssn)
-        .single()
+      try {
+        // Check if claim with this SSN already exists
+        const { data: existingClaim, error: checkError } = await supabaseClient
+          .from('claims')
+          .select('id, ssn')
+          .eq('ssn', claim.ssn)
+          .maybeSingle()
 
-      if (existingClaim) {
-        console.log(`Claim with SSN ${claim.ssn} already exists, skipping...`)
+        if (checkError) {
+          console.error('Error checking existing claim:', checkError)
+          continue
+        }
+
+        if (existingClaim) {
+          console.log(`Claim with SSN ${claim.ssn} already exists, skipping...`)
+          skipped.push(claim.ssn)
+          continue
+        }
+
+        const { data, error: insertError } = await supabaseClient
+          .from('claims')
+          .insert(claim)
+          .select()
+        
+        if (insertError) {
+          console.error('Error inserting claim:', insertError)
+          continue
+        }
+        
+        results.push(data[0])
+      } catch (error) {
+        console.error('Error processing claim:', error)
         continue
       }
-
-      const { data, error } = await supabaseClient
-        .from('claims')
-        .insert(claim)
-        .select()
-      
-      if (error) {
-        console.error('Error inserting claim:', error)
-        throw error
-      }
-      
-      results.push(data[0])
     }
 
     return new Response(
       JSON.stringify({ 
         success: true, 
         data: results,
-        message: results.length === 0 ? 'All claims already exist' : `Successfully imported ${results.length} new claims`
+        skipped: skipped,
+        message: `Successfully imported ${results.length} new claims. Skipped ${skipped.length} duplicate claims.`
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -126,7 +141,11 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in naswa-claims function:', error)
     return new Response(
-      JSON.stringify({ success: false, error: error.message }),
+      JSON.stringify({ 
+        success: false, 
+        error: error.message,
+        details: "Check the function logs for more information"
+      }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500
@@ -134,4 +153,3 @@ serve(async (req) => {
     )
   }
 })
-
