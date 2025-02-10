@@ -11,7 +11,7 @@ const fetchClaimStats = async () => {
     .select('claim_status, created_at')
     .order('created_at', { ascending: false });
 
-  if (!claims) return { total: 0, inProgress: 0, newToday: 0 };
+  if (!claims) return { total: 0, inProgress: 0, newToday: 0, rejected: 0 };
 
   const today = startOfDay(new Date());
   
@@ -19,27 +19,33 @@ const fetchClaimStats = async () => {
     // Total claims
     acc.total++;
     
-    // In progress claims (initial_review, pending)
-    if (['initial_review', 'pending'].includes(claim.claim_status)) {
+    // In progress claims
+    if (claim.claim_status === 'in_progress') {
       acc.inProgress++;
     }
     
-    // New claims today
-    if (new Date(claim.created_at) >= today) {
+    // Rejected claims
+    if (claim.claim_status === 'rejected') {
+      acc.rejected++;
+    }
+    
+    // New claims today (initial_review status created today)
+    if (new Date(claim.created_at) >= today && claim.claim_status === 'initial_review') {
       acc.newToday++;
     }
     
     return acc;
-  }, { total: 0, inProgress: 0, newToday: 0 });
+  }, { total: 0, inProgress: 0, rejected: 0, newToday: 0 });
 
   return stats;
 };
 
 export function ClaimsStats() {
   const navigate = useNavigate();
-  const { data: claimStats = { total: 0, inProgress: 0, newToday: 0 }, isLoading } = useQuery({
+  const { data: claimStats = { total: 0, inProgress: 0, rejected: 0, newToday: 0 }, isLoading } = useQuery({
     queryKey: ['claimStats'],
     queryFn: fetchClaimStats,
+    refetchInterval: 5000, // Poll every 5 seconds for real-time updates
   });
   
   const stats = [
@@ -58,6 +64,13 @@ export function ClaimsStats() {
       onClick: () => navigate("/claims?status=in_progress"),
     },
     {
+      title: "Rejected Claims",
+      value: claimStats.rejected.toString(),
+      bgColor: "bg-gradient-to-r from-red-50 to-red-100",
+      textColor: "text-red-900",
+      onClick: () => navigate("/claims?status=rejected"),
+    },
+    {
       title: "New Claims Today",
       value: claimStats.newToday.toString(),
       bgColor: "bg-gradient-to-r from-green-50 to-green-100",
@@ -67,15 +80,15 @@ export function ClaimsStats() {
   ];
 
   if (isLoading) {
-    return <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      {[...Array(3)].map((_, i) => (
+    return <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      {[...Array(4)].map((_, i) => (
         <Card key={i} className="animate-pulse bg-gray-100 h-[104px]" />
       ))}
     </div>;
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
       {stats.map((stat) => (
         <Card
           key={stat.title}

@@ -35,9 +35,14 @@ export const fetchClaims = async (
       case 'in_progress':
         query = query.eq('claim_status', 'in_progress');
         break;
+      case 'rejected':
+        query = query.eq('claim_status', 'rejected');
+        break;
       case 'today':
-        // Use gte with the start of today in ISO format
-        query = query.gte('created_at', today.toISOString());
+        // Only show initial_review claims from today
+        query = query
+          .eq('claim_status', 'initial_review')
+          .gte('created_at', today.toISOString());
         break;
       case 'all':
         break;
@@ -63,6 +68,6 @@ export const useClaimsList = (
     queryFn: () => fetchClaims(searchQuery, status, currentPage),
     staleTime: 0,
     refetchOnWindowFocus: true,
-    refetchInterval: 1000, // Poll every second to ensure we catch all updates
+    refetchInterval: 5000, // Poll every 5 seconds for real-time updates
   });
 };
