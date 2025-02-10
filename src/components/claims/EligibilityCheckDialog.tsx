@@ -72,12 +72,16 @@ export function EligibilityCheckDialog({
       const { error } = await supabase
         .from('claims')
         .update(updateData)
-        .eq('id', claimId);
+        .eq('id', claimId)
+        .select();
 
       if (error) throw error;
 
-      // Invalidate all queries that include claims data
+      // Invalidate claims queries immediately
       await queryClient.invalidateQueries({ queryKey: ['claims'] });
+      
+      // Force an immediate refetch
+      await queryClient.refetchQueries({ queryKey: ['claims'] });
 
       toast({
         title: "Success",
@@ -104,7 +108,7 @@ export function EligibilityCheckDialog({
             {isChecking ? "Checking Eligibility..." : 
               isEligible ? "Claim is Eligible" : "Claim not Eligible"}
           </AlertDialogTitle>
-          <AlertDialogDescription>
+          <AlertDialogDescription className="space-y-4">
             {isChecking ? (
               <div className="flex items-center justify-center py-4">
                 <Loader2 className="h-8 w-8 animate-spin" />
@@ -150,3 +154,4 @@ export function EligibilityCheckDialog({
     </AlertDialog>
   );
 }
+

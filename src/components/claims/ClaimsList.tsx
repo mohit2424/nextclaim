@@ -43,9 +43,10 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
           schema: 'public',
           table: 'claims'
         },
-        () => {
-          // Invalidate and refetch claims data when any change occurs
-          queryClient.invalidateQueries({ queryKey: ['claims'] });
+        async () => {
+          // Immediately invalidate and refetch
+          await queryClient.invalidateQueries({ queryKey: ['claims'] });
+          await queryClient.refetchQueries({ queryKey: ['claims'] });
         }
       )
       .subscribe();
@@ -105,6 +106,7 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
             claims={claims} 
             onStatusUpdate={() => {
               queryClient.invalidateQueries({ queryKey: ['claims'] });
+              queryClient.refetchQueries({ queryKey: ['claims'] });
             }}
           />
         </div>
@@ -119,3 +121,4 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
     </DashboardLayout>
   );
 }
+
