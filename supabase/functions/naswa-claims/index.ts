@@ -23,6 +23,9 @@ function generateMockClaims() {
   return Array.from({ length: 5 }, (_, i) => {
     const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
     const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+    const today = new Date();
+    const lastDayOfWork = new Date(today);
+    lastDayOfWork.setDate(today.getDate() - Math.floor(Math.random() * 30)); // Random date within last 30 days
     
     return {
       first_name: firstName,
@@ -35,10 +38,12 @@ function generateMockClaims() {
       email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@example.com`,
       phone: `${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 9000 + 1000)}`,
       employer_name: employers[Math.floor(Math.random() * employers.length)],
-      claim_date: new Date().toISOString().split('T')[0],
+      claim_date: today.toISOString().split('T')[0],
       claim_status: "initial_review",
       separation_reason: separationReasons[Math.floor(Math.random() * separationReasons.length)],
-      last_day_of_work: new Date().toISOString().split('T')[0],
+      last_day_of_work: lastDayOfWork.toISOString().split('T')[0],
+      employment_start_date: new Date(today.getFullYear() - 1, today.getMonth(), today.getDate()).toISOString().split('T')[0],
+      employment_end_date: lastDayOfWork.toISOString().split('T')[0],
       severance_package: Math.random() > 0.5,
       severance_amount: Math.random() > 0.5 ? Math.floor(Math.random() * 50000 + 5000) : null,
       reason_for_unemployment: "Company restructuring",

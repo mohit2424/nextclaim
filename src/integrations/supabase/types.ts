@@ -22,6 +22,7 @@ export type Database = {
           employment_start_date: string
           first_name: string
           id: string
+          last_day_of_work: string | null
           last_name: string
           middle_name: string | null
           phone: string
@@ -50,6 +51,7 @@ export type Database = {
           employment_start_date: string
           first_name: string
           id: string
+          last_day_of_work?: string | null
           last_name: string
           middle_name?: string | null
           phone: string
@@ -78,6 +80,7 @@ export type Database = {
           employment_start_date?: string
           first_name?: string
           id?: string
+          last_day_of_work?: string | null
           last_name?: string
           middle_name?: string | null
           phone?: string
