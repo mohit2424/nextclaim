@@ -85,9 +85,10 @@ function generateMockClaims(): MockClaim[] {
     const { startDate, endDate } = generateEmploymentDates(isEligible);
     const hasSeverance = Math.random() > 0.5;
     
+    // Explicitly set claim_status as "initial_review" for all new claims
     const claim: MockClaim = {
       first_name: firstName,
-      middle_name: `${firstName[0]}`,
+      middle_name: Math.random() > 0.5 ? `${firstName[0]}` : null, // Make middle name optional
       last_name: lastName,
       age: Math.floor(Math.random() * (65 - 18) + 18),
       state: states[Math.floor(Math.random() * states.length)],
@@ -97,7 +98,7 @@ function generateMockClaims(): MockClaim[] {
       phone: `${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 9000 + 1000)}`,
       employer_name: employers[Math.floor(Math.random() * employers.length)],
       claim_date: new Date().toISOString().split('T')[0],
-      claim_status: 'initial_review',
+      claim_status: 'initial_review', // Explicitly set initial status
       separation_reason: separationReasons[Math.floor(Math.random() * separationReasons.length)],
       employment_start_date: startDate,
       employment_end_date: endDate,
@@ -133,6 +134,12 @@ serve(async (req) => {
     for (const claim of mockClaims) {
       console.log(`Processing claim for ${claim.first_name} ${claim.last_name}...`)
       
+      // Validate claim_status before insertion
+      if (!claim.claim_status) {
+        console.error('Missing claim_status for claim:', claim)
+        continue
+      }
+
       // Check if claim with this SSN already exists
       const { data: existingClaim } = await supabaseClient
         .from('claims')
