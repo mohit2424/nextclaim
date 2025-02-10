@@ -160,7 +160,7 @@ export type Database = {
             columns: ["claim_id"]
             isOneToOne: false
             referencedRelation: "todays_claims"
-            referencedColumns: ["id"]
+            referencedColumns: ["claim_id"]
           },
         ]
       }
@@ -380,6 +380,7 @@ export type Database = {
         Row: {
           age: number | null
           claim_date: string | null
+          claim_id: string | null
           claim_status: Database["public"]["Enums"]["claim_status"] | null
           created_at: string | null
           documents: Json | null
@@ -388,7 +389,6 @@ export type Database = {
           employment_end_date: string | null
           employment_start_date: string | null
           first_name: string | null
-          id: string | null
           last_day_of_work: string | null
           last_name: string | null
           middle_name: string | null
@@ -409,6 +409,7 @@ export type Database = {
         Insert: {
           age?: number | null
           claim_date?: string | null
+          claim_id?: string | null
           claim_status?: Database["public"]["Enums"]["claim_status"] | null
           created_at?: string | null
           documents?: Json | null
@@ -417,7 +418,6 @@ export type Database = {
           employment_end_date?: string | null
           employment_start_date?: string | null
           first_name?: string | null
-          id?: string | null
           last_day_of_work?: string | null
           last_name?: string | null
           middle_name?: string | null
@@ -438,6 +438,7 @@ export type Database = {
         Update: {
           age?: number | null
           claim_date?: string | null
+          claim_id?: string | null
           claim_status?: Database["public"]["Enums"]["claim_status"] | null
           created_at?: string | null
           documents?: Json | null
@@ -446,7 +447,6 @@ export type Database = {
           employment_end_date?: string | null
           employment_start_date?: string | null
           first_name?: string | null
-          id?: string | null
           last_day_of_work?: string | null
           last_name?: string | null
           middle_name?: string | null
