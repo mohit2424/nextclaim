@@ -32,6 +32,8 @@ export function EligibilityCheckDialog({
 
   const checkEligibility = async () => {
     try {
+      console.log('Checking eligibility with dates:', { employmentStartDate, employmentEndDate });
+      
       const { data, error } = await supabase.rpc('check_claim_eligibility', {
         start_date: employmentStartDate,
         end_date: employmentEndDate
@@ -39,7 +41,9 @@ export function EligibilityCheckDialog({
 
       if (error) throw error;
 
+      console.log('Eligibility check result:', data);
       setIsEligible(data);
+      
       if (!data) {
         setRejectionReason("Employee did not meet the minimum 4-month employment duration requirement.");
       }
@@ -67,6 +71,8 @@ export function EligibilityCheckDialog({
         claim_status: newStatus,
         ...(newStatus === "rejected" ? { rejection_reason: rejectionReason } : {})
       };
+
+      console.log('Updating claim with:', updateData);
 
       const { error } = await supabase
         .from('claims')
