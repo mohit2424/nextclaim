@@ -4,8 +4,7 @@ import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, A
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
-import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import type { ClaimStatus } from "@/types/claim";
 
@@ -27,7 +26,6 @@ export function EligibilityCheckDialog({
   const [isChecking, setIsChecking] = useState(true);
   const [isEligible, setIsEligible] = useState<boolean | null>(null);
   const [rejectionReason, setRejectionReason] = useState("");
-  const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const checkEligibility = async () => {
@@ -49,11 +47,7 @@ export function EligibilityCheckDialog({
       }
     } catch (error) {
       console.error('Error checking eligibility:', error);
-      toast({
-        title: "Error",
-        description: "Failed to check eligibility. Please try again.",
-        variant: "destructive"
-      });
+      toast.error("Failed to check eligibility. Please try again.");
     } finally {
       setIsChecking(false);
     }
@@ -78,13 +72,10 @@ export function EligibilityCheckDialog({
       if (error) throw error;
 
       console.log('Rejection email sent successfully');
+      toast.success("Rejection notification email sent to claimant");
     } catch (error) {
       console.error('Error sending rejection email:', error);
-      toast({
-        title: "Warning",
-        description: "Claim was rejected but failed to send notification email.",
-        variant: "destructive"
-      });
+      toast.error("Failed to send rejection notification email");
     }
   };
 
@@ -125,34 +116,19 @@ export function EligibilityCheckDialog({
         );
       }
 
-      // Invalidate and immediately refetch all relevant queries
+      // Invalidate and refetch queries to update UI
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['claims'] }),
         queryClient.invalidateQueries({ queryKey: ['claim', claimId] }),
         queryClient.invalidateQueries({ queryKey: ['claimStats'] })
       ]);
 
-      // Force immediate refetch to ensure UI is updated
-      await Promise.all([
-        queryClient.refetchQueries({ queryKey: ['claims'], exact: false }),
-        queryClient.refetchQueries({ queryKey: ['claim', claimId] }),
-        queryClient.refetchQueries({ queryKey: ['claimStats'] })
-      ]);
-
-      toast({
-        title: "Success",
-        description: `Claim has been marked as ${isEligible ? 'in progress' : 'rejected'}.`
-      });
-
+      toast.success(`Claim has been marked as ${isEligible ? 'in progress' : 'rejected'}`);
       onStatusUpdate();
       onClose();
     } catch (error) {
       console.error('Error updating claim:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update claim status. Please try again.",
-        variant: "destructive"
-      });
+      toast.error("Failed to update claim status");
     }
   };
 
@@ -167,7 +143,7 @@ export function EligibilityCheckDialog({
           <AlertDialogDescription>
             {isChecking ? (
               <div className="flex items-center justify-center py-4">
-                <Loader2 className="h-8 w-8 animate-spin" />
+                <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
               </div>
             ) : isEligible ? (
               "The claim meets all eligibility criteria and will be moved to in-progress status."
