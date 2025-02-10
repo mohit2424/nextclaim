@@ -25,7 +25,7 @@ export function ClaimForm({ onCancel }: ClaimFormProps) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       middleName: "",
-      claimStatus: "initial_review", // Set default status
+      claimStatus: "initial_review",
     },
   });
 
@@ -57,7 +57,7 @@ export function ClaimForm({ onCancel }: ClaimFormProps) {
         id: crypto.randomUUID(),
         age: values.age,
         claim_date: format(values.claimDate, 'yyyy-MM-dd'),
-        claim_status: "initial_review", // Always set initial status
+        claim_status: values.claimStatus,
         documents: [],
         email: values.email,
         employer_name: values.employerName,
@@ -74,6 +74,8 @@ export function ClaimForm({ onCancel }: ClaimFormProps) {
         state: values.state,
         user_id: session.user.id
       };
+
+      console.log('Inserting claim with data:', insertData);
 
       const { error: insertError } = await supabase
         .from('claims')
