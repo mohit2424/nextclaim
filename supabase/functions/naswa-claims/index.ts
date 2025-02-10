@@ -61,12 +61,13 @@ function generateMockClaims() {
       phone: `${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 9000 + 1000)}`,
       employer_name: employers[Math.floor(Math.random() * employers.length)],
       claim_date: new Date().toISOString().split('T')[0],
-      claim_status: "initial_review", // Always set to initial_review
-      separation_reason: separationReasons[Math.floor(Math.random() * separationReasons.length)],
+      claim_status: "initial_review" as const, // Explicitly set as initial_review
+      separation_reason: separationReasons[Math.floor(Math.random() * separationReasons.length)] as const,
       employment_start_date: startDate,
       employment_end_date: endDate,
       severance_package: Math.random() > 0.5,
-      documents: []
+      documents: [],
+      user_id: null // Set as null since these are mock claims
     };
   });
 }
