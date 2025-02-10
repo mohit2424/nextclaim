@@ -30,7 +30,6 @@ export const formSchema = z.object({
   employmentEndDate: z.date({
     required_error: "Employment end date is required",
   }),
-  claimStatus: z.enum(["initial_review", "in_progress", "rejected"]).default("initial_review"),
   separationReason: z.enum([
     "resignation",
     "termination_misconduct",
