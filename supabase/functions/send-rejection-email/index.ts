@@ -29,7 +29,7 @@ serve(async (req) => {
     console.log(`Sending rejection email for claim ${claimId} to ${email}`);
 
     const { data, error } = await resend.emails.send({
-      from: "Unemployment Claims <onboarding@resend.dev>",
+      from: "Claims <claims@yourdomain.com>", // Replace yourdomain.com with your verified domain
       to: email,
       subject: `Claim ${claimId} Status Update`,
       html: `
