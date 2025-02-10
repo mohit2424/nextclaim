@@ -15,6 +15,7 @@ export type Database = {
           claim_date: string
           claim_status: Database["public"]["Enums"]["claim_status"] | null
           created_at: string
+          documents: Json | null
           email: string
           employer_name: string
           employment_end_date: string
@@ -40,6 +41,7 @@ export type Database = {
           claim_date: string
           claim_status?: Database["public"]["Enums"]["claim_status"] | null
           created_at?: string
+          documents?: Json | null
           email: string
           employer_name: string
           employment_end_date: string
@@ -65,6 +67,7 @@ export type Database = {
           claim_date?: string
           claim_status?: Database["public"]["Enums"]["claim_status"] | null
           created_at?: string
+          documents?: Json | null
           email?: string
           employer_name?: string
           employment_end_date?: string
@@ -199,87 +202,7 @@ export type Database = {
           claim_date: string | null
           claim_status: Database["public"]["Enums"]["claim_status"] | null
           created_at: string | null
-          email: string | null
-          employer_name: string | null
-          employment_end_date: string | null
-          employment_start_date: string | null
-          first_name: string | null
-          id: string | null
-          last_name: string | null
-          middle_name: string | null
-          phone: string | null
-          pincode: string | null
-          reason_for_unemployment: string | null
-          separation_reason:
-            | Database["public"]["Enums"]["separation_reason"]
-            | null
-          severance_amount: number | null
-          severance_package: boolean | null
-          ssn: string | null
-          state: string | null
-          updated_at: string | null
-          user_id: string | null
-        }
-        Insert: {
-          age?: number | null
-          claim_date?: string | null
-          claim_status?: Database["public"]["Enums"]["claim_status"] | null
-          created_at?: string | null
-          email?: string | null
-          employer_name?: string | null
-          employment_end_date?: string | null
-          employment_start_date?: string | null
-          first_name?: string | null
-          id?: string | null
-          last_name?: string | null
-          middle_name?: string | null
-          phone?: string | null
-          pincode?: string | null
-          reason_for_unemployment?: string | null
-          separation_reason?:
-            | Database["public"]["Enums"]["separation_reason"]
-            | null
-          severance_amount?: number | null
-          severance_package?: boolean | null
-          ssn?: string | null
-          state?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          age?: number | null
-          claim_date?: string | null
-          claim_status?: Database["public"]["Enums"]["claim_status"] | null
-          created_at?: string | null
-          email?: string | null
-          employer_name?: string | null
-          employment_end_date?: string | null
-          employment_start_date?: string | null
-          first_name?: string | null
-          id?: string | null
-          last_name?: string | null
-          middle_name?: string | null
-          phone?: string | null
-          pincode?: string | null
-          reason_for_unemployment?: string | null
-          separation_reason?:
-            | Database["public"]["Enums"]["separation_reason"]
-            | null
-          severance_amount?: number | null
-          severance_package?: boolean | null
-          ssn?: string | null
-          state?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Relationships: []
-      }
-      rejected_claims: {
-        Row: {
-          age: number | null
-          claim_date: string | null
-          claim_status: Database["public"]["Enums"]["claim_status"] | null
-          created_at: string | null
+          documents: Json | null
           email: string | null
           employer_name: string | null
           employment_end_date: string | null
@@ -307,6 +230,7 @@ export type Database = {
           claim_date?: string | null
           claim_status?: Database["public"]["Enums"]["claim_status"] | null
           created_at?: string | null
+          documents?: Json | null
           email?: string | null
           employer_name?: string | null
           employment_end_date?: string | null
@@ -334,6 +258,94 @@ export type Database = {
           claim_date?: string | null
           claim_status?: Database["public"]["Enums"]["claim_status"] | null
           created_at?: string | null
+          documents?: Json | null
+          email?: string | null
+          employer_name?: string | null
+          employment_end_date?: string | null
+          employment_start_date?: string | null
+          first_name?: string | null
+          id?: string | null
+          last_name?: string | null
+          middle_name?: string | null
+          phone?: string | null
+          pincode?: string | null
+          reason_for_unemployment?: string | null
+          rejection_reason?: string | null
+          separation_reason?:
+            | Database["public"]["Enums"]["separation_reason"]
+            | null
+          severance_amount?: number | null
+          severance_package?: boolean | null
+          ssn?: string | null
+          state?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      rejected_claims: {
+        Row: {
+          age: number | null
+          claim_date: string | null
+          claim_status: Database["public"]["Enums"]["claim_status"] | null
+          created_at: string | null
+          documents: Json | null
+          email: string | null
+          employer_name: string | null
+          employment_end_date: string | null
+          employment_start_date: string | null
+          first_name: string | null
+          id: string | null
+          last_name: string | null
+          middle_name: string | null
+          phone: string | null
+          pincode: string | null
+          reason_for_unemployment: string | null
+          rejection_reason: string | null
+          separation_reason:
+            | Database["public"]["Enums"]["separation_reason"]
+            | null
+          severance_amount: number | null
+          severance_package: boolean | null
+          ssn: string | null
+          state: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          age?: number | null
+          claim_date?: string | null
+          claim_status?: Database["public"]["Enums"]["claim_status"] | null
+          created_at?: string | null
+          documents?: Json | null
+          email?: string | null
+          employer_name?: string | null
+          employment_end_date?: string | null
+          employment_start_date?: string | null
+          first_name?: string | null
+          id?: string | null
+          last_name?: string | null
+          middle_name?: string | null
+          phone?: string | null
+          pincode?: string | null
+          reason_for_unemployment?: string | null
+          rejection_reason?: string | null
+          separation_reason?:
+            | Database["public"]["Enums"]["separation_reason"]
+            | null
+          severance_amount?: number | null
+          severance_package?: boolean | null
+          ssn?: string | null
+          state?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          age?: number | null
+          claim_date?: string | null
+          claim_status?: Database["public"]["Enums"]["claim_status"] | null
+          created_at?: string | null
+          documents?: Json | null
           email?: string | null
           employer_name?: string | null
           employment_end_date?: string | null
@@ -365,6 +377,7 @@ export type Database = {
           claim_id: string | null
           claim_status: Database["public"]["Enums"]["claim_status"] | null
           created_at: string | null
+          documents: Json | null
           email: string | null
           employer_name: string | null
           employment_end_date: string | null
@@ -391,6 +404,7 @@ export type Database = {
           claim_id?: string | null
           claim_status?: Database["public"]["Enums"]["claim_status"] | null
           created_at?: string | null
+          documents?: Json | null
           email?: string | null
           employer_name?: string | null
           employment_end_date?: string | null
@@ -417,6 +431,7 @@ export type Database = {
           claim_id?: string | null
           claim_status?: Database["public"]["Enums"]["claim_status"] | null
           created_at?: string | null
+          documents?: Json | null
           email?: string | null
           employer_name?: string | null
           employment_end_date?: string | null
