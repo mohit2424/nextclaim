@@ -20,25 +20,6 @@ function generateMockClaims() {
   ];
   const separationReasons = ["layoff", "reduction_in_force", "constructive_discharge", "severance_agreement", "job_abandonment"];
   
-  const currentDate = new Date();
-  
-  const generateEmploymentDates = (isEligible: boolean) => {
-    const endDate = new Date(currentDate);
-    endDate.setDate(endDate.getDate() - Math.floor(Math.random() * 30));
-    
-    const startDate = new Date(endDate);
-    if (isEligible) {
-      startDate.setDate(startDate.getDate() - (120 + Math.floor(Math.random() * 245)));
-    } else {
-      startDate.setDate(startDate.getDate() - (30 + Math.floor(Math.random() * 89)));
-    }
-    
-    return {
-      startDate: startDate.toISOString().split('T')[0],
-      endDate: endDate.toISOString().split('T')[0]
-    };
-  };
-
   const generateSSN = () => {
     const area = String(Math.floor(Math.random() * 900 + 100));
     const group = String(Math.floor(Math.random() * 90 + 10));
@@ -49,8 +30,6 @@ function generateMockClaims() {
   return Array.from({ length: 5 }, (_, i) => {
     const firstName = firstNames[i];
     const lastName = lastNames[i];
-    const isEligible = i < 3;
-    const { startDate, endDate } = generateEmploymentDates(isEligible);
     const uniqueSSN = generateSSN();
     
     return {
@@ -67,8 +46,8 @@ function generateMockClaims() {
       claim_date: new Date().toISOString().split('T')[0],
       claim_status: "initial_review",
       separation_reason: separationReasons[i],
-      employment_start_date: startDate,
-      employment_end_date: endDate,
+      employment_start_date: new Date(new Date().setMonth(new Date().getMonth() - 6)).toISOString().split('T')[0],
+      employment_end_date: new Date().toISOString().split('T')[0],
       severance_package: Math.random() > 0.5,
       documents: [],
       id: crypto.randomUUID(),
