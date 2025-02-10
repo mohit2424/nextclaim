@@ -8,8 +8,8 @@ const corsHeaders = {
 }
 
 function generateMockClaims() {
-  const firstNames = ["James", "Emma", "Michael", "Sarah", "David", "Jennifer", "William", "Elizabeth", "Robert", "Patricia"];
-  const lastNames = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez"];
+  const firstNames = ["James", "Emma", "Michael", "Sarah", "David"];
+  const lastNames = ["Smith", "Johnson", "Williams", "Brown", "Jones"];
   const states = ["California", "New York", "Texas", "Florida", "Washington"];
   const employers = [
     "Global Technologies Inc.",
@@ -46,10 +46,10 @@ function generateMockClaims() {
     return `${area}-${group}-${serial}`;
   };
   
-  return Array.from({ length: 10 }, (_, i) => {
-    const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
-    const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-    const isEligible = i < 4;
+  return Array.from({ length: 5 }, (_, i) => {
+    const firstName = firstNames[i];
+    const lastName = lastNames[i];
+    const isEligible = i < 3;
     const { startDate, endDate } = generateEmploymentDates(isEligible);
     const uniqueSSN = generateSSN();
     
@@ -58,15 +58,15 @@ function generateMockClaims() {
       middle_name: `${firstName[0]}`,
       last_name: lastName,
       age: Math.floor(Math.random() * (65 - 18) + 18),
-      state: states[Math.floor(Math.random() * states.length)],
+      state: states[i],
       pincode: Math.floor(Math.random() * 90000 + 10000).toString(),
       ssn: uniqueSSN,
       email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@example.com`,
       phone: `${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 9000 + 1000)}`,
-      employer_name: employers[Math.floor(Math.random() * employers.length)],
+      employer_name: employers[i],
       claim_date: new Date().toISOString().split('T')[0],
       claim_status: "initial_review",
-      separation_reason: separationReasons[Math.floor(Math.random() * separationReasons.length)],
+      separation_reason: separationReasons[i],
       employment_start_date: startDate,
       employment_end_date: endDate,
       severance_package: Math.random() > 0.5,
@@ -114,7 +114,6 @@ serve(async (req) => {
           continue
         }
 
-        // Insert the new claim
         const { data, error: insertError } = await supabaseClient
           .from('claims')
           .insert(claim)

@@ -20,7 +20,7 @@ const fetchClaimStats = async () => {
     acc.total++;
     
     // In progress claims
-    if (claim.claim_status === 'in_progress') {
+    if (claim.claim_status === 'initial_review') {
       acc.inProgress++;
     }
     
@@ -30,7 +30,7 @@ const fetchClaimStats = async () => {
     }
     
     // New claims today (initial_review status created today)
-    if (new Date(claim.created_at) >= today && claim.claim_status === 'initial_review') {
+    if (new Date(claim.created_at) >= today) {
       acc.newToday++;
     }
     
@@ -54,14 +54,14 @@ export function ClaimsStats() {
       value: claimStats.total.toString(),
       bgColor: "bg-gradient-to-r from-blue-50 to-blue-100",
       textColor: "text-blue-900",
-      onClick: () => navigate("/claims"),
+      onClick: () => navigate("/claims?status=all"),
     },
     {
       title: "In Progress",
       value: claimStats.inProgress.toString(),
       bgColor: "bg-gradient-to-r from-purple-50 to-purple-100",
       textColor: "text-purple-900",
-      onClick: () => navigate("/claims?status=in_progress"),
+      onClick: () => navigate("/claims?status=initial_review"),
     },
     {
       title: "Rejected Claims",
@@ -75,7 +75,10 @@ export function ClaimsStats() {
       value: claimStats.newToday.toString(),
       bgColor: "bg-gradient-to-r from-green-50 to-green-100",
       textColor: "text-green-900",
-      onClick: () => navigate("/claims?status=today"),
+      onClick: () => {
+        const today = new Date().toISOString().split('T')[0];
+        navigate(`/claims?status=today`);
+      },
     },
   ];
 
