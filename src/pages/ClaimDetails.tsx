@@ -1,4 +1,3 @@
-
 import { useParams, useNavigate } from "react-router-dom";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card } from "@/components/ui/card";
@@ -38,12 +37,11 @@ export type Claim = {
   claim_status: string;
   separation_reason: "resignation" | "termination_misconduct" | "layoff" | "reduction_in_force" | "constructive_discharge" | "job_abandonment" | "severance_agreement";
   documents: ClaimDocument[];
-  last_day_of_work: string | null;
-  severance_package: boolean | null;
-  severance_amount: number | null;
-  reason_for_unemployment: string | null;
   employment_start_date: string | null;
   employment_end_date: string | null;
+  reason_for_unemployment: string | null;
+  severance_package: boolean | null;
+  severance_amount: number | null;
 };
 
 export default function ClaimDetails() {
@@ -255,4 +253,3 @@ export default function ClaimDetails() {
     </DashboardLayout>
   );
 }
-
