@@ -53,6 +53,24 @@ export function ClaimForm({ onCancel }: ClaimFormProps) {
         return;
       }
 
+      // First check if a claim with this SSN already exists
+      const { data: existingClaim, error: checkError } = await supabase
+        .from('claims')
+        .select('id')
+        .eq('ssn', formattedSsn)
+        .maybeSingle();
+
+      if (checkError) {
+        console.error('Error checking existing claim:', checkError);
+        toast.error("Error checking existing claim");
+        return;
+      }
+
+      if (existingClaim) {
+        toast.error("A claim with this SSN already exists");
+        return;
+      }
+
       const insertData: Database["public"]["Tables"]["claims"]["Insert"] = {
         id: crypto.randomUUID(),
         age: values.age,
@@ -82,11 +100,8 @@ export function ClaimForm({ onCancel }: ClaimFormProps) {
         .single();
 
       if (error) {
-        if (error.code === '23505') {
-          toast.error("A claim with this SSN already exists");
-        } else {
-          throw error;
-        }
+        console.error('Error submitting claim:', error);
+        toast.error("Failed to submit claim");
         return;
       }
 
