@@ -143,36 +143,6 @@ export type Database = {
           },
         ]
       }
-      employer_details: {
-        Row: {
-          company_name: string
-          created_at: string
-          email_address: string
-          employer_id: string
-          hr_representative: string
-          phone_number: string
-          updated_at: string
-        }
-        Insert: {
-          company_name: string
-          created_at?: string
-          email_address: string
-          employer_id?: string
-          hr_representative: string
-          phone_number: string
-          updated_at?: string
-        }
-        Update: {
-          company_name?: string
-          created_at?: string
-          email_address?: string
-          employer_id?: string
-          hr_representative?: string
-          phone_number?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
       messages: {
         Row: {
           claim_id: string | null
