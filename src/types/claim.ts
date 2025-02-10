@@ -1,6 +1,4 @@
 
-export type ClaimStatus = "initial_review" | "in_progress" | "rejected";
-
 export type ClaimDocument = {
   name: string;
   path: string;
@@ -21,7 +19,7 @@ export type Claim = {
   phone: string;
   employer_name: string;
   claim_date: string;
-  claim_status: ClaimStatus;
+  claim_status: string;
   separation_reason: "resignation" | "termination_misconduct" | "layoff" | "reduction_in_force" | "constructive_discharge" | "job_abandonment" | "severance_agreement";
   documents: ClaimDocument[];
   last_day_of_work: string | null;
@@ -30,5 +28,4 @@ export type Claim = {
   reason_for_unemployment: string | null;
   employment_start_date: string | null;
   employment_end_date: string | null;
-  rejection_reason?: string;
 };

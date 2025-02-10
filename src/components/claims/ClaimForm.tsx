@@ -25,7 +25,7 @@ export function ClaimForm({ onCancel }: ClaimFormProps) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       middleName: "",
-      separationReason: "resignation", // Set a default value for separation reason
+      claimStatus: "initial_review", // Set default but don't show in form
     },
   });
 
@@ -57,7 +57,7 @@ export function ClaimForm({ onCancel }: ClaimFormProps) {
         id: crypto.randomUUID(),
         age: values.age,
         claim_date: format(values.claimDate, 'yyyy-MM-dd'),
-        claim_status: "initial_review",
+        claim_status: "initial_review", // Always set to initial_review
         documents: [],
         email: values.email,
         employer_name: values.employerName,
@@ -75,18 +75,17 @@ export function ClaimForm({ onCancel }: ClaimFormProps) {
         user_id: session.user.id
       };
 
-      console.log('Inserting claim with data:', insertData);
-
-      const { error: insertError } = await supabase
+      const { error } = await supabase
         .from('claims')
-        .insert(insertData);
+        .insert(insertData)
+        .select()
+        .single();
 
-      if (insertError) {
-        console.error('Error inserting claim:', insertError);
-        if (insertError.code === '23505') {
+      if (error) {
+        if (error.code === '23505') {
           toast.error("A claim with this SSN already exists");
         } else {
-          toast.error("Failed to submit claim");
+          throw error;
         }
         return;
       }

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import type { Claim, ClaimStatus } from "@/types/claim";
+import type { Claim } from "@/types/claim";
 
 export function useClaimData(id: string | undefined) {
   const queryClient = useQueryClient();
@@ -53,34 +53,6 @@ export function useClaimData(id: string | undefined) {
     setEditedClaim(null);
   };
 
-  const handleStatusChange = async (newStatus: ClaimStatus) => {
-    if (!editedClaim) return;
-    
-    try {
-      const { error } = await supabase
-        .from('claims')
-        .update({ claim_status: newStatus })
-        .eq('id', id);
-
-      if (error) throw error;
-
-      setEditedClaim({
-        ...editedClaim,
-        claim_status: newStatus
-      });
-
-      // Invalidate and refetch queries to update UI
-      await queryClient.invalidateQueries({ queryKey: ['claims'] });
-      await queryClient.invalidateQueries({ queryKey: ['claim', id] });
-      await queryClient.invalidateQueries({ queryKey: ['claimStats'] });
-      
-      toast.success(`Claim status updated to ${newStatus.replace('_', ' ')}`);
-    } catch (error) {
-      console.error('Error updating claim status:', error);
-      toast.error('Failed to update claim status');
-    }
-  };
-
   const handleSaveEdit = async () => {
     if (!editedClaim) return;
 
@@ -104,7 +76,6 @@ export function useClaimData(id: string | undefined) {
           reason_for_unemployment: editedClaim.reason_for_unemployment,
           severance_package: editedClaim.severance_package,
           severance_amount: editedClaim.severance_amount,
-          claim_status: editedClaim.claim_status,
         })
         .eq('id', id);
 
@@ -130,7 +101,6 @@ export function useClaimData(id: string | undefined) {
     setEditedClaim,
     handleEditClick,
     handleCancelEdit,
-    handleSaveEdit,
-    handleStatusChange
+    handleSaveEdit
   };
 }

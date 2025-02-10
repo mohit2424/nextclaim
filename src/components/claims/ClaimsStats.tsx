@@ -6,37 +6,39 @@ import { supabase } from "@/integrations/supabase/client";
 import { startOfDay } from "date-fns";
 
 const fetchClaimStats = async () => {
-  // Get total claims count
-  const { count: totalCount } = await supabase
+  const { data: claims, error } = await supabase
     .from('claims')
-    .select('*', { count: 'exact', head: true });
+    .select('claim_status, created_at');
 
-  // Get in progress claims count
-  const { count: inProgressCount } = await supabase
-    .from('claims')
-    .select('*', { count: 'exact', head: true })
-    .eq('claim_status', 'in_progress');
+  if (error) throw error;
+  if (!claims) return { total: 0, inProgress: 0, newToday: 0, rejected: 0 };
 
-  // Get rejected claims count
-  const { count: rejectedCount } = await supabase
-    .from('claims')
-    .select('*', { count: 'exact', head: true })
-    .eq('claim_status', 'rejected');
+  const today = startOfDay(new Date());
+  
+  const stats = claims.reduce((acc: any, claim) => {
+    // Total claims
+    acc.total++;
+    
+    // In progress claims
+    if (claim.claim_status === 'in_progress') {
+      acc.inProgress++;
+    }
+    
+    // Rejected claims
+    if (claim.claim_status === 'rejected') {
+      acc.rejected++;
+    }
+    
+    // New claims today (only include initial_review status created today)
+    const claimDate = startOfDay(new Date(claim.created_at));
+    if (claimDate >= today && claim.claim_status === 'initial_review') {
+      acc.newToday++;
+    }
+    
+    return acc;
+  }, { total: 0, inProgress: 0, rejected: 0, newToday: 0 });
 
-  // Get new claims today count
-  const today = startOfDay(new Date()).toISOString();
-  const { count: newTodayCount } = await supabase
-    .from('claims')
-    .select('*', { count: 'exact', head: true })
-    .eq('claim_status', 'initial_review')
-    .gte('created_at', today);
-
-  return {
-    total: totalCount || 0,
-    inProgress: inProgressCount || 0,
-    rejected: rejectedCount || 0,
-    newToday: newTodayCount || 0
-  };
+  return stats;
 };
 
 export function ClaimsStats() {
@@ -44,8 +46,8 @@ export function ClaimsStats() {
   const { data: claimStats = { total: 0, inProgress: 0, rejected: 0, newToday: 0 }, isLoading } = useQuery({
     queryKey: ['claimStats'],
     queryFn: fetchClaimStats,
-    refetchInterval: 3000, // Poll more frequently for dashboard
-    staleTime: 0,
+    refetchInterval: 3000, // Poll more frequently
+    staleTime: 0, // Consider data always stale to enable immediate refetches
   });
   
   const stats = [
@@ -54,7 +56,7 @@ export function ClaimsStats() {
       value: claimStats.total.toString(),
       bgColor: "bg-gradient-to-r from-[#9b87f5] to-[#7E69AB]",
       textColor: "text-white",
-      onClick: () => navigate("/claims?status=all"),
+      onClick: () => navigate("/claims"),
     },
     {
       title: "In Progress",
