@@ -26,7 +26,6 @@ export function ClaimForm({ onCancel }: ClaimFormProps) {
     defaultValues: {
       middleName: "",
       claimStatus: "initial_review",
-      severancePackage: false,
     },
   });
 
@@ -58,7 +57,8 @@ export function ClaimForm({ onCancel }: ClaimFormProps) {
         id: crypto.randomUUID(),
         age: values.age,
         claim_date: format(values.claimDate, 'yyyy-MM-dd'),
-        claim_status: "initial_review",
+        claim_status: values.claimStatus,
+        documents: [],
         email: values.email,
         employer_name: values.employerName,
         first_name: values.firstName,
@@ -69,12 +69,10 @@ export function ClaimForm({ onCancel }: ClaimFormProps) {
         phone: values.phone,
         pincode: values.pincode,
         separation_reason: values.separationReason,
+        severance_package: false,
         ssn: formattedSsn,
         state: values.state,
-        user_id: session.user.id,
-        reason_for_unemployment: values.reasonForUnemployment,
-        severance_package: values.severancePackage,
-        severance_amount: values.severanceAmount || null,
+        user_id: session.user.id
       };
 
       const { error } = await supabase
@@ -103,10 +101,10 @@ export function ClaimForm({ onCancel }: ClaimFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <PersonalInfoFields form={form} />
-          <AddressFields form={form} />
           <ContactInfoFields form={form} />
+          <AddressFields form={form} />
           <ClaimDetailsFields form={form} />
         </div>
 

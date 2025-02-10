@@ -42,17 +42,6 @@ function generateMockClaims() {
       endDate: endDate.toISOString().split('T')[0]
     };
   };
-
-  const uniqueSSNs = new Set(); // Track used SSNs
-  
-  const generateSSN = () => {
-    let ssn;
-    do {
-      ssn = `${Math.floor(Math.random() * 900 + 100)}-${Math.floor(Math.random() * 90 + 10)}-${Math.floor(Math.random() * 9000 + 1000)}`;
-    } while (uniqueSSNs.has(ssn));
-    uniqueSSNs.add(ssn);
-    return ssn;
-  };
   
   return Array.from({ length: 5 }, (_, i) => {
     const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
@@ -67,7 +56,7 @@ function generateMockClaims() {
       age: Math.floor(Math.random() * (65 - 18) + 18),
       state: states[Math.floor(Math.random() * states.length)],
       pincode: Math.floor(Math.random() * 90000 + 10000).toString(),
-      ssn: generateSSN(), // Use the new SSN generator
+      ssn: `${Math.floor(Math.random() * 900 + 100)}-${Math.floor(Math.random() * 90 + 10)}-${Math.floor(Math.random() * 9000 + 1000)}`,
       email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@example.com`,
       phone: `${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 9000 + 1000)}`,
       employer_name: employers[Math.floor(Math.random() * employers.length)],
@@ -77,6 +66,8 @@ function generateMockClaims() {
       employment_start_date: startDate,
       employment_end_date: endDate,
       severance_package: Math.random() > 0.5,
+      severance_amount: Math.random() > 0.5 ? Math.floor(Math.random() * 50000 + 5000) : null,
+      reason_for_unemployment: "Company restructuring due to market conditions",
       documents: []
     };
   });
@@ -96,45 +87,38 @@ serve(async (req) => {
     console.log('Generating and processing new mock claims...')
     const mockClaims = generateMockClaims();
     
-    const successfulInserts = [];
-    const duplicates = [];
-    
+    const results = []
     for (const claim of mockClaims) {
+      // Check if claim with this SSN already exists
       const { data: existingClaim } = await supabaseClient
         .from('claims')
-        .select('ssn')
+        .select('id')
         .eq('ssn', claim.ssn)
-        .single();
+        .single()
 
       if (existingClaim) {
-        console.log(`Skipping duplicate SSN: ${claim.ssn}`);
-        duplicates.push(claim.ssn);
-        continue;
+        console.log(`Claim with SSN ${claim.ssn} already exists, skipping...`)
+        continue
       }
 
       const { data, error } = await supabaseClient
         .from('claims')
         .insert(claim)
-        .select();
+        .select()
       
       if (error) {
-        console.error('Error inserting claim:', error);
-        continue;
+        console.error('Error inserting claim:', error)
+        throw error
       }
       
-      successfulInserts.push(data[0]);
+      results.push(data[0])
     }
-
-    const message = successfulInserts.length > 0
-      ? `Successfully imported ${successfulInserts.length} new claims`
-      : 'No new claims were imported - all SSNs already exist';
 
     return new Response(
       JSON.stringify({ 
         success: true, 
-        data: successfulInserts,
-        message,
-        skippedCount: duplicates.length
+        data: results,
+        message: results.length === 0 ? 'All claims already exist' : `Successfully imported ${results.length} new claims`
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

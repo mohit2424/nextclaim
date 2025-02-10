@@ -3,9 +3,8 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Building2 } from "lucide-react";
-import type { Claim } from "@/types/claim";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import type { Claim } from "@/pages/ClaimDetails";
 
 interface EmployerDetailsTabProps {
   claim: Claim;
@@ -14,21 +13,7 @@ interface EmployerDetailsTabProps {
 }
 
 export function EmployerDetailsTab({ claim, isEditing, onUpdate }: EmployerDetailsTabProps) {
-  const { data: employerDetails } = useQuery({
-    queryKey: ['employer_details', claim.employer_name],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('employer_details')
-        .select('*')
-        .eq('company_name', claim.employer_name)
-        .single();
-
-      if (error) throw error;
-      return data;
-    }
-  });
-
-  const handleInputChange = (field: keyof Claim, value: string) => {
+  const handleInputChange = (field: string, value: any) => {
     onUpdate({
       ...claim,
       [field]: value
@@ -43,7 +28,7 @@ export function EmployerDetailsTab({ claim, isEditing, onUpdate }: EmployerDetai
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div className="col-span-2">
-          <Label>Employer Name</Label>
+          <Label>Company Name</Label>
           <Input 
             value={claim.employer_name} 
             readOnly={!isEditing}
@@ -51,35 +36,34 @@ export function EmployerDetailsTab({ claim, isEditing, onUpdate }: EmployerDetai
             className={!isEditing ? 'bg-gray-50' : ''}
           />
         </div>
-
-        {employerDetails && (
-          <>
-            <div className="col-span-2">
-              <Label>Employer Address</Label>
-              <Input 
-                value={employerDetails.employer_address || ''} 
-                readOnly={!isEditing}
-                className="bg-gray-50"
-              />
-            </div>
-            <div>
-              <Label>HR Contact</Label>
-              <Input 
-                value={employerDetails.hr_representative || ''} 
-                readOnly={!isEditing}
-                className="bg-gray-50"
-              />
-            </div>
-            <div>
-              <Label>Email</Label>
-              <Input 
-                value={employerDetails.email_address || ''} 
-                readOnly={!isEditing}
-                className="bg-gray-50"
-              />
-            </div>
-          </>
-        )}
+        <div>
+          <Label>Separation Reason</Label>
+          {isEditing ? (
+            <Select
+              value={claim.separation_reason}
+              onValueChange={(value: any) => handleInputChange('separation_reason', value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select reason" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="resignation">Resignation</SelectItem>
+                <SelectItem value="termination_misconduct">Termination for Misconduct</SelectItem>
+                <SelectItem value="layoff">Layoff</SelectItem>
+                <SelectItem value="reduction_in_force">Reduction in Force (RIF)</SelectItem>
+                <SelectItem value="constructive_discharge">Constructive Discharge</SelectItem>
+                <SelectItem value="job_abandonment">Job Abandonment</SelectItem>
+                <SelectItem value="severance_agreement">Severance Agreement</SelectItem>
+              </SelectContent>
+            </Select>
+          ) : (
+            <Input 
+              value={claim.separation_reason.replace(/_/g, ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')} 
+              readOnly
+              className="bg-gray-50"
+            />
+          )}
+        </div>
       </div>
     </Card>
   );

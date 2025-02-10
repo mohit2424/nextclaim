@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { BriefcaseIcon } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
-import type { Claim } from "@/types/claim";
+import type { Claim } from "@/pages/ClaimDetails";
 
 interface UnemploymentDetailsTabProps {
   claim: Claim;
@@ -13,7 +13,7 @@ interface UnemploymentDetailsTabProps {
 }
 
 export function UnemploymentDetailsTab({ claim, isEditing, onUpdate }: UnemploymentDetailsTabProps) {
-  const handleInputChange = (field: keyof Claim, value: any) => {
+  const handleInputChange = (field: string, value: any) => {
     onUpdate({
       ...claim,
       [field]: value
@@ -31,7 +31,7 @@ export function UnemploymentDetailsTab({ claim, isEditing, onUpdate }: Unemploym
           <Label>First Day of Work</Label>
           <Input 
             type="date"
-            value={claim.employment_start_date} 
+            value={claim.employment_start_date || ''} 
             readOnly={!isEditing}
             onChange={(e) => handleInputChange('employment_start_date', e.target.value)}
             className={!isEditing ? 'bg-gray-50' : ''}
@@ -41,7 +41,7 @@ export function UnemploymentDetailsTab({ claim, isEditing, onUpdate }: Unemploym
           <Label>Last Day of Work</Label>
           <Input 
             type="date"
-            value={claim.employment_end_date} 
+            value={claim.employment_end_date || ''} 
             readOnly={!isEditing}
             onChange={(e) => handleInputChange('employment_end_date', e.target.value)}
             className={!isEditing ? 'bg-gray-50' : ''}

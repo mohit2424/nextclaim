@@ -2,7 +2,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { ClaimStatus } from "./ClaimsTable";
-import { startOfDay } from "date-fns";
 
 export const fetchClaims = async (
   searchQuery: string = "", 
@@ -29,25 +28,20 @@ export const fetchClaims = async (
   }
 
   if (status) {
-    const today = startOfDay(new Date()).toISOString();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
     switch (status) {
       case 'in_progress':
-        query = query.eq('claim_status', 'in_progress');
-        break;
-      case 'rejected':
-        query = query.eq('claim_status', 'rejected');
+        query = query.in('claim_status', ['initial_review', 'pending']);
         break;
       case 'today':
-        // Only show initial_review claims from today
-        query = query
-          .eq('claim_status', 'initial_review')
-          .gte('created_at', today);
+        query = query.gte('created_at', today.toISOString());
         break;
       case 'all':
         break;
       default:
-        if (['initial_review'].includes(status)) {
+        if (['initial_review', 'pending', 'approved', 'rejected'].includes(status)) {
           query = query.eq('claim_status', status as ClaimStatus);
         }
     }
@@ -66,8 +60,7 @@ export const useClaimsList = (
   return useQuery({
     queryKey: ['claims', searchQuery, status, currentPage],
     queryFn: () => fetchClaims(searchQuery, status, currentPage),
-    staleTime: 0,
-    refetchOnWindowFocus: true,
-    refetchInterval: 5000, // Poll every 5 seconds for real-time updates
+    staleTime: 0, // This ensures we always get fresh data
+    refetchOnWindowFocus: true // Refetch when window regains focus
   });
 };

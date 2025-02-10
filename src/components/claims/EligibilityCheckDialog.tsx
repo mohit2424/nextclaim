@@ -60,11 +60,14 @@ export function EligibilityCheckDialog({
 
   const handleClaimUpdate = async () => {
     try {
-      // First, update the claim status
-      const updateData = {
-        claim_status: isEligible ? 'in_progress' : 'rejected',
-        ...(isEligible ? {} : { rejection_reason: rejectionReason })
+      const newStatus = isEligible ? 'in_progress' : 'rejected';
+      const updateData: any = {
+        claim_status: newStatus
       };
+
+      if (!isEligible) {
+        updateData.rejection_reason = rejectionReason;
+      }
 
       const { error } = await supabase
         .from('claims')
@@ -73,17 +76,8 @@ export function EligibilityCheckDialog({
 
       if (error) throw error;
 
-      // Invalidate and immediately refetch both queries
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['claims'] }),
-        queryClient.invalidateQueries({ queryKey: ['claimStats'] })
-      ]);
-
-      // Force immediate refetch to update UI
-      await Promise.all([
-        queryClient.refetchQueries({ queryKey: ['claims'], exact: true }),
-        queryClient.refetchQueries({ queryKey: ['claimStats'], exact: true })
-      ]);
+      // Invalidate all queries that include claims data
+      await queryClient.invalidateQueries({ queryKey: ['claims'] });
 
       toast({
         title: "Success",
@@ -110,7 +104,7 @@ export function EligibilityCheckDialog({
             {isChecking ? "Checking Eligibility..." : 
               isEligible ? "Claim is Eligible" : "Claim not Eligible"}
           </AlertDialogTitle>
-          <AlertDialogDescription className="space-y-4">
+          <AlertDialogDescription>
             {isChecking ? (
               <div className="flex items-center justify-center py-4">
                 <Loader2 className="h-8 w-8 animate-spin" />

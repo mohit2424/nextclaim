@@ -1,4 +1,3 @@
-
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -6,7 +5,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { EligibilityCheckDialog } from "./EligibilityCheckDialog";
 
-export type ClaimStatus = "initial_review" | "in_progress" | "rejected";
+export type ClaimStatus = "initial_review" | "pending" | "approved" | "rejected" | "in_progress";
 
 type Claim = {
   id: string;
@@ -30,8 +29,10 @@ interface ClaimsTableProps {
 const getStatusColor = (status: ClaimStatus) => {
   const colors = {
     initial_review: "bg-yellow-100 text-yellow-800 border-yellow-200",
-    in_progress: "bg-purple-100 text-purple-800 border-purple-200",
+    pending: "bg-blue-100 text-blue-800 border-blue-200",
+    approved: "bg-green-100 text-green-800 border-green-200",
     rejected: "bg-red-100 text-red-800 border-red-200",
+    in_progress: "bg-purple-100 text-purple-800 border-purple-200",
   };
   return colors[status] || "bg-gray-100 text-gray-800 border-gray-200";
 };
@@ -125,4 +126,3 @@ export function ClaimsTable({ claims, onStatusUpdate }: ClaimsTableProps) {
     </>
   );
 }
-
