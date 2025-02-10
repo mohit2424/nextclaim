@@ -12,7 +12,7 @@ type SeparationReason = 'layoff' | 'reduction_in_force' | 'constructive_discharg
 
 type MockClaim = {
   first_name: string;
-  middle_name: string;
+  middle_name: string | null;
   last_name: string;
   age: number;
   state: string;
@@ -29,6 +29,10 @@ type MockClaim = {
   severance_package: boolean;
   documents: any[];
   user_id: string | null;
+  reason_for_unemployment: string | null;
+  severance_amount: number | null;
+  last_day_of_work: string | null;
+  rejection_reason: string | null;
 }
 
 function generateMockClaims(): MockClaim[] {
@@ -43,6 +47,13 @@ function generateMockClaims(): MockClaim[] {
     "Advanced Systems Corp"
   ];
   const separationReasons: SeparationReason[] = ["layoff", "reduction_in_force", "constructive_discharge", "severance_agreement", "job_abandonment"];
+  const reasons = [
+    "Company downsizing",
+    "Department reorganization",
+    "Position elimination",
+    "Business closure",
+    "Economic conditions"
+  ];
   
   // Current date for reference
   const currentDate = new Date();
@@ -72,6 +83,7 @@ function generateMockClaims(): MockClaim[] {
     const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
     const isEligible = i < 2; // First 2 claims will be eligible, last 3 won't
     const { startDate, endDate } = generateEmploymentDates(isEligible);
+    const hasSeverance = Math.random() > 0.5;
     
     const claim: MockClaim = {
       first_name: firstName,
@@ -89,9 +101,13 @@ function generateMockClaims(): MockClaim[] {
       separation_reason: separationReasons[Math.floor(Math.random() * separationReasons.length)],
       employment_start_date: startDate,
       employment_end_date: endDate,
-      severance_package: Math.random() > 0.5,
+      last_day_of_work: endDate,
+      severance_package: hasSeverance,
+      severance_amount: hasSeverance ? Math.floor(Math.random() * 50000 + 10000) : null,
       documents: [],
-      user_id: null
+      user_id: null,
+      reason_for_unemployment: reasons[Math.floor(Math.random() * reasons.length)],
+      rejection_reason: null
     };
     
     return claim;
@@ -104,6 +120,7 @@ serve(async (req) => {
   }
 
   try {
+    console.log('Creating Supabase client...')
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
@@ -114,6 +131,8 @@ serve(async (req) => {
     
     const results = []
     for (const claim of mockClaims) {
+      console.log(`Processing claim for ${claim.first_name} ${claim.last_name}...`)
+      
       // Check if claim with this SSN already exists
       const { data: existingClaim } = await supabaseClient
         .from('claims')
@@ -136,6 +155,7 @@ serve(async (req) => {
         throw error
       }
       
+      console.log('Successfully inserted claim:', data[0].id)
       results.push(data[0])
     }
 
