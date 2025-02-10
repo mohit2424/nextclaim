@@ -50,6 +50,7 @@ function generateMockClaims() {
     const { startDate, endDate } = generateEmploymentDates(isEligible);
     
     return {
+      id: crypto.randomUUID(),
       first_name: firstName,
       middle_name: `${firstName[0]}`,
       last_name: lastName,
@@ -136,4 +137,3 @@ serve(async (req) => {
     )
   }
 })
-
