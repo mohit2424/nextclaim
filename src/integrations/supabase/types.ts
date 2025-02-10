@@ -155,6 +155,13 @@ export type Database = {
             foreignKeyName: "deadlines_claim_id_fkey"
             columns: ["claim_id"]
             isOneToOne: false
+            referencedRelation: "invalid_employment_dates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deadlines_claim_id_fkey"
+            columns: ["claim_id"]
+            isOneToOne: false
             referencedRelation: "rejected_claims"
             referencedColumns: ["id"]
           },
@@ -286,6 +293,24 @@ export type Database = {
           state?: string | null
           updated_at?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      invalid_employment_dates: {
+        Row: {
+          employment_end_date: string | null
+          employment_start_date: string | null
+          id: string | null
+        }
+        Insert: {
+          employment_end_date?: string | null
+          employment_start_date?: string | null
+          id?: string | null
+        }
+        Update: {
+          employment_end_date?: string | null
+          employment_start_date?: string | null
+          id?: string | null
         }
         Relationships: []
       }

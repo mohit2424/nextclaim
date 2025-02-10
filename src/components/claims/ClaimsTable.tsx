@@ -125,4 +125,3 @@ export function ClaimsTable({ claims, onStatusUpdate }: ClaimsTableProps) {
     </>
   );
 }
-

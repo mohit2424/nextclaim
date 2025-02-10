@@ -145,7 +145,7 @@ export function EligibilityCheckDialog({
                 Cancel
               </Button>
               <Button onClick={handleClaimUpdate}>
-                {isEligible ? "Proceed" : "Reject Claim"}
+                {isEligible ? "Close" : "Close Claim"}
               </Button>
             </>
           )}
@@ -154,4 +154,3 @@ export function EligibilityCheckDialog({
     </AlertDialog>
   );
 }
-
