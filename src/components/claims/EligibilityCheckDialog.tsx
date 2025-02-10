@@ -63,6 +63,31 @@ export function EligibilityCheckDialog({
     checkEligibility();
   }, []);
 
+  const sendRejectionEmail = async (firstName: string, lastName: string, email: string) => {
+    try {
+      const { error } = await supabase.functions.invoke('send-rejection-email', {
+        body: {
+          claimId,
+          firstName,
+          lastName,
+          email,
+          rejectionReason
+        }
+      });
+
+      if (error) throw error;
+
+      console.log('Rejection email sent successfully');
+    } catch (error) {
+      console.error('Error sending rejection email:', error);
+      toast({
+        title: "Warning",
+        description: "Claim was rejected but failed to send notification email.",
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleClaimUpdate = async () => {
     try {
       const newStatus: ClaimStatus = isEligible ? "in_progress" : "rejected";
@@ -74,12 +99,31 @@ export function EligibilityCheckDialog({
 
       console.log('Updating claim with:', updateData);
 
-      const { error } = await supabase
+      // First, get the claim details for email sending
+      const { data: claimData, error: fetchError } = await supabase
+        .from('claims')
+        .select('first_name, last_name, email')
+        .eq('id', claimId)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      // Then update the claim status
+      const { error: updateError } = await supabase
         .from('claims')
         .update(updateData)
         .eq('id', claimId);
 
-      if (error) throw error;
+      if (updateError) throw updateError;
+
+      // If the claim is rejected, send the email
+      if (newStatus === "rejected" && claimData) {
+        await sendRejectionEmail(
+          claimData.first_name,
+          claimData.last_name,
+          claimData.email
+        );
+      }
 
       // Invalidate and immediately refetch all relevant queries
       await Promise.all([
