@@ -7,7 +7,31 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-function generateMockClaims() {
+type ClaimStatus = 'initial_review' | 'in_progress' | 'rejected';
+type SeparationReason = 'layoff' | 'reduction_in_force' | 'constructive_discharge' | 'severance_agreement' | 'job_abandonment';
+
+type MockClaim = {
+  first_name: string;
+  middle_name: string;
+  last_name: string;
+  age: number;
+  state: string;
+  pincode: string;
+  ssn: string;
+  email: string;
+  phone: string;
+  employer_name: string;
+  claim_date: string;
+  claim_status: ClaimStatus;
+  separation_reason: SeparationReason;
+  employment_start_date: string;
+  employment_end_date: string;
+  severance_package: boolean;
+  documents: any[];
+  user_id: string | null;
+}
+
+function generateMockClaims(): MockClaim[] {
   const firstNames = ["James", "Emma", "Michael", "Sarah", "David", "Jennifer", "William", "Elizabeth", "Robert", "Patricia"];
   const lastNames = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez"];
   const states = ["California", "New York", "Texas", "Florida", "Washington"];
@@ -18,7 +42,7 @@ function generateMockClaims() {
     "Evergreen Manufacturing",
     "Advanced Systems Corp"
   ];
-  const separationReasons = ["layoff", "reduction_in_force", "constructive_discharge", "severance_agreement", "job_abandonment"];
+  const separationReasons: SeparationReason[] = ["layoff", "reduction_in_force", "constructive_discharge", "severance_agreement", "job_abandonment"];
   
   // Current date for reference
   const currentDate = new Date();
@@ -49,7 +73,7 @@ function generateMockClaims() {
     const isEligible = i < 2; // First 2 claims will be eligible, last 3 won't
     const { startDate, endDate } = generateEmploymentDates(isEligible);
     
-    return {
+    const claim: MockClaim = {
       first_name: firstName,
       middle_name: `${firstName[0]}`,
       last_name: lastName,
@@ -61,14 +85,16 @@ function generateMockClaims() {
       phone: `${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 9000 + 1000)}`,
       employer_name: employers[Math.floor(Math.random() * employers.length)],
       claim_date: new Date().toISOString().split('T')[0],
-      claim_status: "initial_review" as const, // Explicitly set as initial_review
-      separation_reason: separationReasons[Math.floor(Math.random() * separationReasons.length)] as const,
+      claim_status: 'initial_review',
+      separation_reason: separationReasons[Math.floor(Math.random() * separationReasons.length)],
       employment_start_date: startDate,
       employment_end_date: endDate,
       severance_package: Math.random() > 0.5,
       documents: [],
-      user_id: null // Set as null since these are mock claims
+      user_id: null
     };
+    
+    return claim;
   });
 }
 
