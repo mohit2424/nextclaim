@@ -48,10 +48,12 @@ function generateMockClaims() {
     const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
     const isEligible = i < 2; // First 2 claims will be eligible, last 3 won't
     const { startDate, endDate } = generateEmploymentDates(isEligible);
-    
+    const separationReason = separationReasons[Math.floor(Math.random() * separationReasons.length)];
+    const hasSeverance = Math.random() > 0.5;
+
     return {
       first_name: firstName,
-      middle_name: `${firstName[0]}`,
+      middle_name: null, // Making middle_name explicitly null
       last_name: lastName,
       age: Math.floor(Math.random() * (65 - 18) + 18),
       state: states[Math.floor(Math.random() * states.length)],
@@ -61,12 +63,16 @@ function generateMockClaims() {
       phone: `${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 9000 + 1000)}`,
       employer_name: employers[Math.floor(Math.random() * employers.length)],
       claim_date: new Date().toISOString().split('T')[0],
-      claim_status: "initial_review", // Always set to initial_review
-      separation_reason: separationReasons[Math.floor(Math.random() * separationReasons.length)],
+      claim_status: "initial_review" as const, // Explicitly set as initial_review
+      separation_reason: separationReason,
       employment_start_date: startDate,
       employment_end_date: endDate,
-      severance_package: Math.random() > 0.5,
-      documents: []
+      last_day_of_work: endDate,
+      severance_package: hasSeverance,
+      severance_amount: hasSeverance ? Math.floor(Math.random() * 50000 + 10000) : null,
+      reason_for_unemployment: `Employment ended due to ${separationReason.replace(/_/g, ' ')}`,
+      documents: [],
+      rejection_reason: null
     };
   });
 }
