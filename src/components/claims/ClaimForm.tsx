@@ -25,6 +25,7 @@ export function ClaimForm({ onCancel }: ClaimFormProps) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       middleName: "",
+      separationReason: "resignation", // Set a default value for separation reason
     },
   });
 
