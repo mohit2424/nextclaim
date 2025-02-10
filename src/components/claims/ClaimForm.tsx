@@ -25,14 +25,14 @@ export function ClaimForm({ onCancel }: ClaimFormProps) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       middleName: "",
-      claimStatus: "initial_review", // Set default but don't show in form
+      claimStatus: "initial_review",
     },
   });
 
   const formatSSN = (ssn: string) => {
     const cleaned = ssn.replace(/\D/g, '');
     if (cleaned.length >= 9) {
-      return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 5)}-${cleaned.slice(5, 9)}`;
+      return `${cleaned.slice(0, 2)}-${cleaned.slice(2, 5)}-${cleaned.slice(5, 9)}`;
     }
     return cleaned;
   };
@@ -49,7 +49,7 @@ export function ClaimForm({ onCancel }: ClaimFormProps) {
 
       const formattedSsn = formatSSN(values.ssn);
       if (formattedSsn.length !== 11) {
-        toast.error("Invalid SSN format. Must be XXX-XX-XXXX");
+        toast.error("Invalid SSN format. Must be XX-XXX-XXXX");
         return;
       }
 
@@ -57,8 +57,7 @@ export function ClaimForm({ onCancel }: ClaimFormProps) {
         id: crypto.randomUUID(),
         age: values.age,
         claim_date: format(values.claimDate, 'yyyy-MM-dd'),
-        claim_status: "initial_review", // Always set to initial_review
-        documents: [],
+        claim_status: "initial_review",
         email: values.email,
         employer_name: values.employerName,
         first_name: values.firstName,
@@ -69,7 +68,6 @@ export function ClaimForm({ onCancel }: ClaimFormProps) {
         phone: values.phone,
         pincode: values.pincode,
         separation_reason: values.separationReason,
-        severance_package: false,
         ssn: formattedSsn,
         state: values.state,
         user_id: session.user.id
@@ -101,9 +99,8 @@ export function ClaimForm({ onCancel }: ClaimFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <PersonalInfoFields form={form} />
-          <ContactInfoFields form={form} />
           <AddressFields form={form} />
           <ClaimDetailsFields form={form} />
         </div>
