@@ -29,14 +29,6 @@ export function ClaimForm({ onCancel }: ClaimFormProps) {
     },
   });
 
-  const formatSSN = (ssn: string) => {
-    const cleaned = ssn.replace(/\D/g, '');
-    if (cleaned.length >= 9) {
-      return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 5)}-${cleaned.slice(5, 9)}`;
-    }
-    return cleaned;
-  };
-
   const onSubmit = async (values: FormValues) => {
     try {
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
@@ -44,12 +36,6 @@ export function ClaimForm({ onCancel }: ClaimFormProps) {
       if (sessionError || !session) {
         toast.error("Please login to submit a claim");
         navigate("/login");
-        return;
-      }
-
-      const formattedSsn = formatSSN(values.ssn);
-      if (formattedSsn.length !== 11) {
-        toast.error("Invalid SSN format. Must be XXX-XX-XXXX");
         return;
       }
 
@@ -68,8 +54,6 @@ export function ClaimForm({ onCancel }: ClaimFormProps) {
         phone: values.phone,
         pincode: values.pincode,
         separation_reason: values.separationReason,
-        severance_package: false,
-        ssn: formattedSsn,
         state: values.state,
         user_id: session.user.id
       };
@@ -81,12 +65,7 @@ export function ClaimForm({ onCancel }: ClaimFormProps) {
         .single();
 
       if (error) {
-        if (error.code === '23505') {
-          toast.error("A claim with this SSN already exists");
-        } else {
-          throw error;
-        }
-        return;
+        throw error;
       }
 
       toast.success("Claim submitted successfully");

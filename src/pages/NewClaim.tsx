@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { ArrowLeft } from "lucide-react";
-import { SSNSearchDialog } from "@/components/claims/SSNSearchDialog";
 import { ClaimForm } from "@/components/claims/ClaimForm";
 import { supabase } from "@/integrations/supabase/client";
 import * as z from "zod";
@@ -17,7 +16,6 @@ export const formSchema = z.object({
   age: z.string().regex(/^\d+$/, "Age must be a number").transform(Number),
   state: z.string().min(2, "State is required"),
   pincode: z.string().regex(/^\d{5,6}$/, "Invalid pincode"),
-  ssn: z.string().regex(/^\d{3}-?\d{2}-?\d{4}$/, "Invalid SSN format"),
   email: z.string().email("Invalid email address"),
   phone: z.string().regex(/^\d{10}$/, "Invalid phone number"),
   employerName: z.string().min(2, "Employer name is required"),
@@ -27,7 +25,7 @@ export const formSchema = z.object({
   lastDayOfWork: z.date({
     required_error: "Last day of work is required",
   }),
-  claimStatus: z.enum(["initial_review", "pending", "approved", "rejected"]),
+  claimStatus: z.enum(["initial_review", "in_progress", "rejected"]),
   separationReason: z.enum([
     "resignation",
     "termination_misconduct",
@@ -43,7 +41,6 @@ export type FormValues = z.infer<typeof formSchema>;
 
 export default function NewClaim() {
   const navigate = useNavigate();
-  const [isDialogOpen, setIsDialogOpen] = useState(true);
 
   useEffect(() => {
     checkUser();
@@ -59,11 +56,6 @@ export default function NewClaim() {
 
   return (
     <DashboardLayout>
-      <SSNSearchDialog 
-        isOpen={isDialogOpen} 
-        onOpenChange={setIsDialogOpen} 
-      />
-
       <div className="container mx-auto py-6 overflow-y-auto overflow-x-hidden">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold">New Unemployment Claim</h1>

@@ -9,38 +9,10 @@ import { useState } from "react";
 import { ClaimsOverviewChart } from "@/components/dashboard/ClaimsOverviewChart";
 import { ClaimsDistributionChart } from "@/components/dashboard/ClaimsDistributionChart";
 import { ClaimsStats } from "@/components/claims/ClaimsStats";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
-import { useQueryClient } from "@tanstack/react-query";
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
-  const queryClient = useQueryClient();
-  const [isImporting, setIsImporting] = useState(false);
-
-  const importNASWAClaims = async () => {
-    try {
-      setIsImporting(true);
-      const { data, error } = await supabase.functions.invoke('naswa-claims');
-      
-      if (error) throw error;
-      
-      if (data.success) {
-        toast.success('Successfully imported NASWA claims');
-        // Invalidate the claims query to refresh the data
-        await queryClient.invalidateQueries({ queryKey: ['claims'] });
-        await queryClient.invalidateQueries({ queryKey: ['claimStats'] });
-      } else {
-        throw new Error('Failed to import claims');
-      }
-    } catch (error) {
-      console.error('Error importing NASWA claims:', error);
-      toast.error('Failed to import NASWA claims');
-    } finally {
-      setIsImporting(false);
-    }
-  };
 
   return (
     <DashboardLayout>
@@ -64,14 +36,6 @@ export default function Dashboard() {
                 className="pl-10"
               />
             </div>
-            <Button 
-              variant="outline"
-              onClick={importNASWAClaims} 
-              disabled={isImporting}
-              className="whitespace-nowrap"
-            >
-              {isImporting ? 'Importing...' : 'Import NASWA Claims'}
-            </Button>
             <Button onClick={() => navigate("/claims/new")} className="whitespace-nowrap">
               <Plus className="mr-2 h-4 w-4" />
               New Claim
