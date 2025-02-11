@@ -2,7 +2,7 @@
 import { ChevronDown } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-type ClaimStatus = "initial_review" | "pending" | "approved" | "rejected" | "all" | "in_progress" | "today";
+type ClaimStatus = "initial_review" | "pending" | "approved" | "rejected" | "all" | "in_progress";
 
 interface ClaimsStatusFilterProps {
   status: ClaimStatus;
@@ -19,9 +19,9 @@ export function ClaimsStatusFilter({ status, onStatusChange }: ClaimsStatusFilte
       <SelectContent>
         <SelectItem value="all">All Claims</SelectItem>
         <SelectItem value="initial_review">Initial Review</SelectItem>
-        <SelectItem value="in_progress">In Progress</SelectItem>
+        <SelectItem value="pending">Pending</SelectItem>
+        <SelectItem value="approved">Approved</SelectItem>
         <SelectItem value="rejected">Rejected</SelectItem>
-        <SelectItem value="today">Today's Claims</SelectItem>
       </SelectContent>
     </Select>
   );

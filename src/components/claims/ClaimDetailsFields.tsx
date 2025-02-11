@@ -49,10 +49,10 @@ export function ClaimDetailsFields({ form }: ClaimDetailsFieldsProps) {
 
       <FormField
         control={form.control}
-        name="employmentStartDate"
+        name="claimDate"
         render={({ field }) => (
           <FormItem className="flex flex-col">
-            <FormLabel>Employment Start Date</FormLabel>
+            <FormLabel>Claim Date</FormLabel>
             <Popover>
               <PopoverTrigger asChild>
                 <FormControl>
@@ -91,53 +91,10 @@ export function ClaimDetailsFields({ form }: ClaimDetailsFieldsProps) {
 
       <FormField
         control={form.control}
-        name="employmentEndDate"
+        name="lastDayOfWork"
         render={({ field }) => (
           <FormItem className="flex flex-col">
-            <FormLabel>Employment End Date</FormLabel>
-            <Popover>
-              <PopoverTrigger asChild>
-                <FormControl>
-                  <Button
-                    variant={"outline"}
-                    className={cn(
-                      "w-full pl-3 text-left font-normal",
-                      !field.value && "text-muted-foreground"
-                    )}
-                  >
-                    {field.value ? (
-                      format(field.value, "PPP")
-                    ) : (
-                      <span>Pick a date</span>
-                    )}
-                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                  </Button>
-                </FormControl>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={field.value}
-                  onSelect={field.onChange}
-                  disabled={(date) =>
-                    date < (form.watch('employmentStartDate') || new Date("1900-01-01")) || 
-                    date > new Date()
-                  }
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={form.control}
-        name="claimDate"
-        render={({ field }) => (
-          <FormItem className="flex flex-col">
-            <FormLabel>Claim Date</FormLabel>
+            <FormLabel>Last Day of Work</FormLabel>
             <Popover>
               <PopoverTrigger asChild>
                 <FormControl>
