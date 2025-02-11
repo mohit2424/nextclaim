@@ -86,37 +86,49 @@ serve(async (req) => {
     const mockClaims = generateMockClaims();
     
     const results = []
+    const skipped = []
+    
     for (const claim of mockClaims) {
-      // Check if claim with this SSN already exists
-      const { data: existingClaim } = await supabaseClient
-        .from('claims')
-        .select('id')
-        .eq('ssn', claim.ssn)
-        .single()
+      try {
+        // Check if claim with this SSN already exists
+        const { data: existingClaim } = await supabaseClient
+          .from('claims')
+          .select('ssn')
+          .eq('ssn', claim.ssn)
+          .single()
 
-      if (existingClaim) {
-        console.log(`Claim with SSN ${claim.ssn} already exists, skipping...`)
-        continue
-      }
+        if (existingClaim) {
+          console.log(`Skipping claim with SSN ${claim.ssn} - already exists`)
+          skipped.push(claim.ssn)
+          continue
+        }
 
-      const { data, error } = await supabaseClient
-        .from('claims')
-        .insert(claim)
-        .select()
-      
-      if (error) {
-        console.error('Error inserting claim:', error)
-        throw error
+        const { data, error } = await supabaseClient
+          .from('claims')
+          .insert(claim)
+          .select()
+        
+        if (error) throw error
+        
+        results.push(data[0])
+        
+      } catch (error) {
+        // Log the error but continue processing other claims
+        console.error(`Error processing claim with SSN ${claim.ssn}:`, error)
+        if (error.code === '23505') { // Unique constraint violation
+          skipped.push(claim.ssn)
+        }
       }
-      
-      results.push(data[0])
     }
+
+    const message = `Processed ${mockClaims.length} claims: ${results.length} imported, ${skipped.length} skipped (already exist)`
 
     return new Response(
       JSON.stringify({ 
         success: true, 
         data: results,
-        message: results.length === 0 ? 'All claims already exist' : `Successfully imported ${results.length} new claims`
+        skipped: skipped.length,
+        message 
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
