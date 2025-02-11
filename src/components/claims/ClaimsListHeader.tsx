@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-export function ClaimsHeader() {
+export function ClaimsListHeader() {
   const navigate = useNavigate();
   
   return (
@@ -29,3 +29,4 @@ export function ClaimsHeader() {
     </div>
   );
 }
+

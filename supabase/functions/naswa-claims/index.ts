@@ -20,12 +20,34 @@ function generateMockClaims() {
   ];
   const separationReasons = ["layoff", "reduction_in_force", "constructive_discharge", "severance_agreement", "job_abandonment"];
   
+  // Current date for reference
+  const currentDate = new Date();
+  
+  // Helper function to generate dates
+  const generateEmploymentDates = (isEligible: boolean) => {
+    const endDate = new Date(currentDate);
+    endDate.setDate(endDate.getDate() - Math.floor(Math.random() * 30)); // End date within last 30 days
+    
+    const startDate = new Date(endDate);
+    if (isEligible) {
+      // For eligible claims: 120-365 days of employment
+      startDate.setDate(startDate.getDate() - (120 + Math.floor(Math.random() * 245)));
+    } else {
+      // For ineligible claims: 30-119 days of employment
+      startDate.setDate(startDate.getDate() - (30 + Math.floor(Math.random() * 89)));
+    }
+    
+    return {
+      startDate: startDate.toISOString().split('T')[0],
+      endDate: endDate.toISOString().split('T')[0]
+    };
+  };
+  
   return Array.from({ length: 5 }, (_, i) => {
     const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
     const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-    const today = new Date();
-    const lastDayOfWork = new Date(today);
-    lastDayOfWork.setDate(today.getDate() - Math.floor(Math.random() * 30)); // Random date within last 30 days
+    const isEligible = i < 2; // First 2 claims will be eligible, last 3 won't
+    const { startDate, endDate } = generateEmploymentDates(isEligible);
     
     return {
       first_name: firstName,
@@ -38,15 +60,12 @@ function generateMockClaims() {
       email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@example.com`,
       phone: `${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 9000 + 1000)}`,
       employer_name: employers[Math.floor(Math.random() * employers.length)],
-      claim_date: today.toISOString().split('T')[0],
-      claim_status: "initial_review",
+      claim_date: new Date().toISOString().split('T')[0],
+      claim_status: "initial_review", // Always set to initial_review
       separation_reason: separationReasons[Math.floor(Math.random() * separationReasons.length)],
-      last_day_of_work: lastDayOfWork.toISOString().split('T')[0],
-      employment_start_date: new Date(today.getFullYear() - 1, today.getMonth(), today.getDate()).toISOString().split('T')[0],
-      employment_end_date: lastDayOfWork.toISOString().split('T')[0],
+      employment_start_date: startDate,
+      employment_end_date: endDate,
       severance_package: Math.random() > 0.5,
-      severance_amount: Math.random() > 0.5 ? Math.floor(Math.random() * 50000 + 5000) : null,
-      reason_for_unemployment: "Company restructuring",
       documents: []
     };
   });
@@ -67,51 +86,37 @@ serve(async (req) => {
     const mockClaims = generateMockClaims();
     
     const results = []
-    const skipped = []
-    
     for (const claim of mockClaims) {
-      try {
-        // Check if claim with this SSN already exists
-        const { data: existingClaim } = await supabaseClient
-          .from('claims')
-          .select('id, ssn')
-          .eq('ssn', claim.ssn)
-          .single()
+      // Check if claim with this SSN already exists
+      const { data: existingClaim } = await supabaseClient
+        .from('claims')
+        .select('id')
+        .eq('ssn', claim.ssn)
+        .single()
 
-        if (existingClaim) {
-          console.log(`Claim with SSN ${claim.ssn} already exists, skipping...`)
-          skipped.push(claim.ssn)
-          continue
-        }
-
-        const { data, error } = await supabaseClient
-          .from('claims')
-          .insert(claim)
-          .select()
-        
-        if (error) {
-          console.error('Error inserting claim:', error)
-          throw error
-        }
-        
-        results.push(data[0])
-      } catch (error) {
-        // Log the error but continue processing other claims
-        console.error(`Error processing claim with SSN ${claim.ssn}:`, error)
-        skipped.push(claim.ssn)
+      if (existingClaim) {
+        console.log(`Claim with SSN ${claim.ssn} already exists, skipping...`)
+        continue
       }
-    }
 
-    const message = results.length === 0 
-      ? `No new claims were imported. ${skipped.length} claims were skipped due to duplicate SSNs.`
-      : `Successfully imported ${results.length} new claims. ${skipped.length} claims were skipped due to duplicate SSNs.`
+      const { data, error } = await supabaseClient
+        .from('claims')
+        .insert(claim)
+        .select()
+      
+      if (error) {
+        console.error('Error inserting claim:', error)
+        throw error
+      }
+      
+      results.push(data[0])
+    }
 
     return new Response(
       JSON.stringify({ 
         success: true, 
         data: results,
-        skipped: skipped,
-        message: message
+        message: results.length === 0 ? 'All claims already exist' : `Successfully imported ${results.length} new claims`
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -121,11 +126,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in naswa-claims function:', error)
     return new Response(
-      JSON.stringify({ 
-        success: false, 
-        error: error.message,
-        details: error.details || 'No additional details available'
-      }),
+      JSON.stringify({ success: false, error: error.message }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500

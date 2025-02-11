@@ -33,8 +33,9 @@ export function SSNSearchDialog({ isOpen, onOpenChange }: SSNSearchDialogProps) 
       formatted = cleaned.slice(0, 3) + '-' + cleaned.slice(3);
     }
     if (cleaned.length > 5) {
-      formatted = formatted.slice(0, 6) + '-' + cleaned.slice(6);
+      formatted = formatted.slice(0, 6) + '-' + formatted.slice(6);
     }
+    
     if (cleaned.length > 9) {
       formatted = formatted.slice(0, 11);
     }
@@ -64,6 +65,9 @@ export function SSNSearchDialog({ isOpen, onOpenChange }: SSNSearchDialogProps) 
       }
 
       setExistingClaim(data);
+      if (!data) {
+        toast.info("Claim with that SSN doesn't exist");
+      }
       return data;
     } catch (error) {
       console.error('Error:', error);

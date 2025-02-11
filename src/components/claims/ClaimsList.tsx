@@ -1,13 +1,16 @@
 
-import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 import { ClaimsTable } from "./ClaimsTable";
+import { ClaimsStatusFilter } from "./ClaimsStatusFilter";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { ClaimsHeader } from "./ClaimsHeader";
-import { ClaimsSearchControls } from "./ClaimsSearchControls";
+import { ClaimsListHeader } from "./ClaimsListHeader";
 import { ClaimsPagination } from "./ClaimsPagination";
-import { useClaims } from "@/hooks/useClaims";
+import { useClaimsList } from "./useClaimsList";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface ClaimsListProps {
   searchQuery: string;
@@ -19,18 +22,17 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
   const [localSearchQuery, setLocalSearchQuery] = useState(initialSearchQuery);
   const statusParam = searchParams.get('status') || 'all';
   const itemsPerPage = 10;
+  const queryClient = useQueryClient();
 
-  const { data: claimsData = { data: [], count: 0 }, isLoading, refetch } = useClaims({
-    searchQuery: localSearchQuery,
-    status: statusParam,
-    page: currentPage,
-    pageSize: itemsPerPage
-  });
+  const { data: claimsData = { data: [], count: 0 }, isLoading } = useClaimsList(
+    localSearchQuery,
+    statusParam,
+    currentPage
+  );
 
   const { data: claims, count: totalClaims } = claimsData;
   const totalPages = Math.ceil((totalClaims || 0) / itemsPerPage);
 
-  // Set up real-time subscription
   useEffect(() => {
     const channel = supabase
       .channel('schema-db-changes')
@@ -41,8 +43,10 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
           schema: 'public',
           table: 'claims'
         },
-        () => {
-          refetch();
+        async () => {
+          // Immediately invalidate and refetch
+          await queryClient.invalidateQueries({ queryKey: ['claims'] });
+          await queryClient.refetchQueries({ queryKey: ['claims'] });
         }
       )
       .subscribe();
@@ -50,7 +54,7 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [refetch]);
+  }, [queryClient]);
 
   const handleStatusChange = (newStatus: string) => {
     setSearchParams({ status: newStatus });
@@ -74,17 +78,37 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
     <DashboardLayout>
       <div className="container mx-auto px-4 space-y-6">
         <div className="flex flex-col gap-6">
-          <ClaimsHeader />
-          <ClaimsSearchControls
-            searchQuery={localSearchQuery}
-            onSearchChange={setLocalSearchQuery}
-            status={statusParam}
-            onStatusChange={handleStatusChange}
-          />
+          <ClaimsListHeader />
+          
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div className="relative w-full md:w-96">
+              <Input
+                type="text"
+                placeholder="Search by SSN (XXX-XX-XXXX)"
+                value={localSearchQuery}
+                onChange={(e) => {
+                  setLocalSearchQuery(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="pl-10"
+              />
+              <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+            </div>
+            <ClaimsStatusFilter 
+              status={statusParam as any}
+              onStatusChange={handleStatusChange}
+            />
+          </div>
         </div>
 
         <div className="max-w-[1200px] mx-auto">
-          <ClaimsTable claims={claims} />
+          <ClaimsTable 
+            claims={claims} 
+            onStatusUpdate={() => {
+              queryClient.invalidateQueries({ queryKey: ['claims'] });
+              queryClient.refetchQueries({ queryKey: ['claims'] });
+            }}
+          />
         </div>
 
         <ClaimsPagination
@@ -97,3 +121,4 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
     </DashboardLayout>
   );
 }
+

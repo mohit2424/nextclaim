@@ -25,7 +25,7 @@ export function ClaimForm({ onCancel }: ClaimFormProps) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       middleName: "",
-      claimStatus: "initial_review",
+      claimStatus: "initial_review", // Set default but don't show in form
     },
   });
 
@@ -57,12 +57,13 @@ export function ClaimForm({ onCancel }: ClaimFormProps) {
         id: crypto.randomUUID(),
         age: values.age,
         claim_date: format(values.claimDate, 'yyyy-MM-dd'),
-        claim_status: 'initial_review',
+        claim_status: "initial_review", // Always set to initial_review
         documents: [],
         email: values.email,
         employer_name: values.employerName,
         first_name: values.firstName,
-        last_day_of_work: format(values.lastDayOfWork, 'yyyy-MM-dd'),
+        employment_start_date: format(values.employmentStartDate, 'yyyy-MM-dd'),
+        employment_end_date: format(values.employmentEndDate, 'yyyy-MM-dd'),
         last_name: values.lastName,
         middle_name: values.middleName || null,
         phone: values.phone,

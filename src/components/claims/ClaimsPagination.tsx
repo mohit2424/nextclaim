@@ -18,7 +18,7 @@ interface ClaimsPaginationProps {
 export function ClaimsPagination({ 
   currentPage, 
   totalPages, 
-  totalClaims, 
+  totalClaims,
   onPageChange 
 }: ClaimsPaginationProps) {
   const getPageNumbers = () => {
@@ -76,3 +76,4 @@ export function ClaimsPagination({
     </div>
   );
 }
+

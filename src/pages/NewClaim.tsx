@@ -24,8 +24,11 @@ export const formSchema = z.object({
   claimDate: z.date({
     required_error: "Claim date is required",
   }),
-  lastDayOfWork: z.date({
-    required_error: "Last day of work is required",
+  employmentStartDate: z.date({
+    required_error: "Employment start date is required",
+  }),
+  employmentEndDate: z.date({
+    required_error: "Employment end date is required",
   }),
   claimStatus: z.enum(["initial_review", "pending", "approved", "rejected"]),
   separationReason: z.enum([
