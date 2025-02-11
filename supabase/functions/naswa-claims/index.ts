@@ -56,7 +56,7 @@ function generateMockClaims() {
       age: Math.floor(Math.random() * (65 - 18) + 18),
       state: states[Math.floor(Math.random() * states.length)],
       pincode: Math.floor(Math.random() * 90000 + 10000).toString(),
-      ssn: `${Math.floor(Math.random() * 900 + 100)}-${Math.floor(Math.random() * 90 + 10)}-${Math.floor(Math.random() * 9000 + 1000)}`,
+      ssn: crypto.randomUUID().slice(0, 11), // Generate unique SSNs instead of checking for duplicates
       email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@example.com`,
       phone: `${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 9000 + 1000)}`,
       employer_name: employers[Math.floor(Math.random() * employers.length)],
@@ -86,48 +86,33 @@ serve(async (req) => {
     const mockClaims = generateMockClaims();
     
     const results = []
-    const skipped = []
     
     for (const claim of mockClaims) {
       try {
-        // Check if claim with this SSN already exists
-        const { data: existingClaim } = await supabaseClient
-          .from('claims')
-          .select('ssn')
-          .eq('ssn', claim.ssn)
-          .single()
-
-        if (existingClaim) {
-          console.log(`Skipping claim with SSN ${claim.ssn} - already exists`)
-          skipped.push(claim.ssn)
-          continue
-        }
-
         const { data, error } = await supabaseClient
           .from('claims')
           .insert(claim)
           .select()
         
-        if (error) throw error
+        if (error) {
+          console.error(`Error inserting claim:`, error)
+          continue
+        }
         
         results.push(data[0])
         
       } catch (error) {
         // Log the error but continue processing other claims
-        console.error(`Error processing claim with SSN ${claim.ssn}:`, error)
-        if (error.code === '23505') { // Unique constraint violation
-          skipped.push(claim.ssn)
-        }
+        console.error(`Error processing claim:`, error)
       }
     }
 
-    const message = `Processed ${mockClaims.length} claims: ${results.length} imported, ${skipped.length} skipped (already exist)`
+    const message = `Processed ${mockClaims.length} claims: ${results.length} imported`
 
     return new Response(
       JSON.stringify({ 
         success: true, 
         data: results,
-        skipped: skipped.length,
         message 
       }),
       { 
@@ -146,4 +131,3 @@ serve(async (req) => {
     )
   }
 })
-
