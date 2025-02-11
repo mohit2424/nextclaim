@@ -678,7 +678,16 @@ export type Database = {
     }
     Enums: {
       claim_status: "initial_review" | "in_progress" | "rejected"
+      claim_status_type: "initial_review" | "in_progress" | "rejected"
       separation_reason:
+        | "resignation"
+        | "termination_misconduct"
+        | "layoff"
+        | "reduction_in_force"
+        | "constructive_discharge"
+        | "job_abandonment"
+        | "severance_agreement"
+      separation_reason_type:
         | "resignation"
         | "termination_misconduct"
         | "layoff"

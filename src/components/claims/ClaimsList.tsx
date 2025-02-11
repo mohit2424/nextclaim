@@ -52,7 +52,7 @@ const fetchClaims = async (
 
     switch (status) {
       case 'in_progress':
-        query = query.in('claim_status', ['initial_review', 'pending']);
+        query = query.in('claim_status', ['initial_review', 'in_progress']);
         break;
       case 'today':
         query = query.gte('created_at', today.toISOString());
@@ -60,7 +60,7 @@ const fetchClaims = async (
       case 'all':
         break;
       default:
-        if (['initial_review', 'pending', 'approved', 'rejected'].includes(status)) {
+        if (['initial_review', 'in_progress', 'rejected'].includes(status)) {
           query = query.eq('claim_status', status as ClaimStatus);
         }
     }
