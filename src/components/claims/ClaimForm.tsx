@@ -57,7 +57,7 @@ export function ClaimForm({ onCancel }: ClaimFormProps) {
         id: crypto.randomUUID(),
         age: values.age,
         claim_date: format(values.claimDate, 'yyyy-MM-dd'),
-        claim_status: values.claimStatus,
+        claim_status: 'initial_review',
         documents: [],
         email: values.email,
         employer_name: values.employerName,
