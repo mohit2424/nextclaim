@@ -64,11 +64,13 @@ export function SSNSearchDialog({ isOpen, onOpenChange }: SSNSearchDialogProps) 
         return null;
       }
 
-      setExistingClaim(data);
-      if (!data) {
-        toast.info("Claim with that SSN doesn't exist");
+      if (data) {
+        setExistingClaim(data);
+        toast.error("A claim with this SSN already exists");
+        return data;
       }
-      return data;
+
+      return null;
     } catch (error) {
       console.error('Error:', error);
       toast.error("Error checking SSN");
@@ -86,8 +88,9 @@ export function SSNSearchDialog({ isOpen, onOpenChange }: SSNSearchDialogProps) 
 
     const claim = await checkExistingSSN(searchSsn);
     
-    if (claim) {
-      toast.info("A claim with this SSN already exists");
+    if (!claim) {
+      toast.success("SSN is available for a new claim");
+      onOpenChange(false);
     }
   };
 
@@ -137,7 +140,10 @@ export function SSNSearchDialog({ isOpen, onOpenChange }: SSNSearchDialogProps) 
                   View Existing Claim
                 </Button>
               ) : (
-                <Button onClick={() => onOpenChange(false)}>
+                <Button 
+                  onClick={() => onOpenChange(false)}
+                  disabled={isSearching || !searchSsn}
+                >
                   Add New Claim
                 </Button>
               )}
@@ -148,3 +154,4 @@ export function SSNSearchDialog({ isOpen, onOpenChange }: SSNSearchDialogProps) 
     </Dialog>
   );
 }
+
