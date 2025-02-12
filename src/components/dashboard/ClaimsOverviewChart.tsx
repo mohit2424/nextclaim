@@ -19,96 +19,36 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from "recharts";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { startOfMonth, endOfMonth, format, subMonths, startOfYear, endOfYear, subYears } from "date-fns";
 
-const fetchMonthlyData = async (year: string) => {
-  const startDate = `${year}-01-01`;
-  const endDate = `${year}-12-31`;
-  
-  const { data: claims } = await supabase
-    .from('claims')
-    .select('created_at')
-    .gte('created_at', startDate)
-    .lte('created_at', endDate);
+const monthlyData = [
+  { month: "Jan", claims: 280 },
+  { month: "Feb", claims: 150 },
+  { month: "Mar", claims: 650 },
+  { month: "Apr", claims: 100 },
+  { month: "May", claims: 400 },
+  { month: "Jun", claims: 200 },
+  { month: "Jul", claims: 520 },
+  { month: "Aug", claims: 300 },
+  { month: "Sep", claims: 450 },
+  { month: "Oct", claims: 250 },
+  { month: "Nov", claims: 600 },
+  { month: "Dec", claims: 350 },
+];
 
-  if (!claims) return [];
-
-  // Initialize all months with 0
-  const monthsData = Array.from({ length: 12 }, (_, i) => ({
-    month: format(new Date(parseInt(year), i), 'MMM'),
-    claims: 0
-  }));
-
-  // Count claims per month
-  claims.forEach(claim => {
-    const monthIndex = new Date(claim.created_at).getMonth();
-    monthsData[monthIndex].claims++;
-  });
-
-  return monthsData;
-};
-
-const fetchYearlyData = async () => {
-  const currentYear = new Date().getFullYear();
-  const fiveYearsAgo = currentYear - 4;
-  
-  const { data: claims } = await supabase
-    .from('claims')
-    .select('created_at')
-    .gte('created_at', `${fiveYearsAgo}-01-01`);
-
-  if (!claims) return [];
-
-  // Initialize years with 0
-  const yearsData = Array.from({ length: 5 }, (_, i) => ({
-    year: (fiveYearsAgo + i).toString(),
-    claims: 0
-  }));
-
-  // Count claims per year
-  claims.forEach(claim => {
-    const year = new Date(claim.created_at).getFullYear();
-    const yearIndex = year - fiveYearsAgo;
-    if (yearIndex >= 0 && yearIndex < 5) {
-      yearsData[yearIndex].claims++;
-    }
-  });
-
-  return yearsData;
-};
+const yearlyData = [
+  { year: "2020", claims: 2500 },
+  { year: "2021", claims: 3200 },
+  { year: "2022", claims: 4100 },
+  { year: "2023", claims: 3800 },
+  { year: "2024", claims: 1500 },
+];
 
 export function ClaimsOverviewChart() {
   const [isMonthly, setIsMonthly] = useState(true);
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
-
-  const { data: monthlyData = [], isLoading: isLoadingMonthly } = useQuery({
-    queryKey: ['monthlyClaimsData', selectedYear],
-    queryFn: () => fetchMonthlyData(selectedYear),
-    enabled: isMonthly
-  });
-
-  const { data: yearlyData = [], isLoading: isLoadingYearly } = useQuery({
-    queryKey: ['yearlyClaimsData'],
-    queryFn: fetchYearlyData,
-    enabled: !isMonthly
-  });
+  const [selectedYear, setSelectedYear] = useState("2024");
 
   const data = isMonthly ? monthlyData : yearlyData;
   const xAxisKey = isMonthly ? "month" : "year";
-  const isLoading = isMonthly ? isLoadingMonthly : isLoadingYearly;
-
-  if (isLoading) {
-    return (
-      <Card className="p-6">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-48 mb-8" />
-          <div className="h-[300px] bg-gray-100 rounded" />
-        </div>
-      </Card>
-    );
-  }
 
   return (
     <Card className="p-6">

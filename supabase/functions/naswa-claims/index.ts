@@ -20,32 +20,9 @@ function generateMockClaims() {
   ];
   const separationReasons = ["layoff", "reduction_in_force", "constructive_discharge", "severance_agreement", "job_abandonment"];
   
-  const currentDate = new Date();
-  
-  const generateEmploymentDates = (isEligible: boolean) => {
-    const endDate = new Date(currentDate);
-    endDate.setDate(endDate.getDate() - Math.floor(Math.random() * 30));
-    
-    const startDate = new Date(endDate);
-    if (isEligible) {
-      startDate.setDate(startDate.getDate() - (120 + Math.floor(Math.random() * 245)));
-    } else {
-      startDate.setDate(startDate.getDate() - (30 + Math.floor(Math.random() * 89)));
-    }
-    
-    return {
-      startDate: startDate.toISOString().split('T')[0],
-      endDate: endDate.toISOString().split('T')[0]
-    };
-  };
-  
   return Array.from({ length: 5 }, (_, i) => {
     const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
     const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-    const isEligible = i < 2;
-    const { startDate, endDate } = generateEmploymentDates(isEligible);
-    
-    const ssn = `${Math.floor(Math.random() * 900 + 100)}-${Math.floor(Math.random() * 100).toString().padStart(2, '0')}-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
     
     return {
       first_name: firstName,
@@ -54,16 +31,17 @@ function generateMockClaims() {
       age: Math.floor(Math.random() * (65 - 18) + 18),
       state: states[Math.floor(Math.random() * states.length)],
       pincode: Math.floor(Math.random() * 90000 + 10000).toString(),
-      ssn,
+      ssn: `${Math.floor(Math.random() * 900 + 100)}-${Math.floor(Math.random() * 90 + 10)}-${Math.floor(Math.random() * 9000 + 1000)}`,
       email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@example.com`,
       phone: `${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 9000 + 1000)}`,
       employer_name: employers[Math.floor(Math.random() * employers.length)],
       claim_date: new Date().toISOString().split('T')[0],
       claim_status: "initial_review",
       separation_reason: separationReasons[Math.floor(Math.random() * separationReasons.length)],
-      employment_start_date: startDate,
-      employment_end_date: endDate,
+      last_day_of_work: new Date().toISOString().split('T')[0],
       severance_package: Math.random() > 0.5,
+      severance_amount: Math.random() > 0.5 ? Math.floor(Math.random() * 50000 + 5000) : null,
+      reason_for_unemployment: "Company restructuring",
       documents: []
     };
   });
@@ -84,36 +62,37 @@ serve(async (req) => {
     const mockClaims = generateMockClaims();
     
     const results = []
-    
     for (const claim of mockClaims) {
-      try {
-        const { data, error } = await supabaseClient
-          .from('claims')
-          .insert(claim)
-          .select()
-        
-        if (error) {
-          console.error(`Error inserting claim:`, error)
-          continue
-        }
-        
-        if (data && data.length > 0) {
-          results.push(data[0])
-        }
-        
-      } catch (error) {
-        console.error(`Error processing claim:`, error)
-      }
-    }
+      // Check if claim with this SSN already exists
+      const { data: existingClaim } = await supabaseClient
+        .from('claims')
+        .select('id')
+        .eq('ssn', claim.ssn)
+        .single()
 
-    const message = `Processed ${mockClaims.length} claims: ${results.length} imported`
-    console.log(message)
+      if (existingClaim) {
+        console.log(`Claim with SSN ${claim.ssn} already exists, skipping...`)
+        continue
+      }
+
+      const { data, error } = await supabaseClient
+        .from('claims')
+        .insert(claim)
+        .select()
+      
+      if (error) {
+        console.error('Error inserting claim:', error)
+        throw error
+      }
+      
+      results.push(data[0])
+    }
 
     return new Response(
       JSON.stringify({ 
         success: true, 
         data: results,
-        message 
+        message: results.length === 0 ? 'All claims already exist' : `Successfully imported ${results.length} new claims`
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -131,3 +110,4 @@ serve(async (req) => {
     )
   }
 })
+
