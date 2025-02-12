@@ -36,13 +36,6 @@ const getStatusColor = (status: ClaimStatus) => {
   return colors[status] || "bg-gray-100 text-gray-800 border-gray-200";
 };
 
-const formatClaimStatus = (status: ClaimStatus | null | undefined) => {
-  if (!status) return "Unknown";
-  return status.split('_')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-};
-
 export function ClaimsTable({ claims, onStatusUpdate }: ClaimsTableProps) {
   const navigate = useNavigate();
   const [selectedClaim, setSelectedClaim] = useState<Claim | null>(null);
@@ -81,7 +74,9 @@ export function ClaimsTable({ claims, onStatusUpdate }: ClaimsTableProps) {
                       className={`${getStatusColor(claim.claim_status)} border`}
                       variant="secondary"
                     >
-                      {formatClaimStatus(claim.claim_status)}
+                      {claim.claim_status.split('_').map(word => 
+                        word.charAt(0).toUpperCase() + word.slice(1)
+                      ).join(' ')}
                     </Badge>
                   </TableCell>
                   <TableCell>{claim.employer_name}</TableCell>
@@ -130,3 +125,4 @@ export function ClaimsTable({ claims, onStatusUpdate }: ClaimsTableProps) {
     </>
   );
 }
+

@@ -6,11 +6,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { startOfDay } from "date-fns";
 
 const fetchClaimStats = async () => {
-  const { data: claims, error } = await supabase
+  const { data: claims } = await supabase
     .from('claims')
-    .select('claim_status, created_at');
+    .select('claim_status, created_at')
+    .order('created_at', { ascending: false });
 
-  if (error) throw error;
   if (!claims) return { total: 0, inProgress: 0, newToday: 0, rejected: 0 };
 
   const today = startOfDay(new Date());
@@ -45,8 +45,7 @@ export function ClaimsStats() {
   const { data: claimStats = { total: 0, inProgress: 0, rejected: 0, newToday: 0 }, isLoading } = useQuery({
     queryKey: ['claimStats'],
     queryFn: fetchClaimStats,
-    refetchInterval: 3000, // Poll more frequently
-    staleTime: 0, // Consider data always stale to enable immediate refetches
+    refetchInterval: 5000, // Poll every 5 seconds for real-time updates
   });
   
   const stats = [
