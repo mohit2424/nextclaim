@@ -26,6 +26,7 @@ export type Database = {
           middle_name: string | null
           phone: string
           pincode: string
+          separation_reason: Database["public"]["Enums"]["separation_reason"]
           severance_package: boolean | null
           ssn: string
           state: string
@@ -48,6 +49,7 @@ export type Database = {
           middle_name?: string | null
           phone: string
           pincode: string
+          separation_reason: Database["public"]["Enums"]["separation_reason"]
           severance_package?: boolean | null
           ssn: string
           state: string
@@ -70,6 +72,7 @@ export type Database = {
           middle_name?: string | null
           phone?: string
           pincode?: string
+          separation_reason?: Database["public"]["Enums"]["separation_reason"]
           severance_package?: boolean | null
           ssn?: string
           state?: string
