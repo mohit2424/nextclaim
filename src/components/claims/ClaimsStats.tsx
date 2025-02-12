@@ -48,7 +48,7 @@ export function ClaimsStats() {
       value: claimStats.total.toString(),
       bgColor: "bg-gradient-to-r from-blue-50 to-blue-100",
       textColor: "text-blue-900",
-      onClick: () => navigate("/claims"),
+      onClick: () => navigate("/claims?status=all"),
     },
     {
       title: "In Progress",

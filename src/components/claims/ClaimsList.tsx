@@ -34,25 +34,14 @@ const fetchClaims = async (searchQuery: string = "", status?: string) => {
     }
   }
 
-  // Apply status filtering
-  if (status) {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    switch (status) {
-      case 'in_progress':
-        query = query.in('claim_status', ['initial_review', 'pending']);
-        break;
-      case 'today':
-        query = query.gte('created_at', today.toISOString());
-        break;
-      case 'all':
-        // No filter needed for 'all'
-        break;
-      default:
-        if (['initial_review', 'pending', 'approved', 'rejected'].includes(status)) {
-          query = query.eq('claim_status', status);
-        }
+  if (status && status !== 'all') {
+    if (status === 'in_progress') {
+      query = query.in('claim_status', ['initial_review', 'pending']);
+    } else if (status === 'today') {
+      const today = startOfDay(new Date()).toISOString();
+      query = query.gte('created_at', today);
+    } else {
+      query = query.eq('claim_status', status as ClaimStatus);
     }
   }
 
