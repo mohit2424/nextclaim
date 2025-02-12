@@ -18,13 +18,27 @@ export function Navbar() {
 
   const handleSignOut = async () => {
     try {
+      // First check if we have a session
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      // If no session, just redirect to login
+      if (!session) {
+        navigate("/login");
+        return;
+      }
+
       const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      if (error && error.message !== "session_not_found") {
+        throw error;
+      }
+
       toast.success("Signed out successfully");
       navigate("/login");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error signing out:", error);
       toast.error("Failed to sign out");
+      // Still redirect to login page if there's an error
+      navigate("/login");
     }
   };
 
