@@ -22,17 +22,10 @@ export type Database = {
           employment_start_date: string
           first_name: string
           id: string
-          last_day_of_work: string | null
           last_name: string
           middle_name: string | null
           phone: string
           pincode: string
-          reason_for_unemployment: string | null
-          rejection_reason: string | null
-          separation_reason:
-            | Database["public"]["Enums"]["separation_reason"]
-            | null
-          severance_amount: number | null
           severance_package: boolean | null
           ssn: string
           state: string
@@ -51,17 +44,10 @@ export type Database = {
           employment_start_date: string
           first_name: string
           id: string
-          last_day_of_work?: string | null
           last_name: string
           middle_name?: string | null
           phone: string
           pincode: string
-          reason_for_unemployment?: string | null
-          rejection_reason?: string | null
-          separation_reason?:
-            | Database["public"]["Enums"]["separation_reason"]
-            | null
-          severance_amount?: number | null
           severance_package?: boolean | null
           ssn: string
           state: string
@@ -80,17 +66,10 @@ export type Database = {
           employment_start_date?: string
           first_name?: string
           id?: string
-          last_day_of_work?: string | null
           last_name?: string
           middle_name?: string | null
           phone?: string
           pincode?: string
-          reason_for_unemployment?: string | null
-          rejection_reason?: string | null
-          separation_reason?:
-            | Database["public"]["Enums"]["separation_reason"]
-            | null
-          severance_amount?: number | null
           severance_package?: boolean | null
           ssn?: string
           state?: string
@@ -227,9 +206,6 @@ export type Database = {
           middle_name: string | null
           phone: string | null
           pincode: string | null
-          reason_for_unemployment: string | null
-          severance_amount: number | null
-          severance_package: boolean | null
           ssn: string | null
           state: string | null
         }
@@ -247,9 +223,6 @@ export type Database = {
           middle_name?: string | null
           phone?: string | null
           pincode?: string | null
-          reason_for_unemployment?: string | null
-          severance_amount?: number | null
-          severance_package?: boolean | null
           ssn?: string | null
           state?: string | null
         }
@@ -267,9 +240,6 @@ export type Database = {
           middle_name?: string | null
           phone?: string | null
           pincode?: string | null
-          reason_for_unemployment?: string | null
-          severance_amount?: number | null
-          severance_package?: boolean | null
           ssn?: string | null
           state?: string | null
         }
@@ -317,10 +287,6 @@ export type Database = {
           middle_name: string | null
           phone: string | null
           pincode: string | null
-          reason_for_unemployment: string | null
-          rejection_reason: string | null
-          severance_amount: number | null
-          severance_package: boolean | null
           ssn: string | null
           state: string | null
         }
@@ -338,10 +304,6 @@ export type Database = {
           middle_name?: string | null
           phone?: string | null
           pincode?: string | null
-          reason_for_unemployment?: string | null
-          rejection_reason?: string | null
-          severance_amount?: number | null
-          severance_package?: boolean | null
           ssn?: string | null
           state?: string | null
         }
@@ -359,10 +321,6 @@ export type Database = {
           middle_name?: string | null
           phone?: string | null
           pincode?: string | null
-          reason_for_unemployment?: string | null
-          rejection_reason?: string | null
-          severance_amount?: number | null
-          severance_package?: boolean | null
           ssn?: string | null
           state?: string | null
         }
@@ -383,9 +341,6 @@ export type Database = {
           middle_name: string | null
           phone: string | null
           pincode: string | null
-          reason_for_unemployment: string | null
-          severance_amount: number | null
-          severance_package: boolean | null
           ssn: string | null
           state: string | null
         }
@@ -403,9 +358,6 @@ export type Database = {
           middle_name?: string | null
           phone?: string | null
           pincode?: string | null
-          reason_for_unemployment?: string | null
-          severance_amount?: number | null
-          severance_package?: boolean | null
           ssn?: string | null
           state?: string | null
         }
@@ -423,9 +375,6 @@ export type Database = {
           middle_name?: string | null
           phone?: string | null
           pincode?: string | null
-          reason_for_unemployment?: string | null
-          severance_amount?: number | null
-          severance_package?: boolean | null
           ssn?: string | null
           state?: string | null
         }
@@ -657,9 +606,6 @@ export type Database = {
         employer_name: string | null
         claim_date: string | null
         claim_status: Database["public"]["Enums"]["old_claim_status"] | null
-        separation_reason:
-          | Database["public"]["Enums"]["separation_reason"]
-          | null
       }
       Database: {
         public: Json | null

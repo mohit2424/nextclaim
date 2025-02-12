@@ -115,14 +115,9 @@ export function ClaimsTable({ claims, onStatusUpdate }: ClaimsTableProps) {
           employmentStartDate={selectedClaim.employment_start_date}
           employmentEndDate={selectedClaim.employment_end_date}
           onClose={() => setSelectedClaim(null)}
-          onStatusUpdate={() => {
-            if (onStatusUpdate) {
-              onStatusUpdate();
-            }
-          }}
+          onStatusUpdate={onStatusUpdate}
         />
       )}
     </>
   );
 }
-
