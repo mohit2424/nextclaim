@@ -1,3 +1,4 @@
+
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -21,7 +22,13 @@ type Claim = {
   employment_start_date: string | null;
   employment_end_date: string | null;
   separation_reason: SeparationReason;
+  rejection_reason?: string | null;
 };
+
+interface ClaimsTableProps {
+  claims: Claim[];
+  onStatusUpdate?: () => void;
+}
 
 const getStatusColor = (status: ClaimStatus) => {
   const colors = {
