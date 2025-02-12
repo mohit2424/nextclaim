@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
@@ -15,7 +14,6 @@ import { ContactInfoFields } from "@/components/claims/ContactInfoFields";
 import { AddressFields } from "@/components/claims/AddressFields";
 import { ClaimDetailsFields } from "@/components/claims/ClaimDetailsFields";
 import { ArrowLeft } from "lucide-react";
-import type { Database } from "@/integrations/supabase/types";
 
 export const formSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),
@@ -68,21 +66,6 @@ export default function NewClaim() {
     }
   };
 
-  const checkExistingSSN = async (ssn: string) => {
-    const { data, error } = await supabase
-      .from('claims')
-      .select('id')
-      .eq('ssn', ssn)
-      .maybeSingle();
-
-    if (error) {
-      console.error('Error checking SSN:', error);
-      return null;
-    }
-
-    return data;
-  };
-
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
@@ -93,43 +76,34 @@ export default function NewClaim() {
         return;
       }
 
-      // Check if SSN already exists
-      const existingClaim = await checkExistingSSN(values.ssn);
-      if (existingClaim) {
-        toast.info("A claim with this SSN already exists");
-        navigate(`/claims/${existingClaim.id}`);
-        return;
-      }
-
-      type ClaimInsert = Database['public']['Tables']['claims']['Insert'];
-      
-      const newClaim: ClaimInsert = {
-        age: values.age,
-        claim_date: format(values.claimDate, 'yyyy-MM-dd'),
-        claim_status: values.claimStatus,
-        documents: [],
-        email: values.email,
-        employer_name: values.employerName,
-        first_name: values.firstName,
-        last_day_of_work: format(values.lastDayOfWork, 'yyyy-MM-dd'),
-        last_name: values.lastName,
-        middle_name: values.middleName || null,
-        phone: values.phone,
-        pincode: values.pincode,
-        separation_reason: values.separationReason,
-        severance_package: false,
-        ssn: values.ssn,
-        state: values.state,
-        user_id: session.user.id
-      };
-
       const { data, error } = await supabase
         .from('claims')
-        .insert(newClaim)
+        .insert({
+          age: values.age,
+          claim_date: format(values.claimDate, 'yyyy-MM-dd'),
+          claim_status: values.claimStatus,
+          documents: [],
+          email: values.email,
+          employer_name: values.employerName,
+          first_name: values.firstName,
+          last_day_of_work: format(values.lastDayOfWork, 'yyyy-MM-dd'),
+          last_name: values.lastName,
+          middle_name: values.middleName,
+          phone: values.phone,
+          pincode: values.pincode,
+          separation_reason: values.separationReason,
+          severance_package: false,
+          ssn: values.ssn,
+          state: values.state,
+          user_id: session.user.id
+        })
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error submitting claim:', error);
+        throw error;
+      }
 
       toast.success("Claim submitted successfully");
       navigate("/claims");
@@ -146,11 +120,11 @@ export default function NewClaim() {
           <h1 className="text-2xl font-bold">New Unemployment Claim</h1>
           <Button 
             variant="outline" 
-            onClick={() => navigate('/claims')}
+            onClick={() => navigate('/dashboard')}
             className="flex items-center gap-2"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to Claims
+            Back to Dashboard
           </Button>
         </div>
         
@@ -167,7 +141,7 @@ export default function NewClaim() {
               <Button 
                 type="button" 
                 variant="outline"
-                onClick={() => navigate('/claims')}
+                onClick={() => navigate(-1)}
               >
                 Cancel
               </Button>

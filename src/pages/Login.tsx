@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -61,20 +62,22 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="absolute top-8 left-8 right-8 flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-blue-600">NextClaim</h2>
-        <Button variant="outline" size="sm">Contact Us</Button>
-      </div>
-
-      <div className="max-w-md w-full space-y-8">
-        <div className="bg-white rounded-lg shadow-lg px-8 pt-8 pb-6">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 font-inter">
+      <div className="w-full max-w-md">
+        <div className="flex justify-between items-center mb-8">
+          <h2 className="text-2xl font-bold text-blue-600">NextClaim</h2>
+          <Button variant="outline" size="sm">Contact Us</Button>
+        </div>
+        
+        <div className="bg-white p-8 rounded-lg shadow-md">
           <div className="text-center mb-8">
             <h1 className="text-2xl font-semibold mb-2">
-              Welcome Back
+              {resetPasswordMode ? "Reset Password" : "Welcome Back"}
             </h1>
             <p className="text-gray-600">
-              Sign in to manage your unemployment claims
+              {resetPasswordMode 
+                ? "Enter your email to receive reset instructions"
+                : "Sign in to manage your unemployment claims"}
             </p>
           </div>
 
