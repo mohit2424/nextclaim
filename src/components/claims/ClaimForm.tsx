@@ -25,7 +25,8 @@ export function ClaimForm({ onCancel }: ClaimFormProps) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       middleName: "",
-      claimStatus: "initial_review", // Set default but don't show in form
+      claimStatus: "initial_review",
+      separationReason: "layoff" // Set a default separation reason
     },
   });
 
@@ -69,7 +70,7 @@ export function ClaimForm({ onCancel }: ClaimFormProps) {
         id: crypto.randomUUID(),
         age: values.age,
         claim_date: format(values.claimDate, 'yyyy-MM-dd'),
-        claim_status: "initial_review", // Always set to initial_review
+        claim_status: values.claimStatus || "initial_review", // Ensure claim_status is set
         documents: [],
         email: values.email,
         employer_name: values.employerName,
@@ -97,6 +98,8 @@ export function ClaimForm({ onCancel }: ClaimFormProps) {
         console.error('Error submitting claim:', error);
         if (error.code === '23505') {
           toast.error("A claim with this SSN already exists");
+        } else if (error.code === '23502') {
+          toast.error("Please fill in all required fields");
         } else {
           toast.error("Failed to submit claim");
         }
