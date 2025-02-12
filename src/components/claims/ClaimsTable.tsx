@@ -42,6 +42,7 @@ export function ClaimsTable({ claims, onStatusUpdate }: ClaimsTableProps) {
 
   const handleEligibilityCheck = (claim: Claim) => {
     setSelectedClaim(claim);
+    claim.claim_status='rejected';
   };
 
   return (
@@ -125,4 +126,3 @@ export function ClaimsTable({ claims, onStatusUpdate }: ClaimsTableProps) {
     </>
   );
 }
-

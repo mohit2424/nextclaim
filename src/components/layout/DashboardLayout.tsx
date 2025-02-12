@@ -11,7 +11,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         <Navbar />
         <main className="flex-1 p-6 overflow-auto">{children}</main>
         <div className="text-center text-sm text-gray-500 p-4 border-t">
-          Powered by Sails Software
+          Powered by Sails Software Solutions
         </div>
       </div>
     </div>
