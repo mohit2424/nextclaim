@@ -147,6 +147,34 @@ export type Database = {
             referencedRelation: "claims"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "deadlines_claim_id_fkey"
+            columns: ["claim_id"]
+            isOneToOne: false
+            referencedRelation: "in_progress_claims"
+            referencedColumns: ["claim_id"]
+          },
+          {
+            foreignKeyName: "deadlines_claim_id_fkey"
+            columns: ["claim_id"]
+            isOneToOne: false
+            referencedRelation: "invalid_employment_dates"
+            referencedColumns: ["claim_id"]
+          },
+          {
+            foreignKeyName: "deadlines_claim_id_fkey"
+            columns: ["claim_id"]
+            isOneToOne: false
+            referencedRelation: "rejected_claims"
+            referencedColumns: ["claim_id"]
+          },
+          {
+            foreignKeyName: "deadlines_claim_id_fkey"
+            columns: ["claim_id"]
+            isOneToOne: false
+            referencedRelation: "todays_claims"
+            referencedColumns: ["claim_id"]
+          },
         ]
       }
       employer_details: {
@@ -184,7 +212,225 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      in_progress_claims: {
+        Row: {
+          age: number | null
+          claim_date: string | null
+          claim_id: string | null
+          documents: Json | null
+          email: string | null
+          employer_name: string | null
+          employment_end_date: string | null
+          employment_start_date: string | null
+          first_name: string | null
+          last_name: string | null
+          middle_name: string | null
+          phone: string | null
+          pincode: string | null
+          reason_for_unemployment: string | null
+          severance_amount: number | null
+          severance_package: boolean | null
+          ssn: string | null
+          state: string | null
+        }
+        Insert: {
+          age?: number | null
+          claim_date?: string | null
+          claim_id?: string | null
+          documents?: Json | null
+          email?: string | null
+          employer_name?: string | null
+          employment_end_date?: string | null
+          employment_start_date?: string | null
+          first_name?: string | null
+          last_name?: string | null
+          middle_name?: string | null
+          phone?: string | null
+          pincode?: string | null
+          reason_for_unemployment?: string | null
+          severance_amount?: number | null
+          severance_package?: boolean | null
+          ssn?: string | null
+          state?: string | null
+        }
+        Update: {
+          age?: number | null
+          claim_date?: string | null
+          claim_id?: string | null
+          documents?: Json | null
+          email?: string | null
+          employer_name?: string | null
+          employment_end_date?: string | null
+          employment_start_date?: string | null
+          first_name?: string | null
+          last_name?: string | null
+          middle_name?: string | null
+          phone?: string | null
+          pincode?: string | null
+          reason_for_unemployment?: string | null
+          severance_amount?: number | null
+          severance_package?: boolean | null
+          ssn?: string | null
+          state?: string | null
+        }
+        Relationships: []
+      }
+      invalid_employment_dates: {
+        Row: {
+          claim_date: string | null
+          claim_id: string | null
+          employment_end_date: string | null
+          employment_start_date: string | null
+          first_name: string | null
+          last_name: string | null
+        }
+        Insert: {
+          claim_date?: string | null
+          claim_id?: string | null
+          employment_end_date?: string | null
+          employment_start_date?: string | null
+          first_name?: string | null
+          last_name?: string | null
+        }
+        Update: {
+          claim_date?: string | null
+          claim_id?: string | null
+          employment_end_date?: string | null
+          employment_start_date?: string | null
+          first_name?: string | null
+          last_name?: string | null
+        }
+        Relationships: []
+      }
+      rejected_claims: {
+        Row: {
+          age: number | null
+          claim_date: string | null
+          claim_id: string | null
+          documents: Json | null
+          email: string | null
+          employer_name: string | null
+          employment_end_date: string | null
+          employment_start_date: string | null
+          first_name: string | null
+          last_name: string | null
+          middle_name: string | null
+          phone: string | null
+          pincode: string | null
+          reason_for_unemployment: string | null
+          rejection_reason: string | null
+          severance_amount: number | null
+          severance_package: boolean | null
+          ssn: string | null
+          state: string | null
+        }
+        Insert: {
+          age?: number | null
+          claim_date?: string | null
+          claim_id?: string | null
+          documents?: Json | null
+          email?: string | null
+          employer_name?: string | null
+          employment_end_date?: string | null
+          employment_start_date?: string | null
+          first_name?: string | null
+          last_name?: string | null
+          middle_name?: string | null
+          phone?: string | null
+          pincode?: string | null
+          reason_for_unemployment?: string | null
+          rejection_reason?: string | null
+          severance_amount?: number | null
+          severance_package?: boolean | null
+          ssn?: string | null
+          state?: string | null
+        }
+        Update: {
+          age?: number | null
+          claim_date?: string | null
+          claim_id?: string | null
+          documents?: Json | null
+          email?: string | null
+          employer_name?: string | null
+          employment_end_date?: string | null
+          employment_start_date?: string | null
+          first_name?: string | null
+          last_name?: string | null
+          middle_name?: string | null
+          phone?: string | null
+          pincode?: string | null
+          reason_for_unemployment?: string | null
+          rejection_reason?: string | null
+          severance_amount?: number | null
+          severance_package?: boolean | null
+          ssn?: string | null
+          state?: string | null
+        }
+        Relationships: []
+      }
+      todays_claims: {
+        Row: {
+          age: number | null
+          claim_date: string | null
+          claim_id: string | null
+          documents: Json | null
+          email: string | null
+          employer_name: string | null
+          employment_end_date: string | null
+          employment_start_date: string | null
+          first_name: string | null
+          last_name: string | null
+          middle_name: string | null
+          phone: string | null
+          pincode: string | null
+          reason_for_unemployment: string | null
+          severance_amount: number | null
+          severance_package: boolean | null
+          ssn: string | null
+          state: string | null
+        }
+        Insert: {
+          age?: number | null
+          claim_date?: string | null
+          claim_id?: string | null
+          documents?: Json | null
+          email?: string | null
+          employer_name?: string | null
+          employment_end_date?: string | null
+          employment_start_date?: string | null
+          first_name?: string | null
+          last_name?: string | null
+          middle_name?: string | null
+          phone?: string | null
+          pincode?: string | null
+          reason_for_unemployment?: string | null
+          severance_amount?: number | null
+          severance_package?: boolean | null
+          ssn?: string | null
+          state?: string | null
+        }
+        Update: {
+          age?: number | null
+          claim_date?: string | null
+          claim_id?: string | null
+          documents?: Json | null
+          email?: string | null
+          employer_name?: string | null
+          employment_end_date?: string | null
+          employment_start_date?: string | null
+          first_name?: string | null
+          last_name?: string | null
+          middle_name?: string | null
+          phone?: string | null
+          pincode?: string | null
+          reason_for_unemployment?: string | null
+          severance_amount?: number | null
+          severance_package?: boolean | null
+          ssn?: string | null
+          state?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       binary_quantize:

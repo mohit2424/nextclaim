@@ -20,20 +20,16 @@ function generateMockClaims() {
   ];
   const separationReasons = ["layoff", "reduction_in_force", "constructive_discharge", "severance_agreement", "job_abandonment"];
   
-  // Current date for reference
   const currentDate = new Date();
   
-  // Helper function to generate dates
   const generateEmploymentDates = (isEligible: boolean) => {
     const endDate = new Date(currentDate);
-    endDate.setDate(endDate.getDate() - Math.floor(Math.random() * 30)); // End date within last 30 days
+    endDate.setDate(endDate.getDate() - Math.floor(Math.random() * 30));
     
     const startDate = new Date(endDate);
     if (isEligible) {
-      // For eligible claims: 120-365 days of employment
       startDate.setDate(startDate.getDate() - (120 + Math.floor(Math.random() * 245)));
     } else {
-      // For ineligible claims: 30-119 days of employment
       startDate.setDate(startDate.getDate() - (30 + Math.floor(Math.random() * 89)));
     }
     
@@ -46,23 +42,24 @@ function generateMockClaims() {
   return Array.from({ length: 5 }, (_, i) => {
     const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
     const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-    const isEligible = i < 2; // First 2 claims will be eligible, last 3 won't
+    const isEligible = i < 2;
     const { startDate, endDate } = generateEmploymentDates(isEligible);
     
+    const ssn = `${Math.floor(Math.random() * 900 + 100)}-${Math.floor(Math.random() * 100).toString().padStart(2, '0')}-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
+    
     return {
-      id: crypto.randomUUID(),
       first_name: firstName,
       middle_name: `${firstName[0]}`,
       last_name: lastName,
       age: Math.floor(Math.random() * (65 - 18) + 18),
       state: states[Math.floor(Math.random() * states.length)],
       pincode: Math.floor(Math.random() * 90000 + 10000).toString(),
-      ssn: `${Math.floor(Math.random() * 900 + 100)}-${Math.floor(Math.random() * 100).toString().padStart(2, '0')}-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`,
+      ssn,
       email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@example.com`,
       phone: `${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 9000 + 1000)}`,
       employer_name: employers[Math.floor(Math.random() * employers.length)],
       claim_date: new Date().toISOString().split('T')[0],
-      claim_status: "initial_review", // Always set to initial_review as per our new schema
+      claim_status: "initial_review",
       separation_reason: separationReasons[Math.floor(Math.random() * separationReasons.length)],
       employment_start_date: startDate,
       employment_end_date: endDate,
@@ -94,22 +91,23 @@ serve(async (req) => {
           .from('claims')
           .insert(claim)
           .select()
-          .single()
         
         if (error) {
           console.error(`Error inserting claim:`, error)
           continue
         }
         
-        results.push(data)
+        if (data && data.length > 0) {
+          results.push(data[0])
+        }
         
       } catch (error) {
-        // Log the error but continue processing other claims
         console.error(`Error processing claim:`, error)
       }
     }
 
     const message = `Processed ${mockClaims.length} claims: ${results.length} imported`
+    console.log(message)
 
     return new Response(
       JSON.stringify({ 
