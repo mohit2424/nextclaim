@@ -13,7 +13,7 @@ export type Database = {
         Row: {
           age: number
           claim_date: string
-          claim_status: Database["public"]["Enums"]["claim_status"]
+          claim_status: Database["public"]["Enums"]["claim_status"] | null
           created_at: string
           documents: Json | null
           email: string
@@ -42,7 +42,7 @@ export type Database = {
         Insert: {
           age: number
           claim_date: string
-          claim_status: Database["public"]["Enums"]["claim_status"]
+          claim_status?: Database["public"]["Enums"]["claim_status"] | null
           created_at?: string
           documents?: Json | null
           email: string
@@ -71,7 +71,7 @@ export type Database = {
         Update: {
           age?: number
           claim_date?: string
-          claim_status?: Database["public"]["Enums"]["claim_status"]
+          claim_status?: Database["public"]["Enums"]["claim_status"] | null
           created_at?: string
           documents?: Json | null
           email?: string
