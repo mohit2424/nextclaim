@@ -67,7 +67,7 @@ export default function Login() {
         <Button variant="outline" size="sm">Contact Us</Button>
       </div>
 
-      <div className="max-w-md w-full space-y-8">
+      <div className="max-w-md w-full space-y-8 login">
         <div className="bg-white rounded-lg shadow-lg px-8 pt-8 pb-6">
           <div className="text-center mb-8">
             <h1 className="text-2xl font-semibold mb-2">
