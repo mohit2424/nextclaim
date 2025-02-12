@@ -13,11 +13,13 @@ export type Database = {
         Row: {
           age: number
           claim_date: string
-          claim_status: Database["public"]["Enums"]["claim_status"]
+          claim_status: Database["public"]["Enums"]["old_claim_status"]
           created_at: string
           documents: Json | null
           email: string
           employer_name: string
+          employment_end_date: string
+          employment_start_date: string
           first_name: string
           id: string
           last_day_of_work: string | null
@@ -26,7 +28,10 @@ export type Database = {
           phone: string
           pincode: string
           reason_for_unemployment: string | null
-          separation_reason: Database["public"]["Enums"]["separation_reason"]
+          rejection_reason: string | null
+          separation_reason:
+            | Database["public"]["Enums"]["separation_reason"]
+            | null
           severance_amount: number | null
           severance_package: boolean | null
           ssn: string
@@ -37,11 +42,13 @@ export type Database = {
         Insert: {
           age: number
           claim_date: string
-          claim_status?: Database["public"]["Enums"]["claim_status"]
+          claim_status?: Database["public"]["Enums"]["old_claim_status"]
           created_at?: string
           documents?: Json | null
           email: string
           employer_name: string
+          employment_end_date: string
+          employment_start_date: string
           first_name: string
           id: string
           last_day_of_work?: string | null
@@ -50,7 +57,10 @@ export type Database = {
           phone: string
           pincode: string
           reason_for_unemployment?: string | null
-          separation_reason: Database["public"]["Enums"]["separation_reason"]
+          rejection_reason?: string | null
+          separation_reason?:
+            | Database["public"]["Enums"]["separation_reason"]
+            | null
           severance_amount?: number | null
           severance_package?: boolean | null
           ssn: string
@@ -61,11 +71,13 @@ export type Database = {
         Update: {
           age?: number
           claim_date?: string
-          claim_status?: Database["public"]["Enums"]["claim_status"]
+          claim_status?: Database["public"]["Enums"]["old_claim_status"]
           created_at?: string
           documents?: Json | null
           email?: string
           employer_name?: string
+          employment_end_date?: string
+          employment_start_date?: string
           first_name?: string
           id?: string
           last_day_of_work?: string | null
@@ -74,7 +86,10 @@ export type Database = {
           phone?: string
           pincode?: string
           reason_for_unemployment?: string | null
-          separation_reason?: Database["public"]["Enums"]["separation_reason"]
+          rejection_reason?: string | null
+          separation_reason?:
+            | Database["public"]["Enums"]["separation_reason"]
+            | null
           severance_amount?: number | null
           severance_package?: boolean | null
           ssn?: string
@@ -132,59 +147,491 @@ export type Database = {
             referencedRelation: "claims"
             referencedColumns: ["id"]
           },
-        ]
-      }
-      messages: {
-        Row: {
-          claim_id: string | null
-          created_at: string
-          id: string
-          message_text: string
-          recipient_email: string
-          sender_email: string
-          sender_name: string
-          sender_role: string
-        }
-        Insert: {
-          claim_id?: string | null
-          created_at?: string
-          id?: string
-          message_text: string
-          recipient_email: string
-          sender_email: string
-          sender_name: string
-          sender_role: string
-        }
-        Update: {
-          claim_id?: string | null
-          created_at?: string
-          id?: string
-          message_text?: string
-          recipient_email?: string
-          sender_email?: string
-          sender_name?: string
-          sender_role?: string
-        }
-        Relationships: [
           {
-            foreignKeyName: "messages_claim_id_fkey"
+            foreignKeyName: "deadlines_claim_id_fkey"
             columns: ["claim_id"]
             isOneToOne: false
-            referencedRelation: "claims"
-            referencedColumns: ["id"]
+            referencedRelation: "in_progress_claims"
+            referencedColumns: ["claim_id"]
+          },
+          {
+            foreignKeyName: "deadlines_claim_id_fkey"
+            columns: ["claim_id"]
+            isOneToOne: false
+            referencedRelation: "invalid_employment_dates"
+            referencedColumns: ["claim_id"]
+          },
+          {
+            foreignKeyName: "deadlines_claim_id_fkey"
+            columns: ["claim_id"]
+            isOneToOne: false
+            referencedRelation: "rejected_claims"
+            referencedColumns: ["claim_id"]
+          },
+          {
+            foreignKeyName: "deadlines_claim_id_fkey"
+            columns: ["claim_id"]
+            isOneToOne: false
+            referencedRelation: "todays_claims"
+            referencedColumns: ["claim_id"]
           },
         ]
       }
+      employer_details: {
+        Row: {
+          company_name: string
+          created_at: string
+          email_address: string
+          employer_address: string
+          employer_id: string
+          hr_representative: string
+          phone_number: string
+          updated_at: string
+        }
+        Insert: {
+          company_name: string
+          created_at?: string
+          email_address: string
+          employer_address?: string
+          employer_id?: string
+          hr_representative: string
+          phone_number: string
+          updated_at?: string
+        }
+        Update: {
+          company_name?: string
+          created_at?: string
+          email_address?: string
+          employer_address?: string
+          employer_id?: string
+          hr_representative?: string
+          phone_number?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
-      [_ in never]: never
+      in_progress_claims: {
+        Row: {
+          age: number | null
+          claim_date: string | null
+          claim_id: string | null
+          documents: Json | null
+          email: string | null
+          employer_name: string | null
+          employment_end_date: string | null
+          employment_start_date: string | null
+          first_name: string | null
+          last_name: string | null
+          middle_name: string | null
+          phone: string | null
+          pincode: string | null
+          reason_for_unemployment: string | null
+          severance_amount: number | null
+          severance_package: boolean | null
+          ssn: string | null
+          state: string | null
+        }
+        Insert: {
+          age?: number | null
+          claim_date?: string | null
+          claim_id?: string | null
+          documents?: Json | null
+          email?: string | null
+          employer_name?: string | null
+          employment_end_date?: string | null
+          employment_start_date?: string | null
+          first_name?: string | null
+          last_name?: string | null
+          middle_name?: string | null
+          phone?: string | null
+          pincode?: string | null
+          reason_for_unemployment?: string | null
+          severance_amount?: number | null
+          severance_package?: boolean | null
+          ssn?: string | null
+          state?: string | null
+        }
+        Update: {
+          age?: number | null
+          claim_date?: string | null
+          claim_id?: string | null
+          documents?: Json | null
+          email?: string | null
+          employer_name?: string | null
+          employment_end_date?: string | null
+          employment_start_date?: string | null
+          first_name?: string | null
+          last_name?: string | null
+          middle_name?: string | null
+          phone?: string | null
+          pincode?: string | null
+          reason_for_unemployment?: string | null
+          severance_amount?: number | null
+          severance_package?: boolean | null
+          ssn?: string | null
+          state?: string | null
+        }
+        Relationships: []
+      }
+      invalid_employment_dates: {
+        Row: {
+          claim_date: string | null
+          claim_id: string | null
+          employment_end_date: string | null
+          employment_start_date: string | null
+          first_name: string | null
+          last_name: string | null
+        }
+        Insert: {
+          claim_date?: string | null
+          claim_id?: string | null
+          employment_end_date?: string | null
+          employment_start_date?: string | null
+          first_name?: string | null
+          last_name?: string | null
+        }
+        Update: {
+          claim_date?: string | null
+          claim_id?: string | null
+          employment_end_date?: string | null
+          employment_start_date?: string | null
+          first_name?: string | null
+          last_name?: string | null
+        }
+        Relationships: []
+      }
+      rejected_claims: {
+        Row: {
+          age: number | null
+          claim_date: string | null
+          claim_id: string | null
+          documents: Json | null
+          email: string | null
+          employer_name: string | null
+          employment_end_date: string | null
+          employment_start_date: string | null
+          first_name: string | null
+          last_name: string | null
+          middle_name: string | null
+          phone: string | null
+          pincode: string | null
+          reason_for_unemployment: string | null
+          rejection_reason: string | null
+          severance_amount: number | null
+          severance_package: boolean | null
+          ssn: string | null
+          state: string | null
+        }
+        Insert: {
+          age?: number | null
+          claim_date?: string | null
+          claim_id?: string | null
+          documents?: Json | null
+          email?: string | null
+          employer_name?: string | null
+          employment_end_date?: string | null
+          employment_start_date?: string | null
+          first_name?: string | null
+          last_name?: string | null
+          middle_name?: string | null
+          phone?: string | null
+          pincode?: string | null
+          reason_for_unemployment?: string | null
+          rejection_reason?: string | null
+          severance_amount?: number | null
+          severance_package?: boolean | null
+          ssn?: string | null
+          state?: string | null
+        }
+        Update: {
+          age?: number | null
+          claim_date?: string | null
+          claim_id?: string | null
+          documents?: Json | null
+          email?: string | null
+          employer_name?: string | null
+          employment_end_date?: string | null
+          employment_start_date?: string | null
+          first_name?: string | null
+          last_name?: string | null
+          middle_name?: string | null
+          phone?: string | null
+          pincode?: string | null
+          reason_for_unemployment?: string | null
+          rejection_reason?: string | null
+          severance_amount?: number | null
+          severance_package?: boolean | null
+          ssn?: string | null
+          state?: string | null
+        }
+        Relationships: []
+      }
+      todays_claims: {
+        Row: {
+          age: number | null
+          claim_date: string | null
+          claim_id: string | null
+          documents: Json | null
+          email: string | null
+          employer_name: string | null
+          employment_end_date: string | null
+          employment_start_date: string | null
+          first_name: string | null
+          last_name: string | null
+          middle_name: string | null
+          phone: string | null
+          pincode: string | null
+          reason_for_unemployment: string | null
+          severance_amount: number | null
+          severance_package: boolean | null
+          ssn: string | null
+          state: string | null
+        }
+        Insert: {
+          age?: number | null
+          claim_date?: string | null
+          claim_id?: string | null
+          documents?: Json | null
+          email?: string | null
+          employer_name?: string | null
+          employment_end_date?: string | null
+          employment_start_date?: string | null
+          first_name?: string | null
+          last_name?: string | null
+          middle_name?: string | null
+          phone?: string | null
+          pincode?: string | null
+          reason_for_unemployment?: string | null
+          severance_amount?: number | null
+          severance_package?: boolean | null
+          ssn?: string | null
+          state?: string | null
+        }
+        Update: {
+          age?: number | null
+          claim_date?: string | null
+          claim_id?: string | null
+          documents?: Json | null
+          email?: string | null
+          employer_name?: string | null
+          employment_end_date?: string | null
+          employment_start_date?: string | null
+          first_name?: string | null
+          last_name?: string | null
+          middle_name?: string | null
+          phone?: string | null
+          pincode?: string | null
+          reason_for_unemployment?: string | null
+          severance_amount?: number | null
+          severance_package?: boolean | null
+          ssn?: string | null
+          state?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      [_ in never]: never
+      binary_quantize:
+        | {
+            Args: {
+              "": string
+            }
+            Returns: unknown
+          }
+        | {
+            Args: {
+              "": unknown
+            }
+            Returns: unknown
+          }
+      check_claim_eligibility: {
+        Args: {
+          start_date: string
+          end_date: string
+        }
+        Returns: boolean
+      }
+      halfvec_avg: {
+        Args: {
+          "": number[]
+        }
+        Returns: unknown
+      }
+      halfvec_out: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      halfvec_send: {
+        Args: {
+          "": unknown
+        }
+        Returns: string
+      }
+      halfvec_typmod_in: {
+        Args: {
+          "": unknown[]
+        }
+        Returns: number
+      }
+      hnsw_bit_support: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      hnsw_halfvec_support: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      hnsw_sparsevec_support: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      hnswhandler: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      ivfflat_bit_support: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      ivfflat_halfvec_support: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      ivfflathandler: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      l2_norm:
+        | {
+            Args: {
+              "": unknown
+            }
+            Returns: number
+          }
+        | {
+            Args: {
+              "": unknown
+            }
+            Returns: number
+          }
+      l2_normalize:
+        | {
+            Args: {
+              "": string
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              "": unknown
+            }
+            Returns: unknown
+          }
+        | {
+            Args: {
+              "": unknown
+            }
+            Returns: unknown
+          }
+      sparsevec_out: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      sparsevec_send: {
+        Args: {
+          "": unknown
+        }
+        Returns: string
+      }
+      sparsevec_typmod_in: {
+        Args: {
+          "": unknown[]
+        }
+        Returns: number
+      }
+      validate_ssn: {
+        Args: {
+          ssn: string
+        }
+        Returns: boolean
+      }
+      vector_avg: {
+        Args: {
+          "": number[]
+        }
+        Returns: string
+      }
+      vector_dims:
+        | {
+            Args: {
+              "": string
+            }
+            Returns: number
+          }
+        | {
+            Args: {
+              "": unknown
+            }
+            Returns: number
+          }
+      vector_norm: {
+        Args: {
+          "": string
+        }
+        Returns: number
+      }
+      vector_out: {
+        Args: {
+          "": string
+        }
+        Returns: unknown
+      }
+      vector_send: {
+        Args: {
+          "": string
+        }
+        Returns: string
+      }
+      vector_typmod_in: {
+        Args: {
+          "": unknown[]
+        }
+        Returns: number
+      }
     }
     Enums: {
-      claim_status: "initial_review" | "pending" | "approved" | "rejected"
+      claim_status: "initial_review" | "in_progress" | "rejected"
+      claim_status_type: "initial_review" | "in_progress" | "rejected"
+      old_claim_status: "initial_review" | "in_progress" | "rejected"
       separation_reason:
+        | "resignation"
+        | "termination_misconduct"
+        | "layoff"
+        | "reduction_in_force"
+        | "constructive_discharge"
+        | "job_abandonment"
+        | "severance_agreement"
+      separation_reason_type:
         | "resignation"
         | "termination_misconduct"
         | "layoff"
@@ -209,7 +656,7 @@ export type Database = {
         phone: string | null
         employer_name: string | null
         claim_date: string | null
-        claim_status: Database["public"]["Enums"]["claim_status"] | null
+        claim_status: Database["public"]["Enums"]["old_claim_status"] | null
         separation_reason:
           | Database["public"]["Enums"]["separation_reason"]
           | null
