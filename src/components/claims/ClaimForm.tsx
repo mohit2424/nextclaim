@@ -83,7 +83,7 @@ export function ClaimForm({ onCancel }: ClaimFormProps) {
 
       if (error) {
         if (error.code === '23505') {
-          toast.error("A claim with this SSN already exists");
+          toast.error("A claim with this SSN already exists testing");
         } else {
           throw error;
         }
