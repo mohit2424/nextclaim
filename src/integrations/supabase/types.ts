@@ -13,7 +13,7 @@ export type Database = {
         Row: {
           age: number
           claim_date: string
-          claim_status: Database["public"]["Enums"]["claim_status"] | null
+          claim_status: Database["public"]["Enums"]["old_claim_status"]
           created_at: string
           documents: Json | null
           email: string
@@ -42,7 +42,7 @@ export type Database = {
         Insert: {
           age: number
           claim_date: string
-          claim_status?: Database["public"]["Enums"]["claim_status"] | null
+          claim_status?: Database["public"]["Enums"]["old_claim_status"]
           created_at?: string
           documents?: Json | null
           email: string
@@ -71,7 +71,7 @@ export type Database = {
         Update: {
           age?: number
           claim_date?: string
-          claim_status?: Database["public"]["Enums"]["claim_status"] | null
+          claim_status?: Database["public"]["Enums"]["old_claim_status"]
           created_at?: string
           documents?: Json | null
           email?: string
@@ -147,34 +147,6 @@ export type Database = {
             referencedRelation: "claims"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "deadlines_claim_id_fkey"
-            columns: ["claim_id"]
-            isOneToOne: false
-            referencedRelation: "in_progress_claims"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "deadlines_claim_id_fkey"
-            columns: ["claim_id"]
-            isOneToOne: false
-            referencedRelation: "invalid_employment_dates"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "deadlines_claim_id_fkey"
-            columns: ["claim_id"]
-            isOneToOne: false
-            referencedRelation: "rejected_claims"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "deadlines_claim_id_fkey"
-            columns: ["claim_id"]
-            isOneToOne: false
-            referencedRelation: "todays_claims"
-            referencedColumns: ["claim_id"]
-          },
         ]
       }
       employer_details: {
@@ -212,282 +184,7 @@ export type Database = {
       }
     }
     Views: {
-      in_progress_claims: {
-        Row: {
-          age: number | null
-          claim_date: string | null
-          claim_status: Database["public"]["Enums"]["claim_status"] | null
-          created_at: string | null
-          documents: Json | null
-          email: string | null
-          employer_name: string | null
-          employment_end_date: string | null
-          employment_start_date: string | null
-          first_name: string | null
-          id: string | null
-          last_name: string | null
-          middle_name: string | null
-          phone: string | null
-          pincode: string | null
-          reason_for_unemployment: string | null
-          rejection_reason: string | null
-          separation_reason:
-            | Database["public"]["Enums"]["separation_reason"]
-            | null
-          severance_amount: number | null
-          severance_package: boolean | null
-          ssn: string | null
-          state: string | null
-          updated_at: string | null
-          user_id: string | null
-        }
-        Insert: {
-          age?: number | null
-          claim_date?: string | null
-          claim_status?: Database["public"]["Enums"]["claim_status"] | null
-          created_at?: string | null
-          documents?: Json | null
-          email?: string | null
-          employer_name?: string | null
-          employment_end_date?: string | null
-          employment_start_date?: string | null
-          first_name?: string | null
-          id?: string | null
-          last_name?: string | null
-          middle_name?: string | null
-          phone?: string | null
-          pincode?: string | null
-          reason_for_unemployment?: string | null
-          rejection_reason?: string | null
-          separation_reason?:
-            | Database["public"]["Enums"]["separation_reason"]
-            | null
-          severance_amount?: number | null
-          severance_package?: boolean | null
-          ssn?: string | null
-          state?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          age?: number | null
-          claim_date?: string | null
-          claim_status?: Database["public"]["Enums"]["claim_status"] | null
-          created_at?: string | null
-          documents?: Json | null
-          email?: string | null
-          employer_name?: string | null
-          employment_end_date?: string | null
-          employment_start_date?: string | null
-          first_name?: string | null
-          id?: string | null
-          last_name?: string | null
-          middle_name?: string | null
-          phone?: string | null
-          pincode?: string | null
-          reason_for_unemployment?: string | null
-          rejection_reason?: string | null
-          separation_reason?:
-            | Database["public"]["Enums"]["separation_reason"]
-            | null
-          severance_amount?: number | null
-          severance_package?: boolean | null
-          ssn?: string | null
-          state?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Relationships: []
-      }
-      invalid_employment_dates: {
-        Row: {
-          employment_end_date: string | null
-          employment_start_date: string | null
-          id: string | null
-        }
-        Insert: {
-          employment_end_date?: string | null
-          employment_start_date?: string | null
-          id?: string | null
-        }
-        Update: {
-          employment_end_date?: string | null
-          employment_start_date?: string | null
-          id?: string | null
-        }
-        Relationships: []
-      }
-      rejected_claims: {
-        Row: {
-          age: number | null
-          claim_date: string | null
-          claim_status: Database["public"]["Enums"]["claim_status"] | null
-          created_at: string | null
-          documents: Json | null
-          email: string | null
-          employer_name: string | null
-          employment_end_date: string | null
-          employment_start_date: string | null
-          first_name: string | null
-          id: string | null
-          last_name: string | null
-          middle_name: string | null
-          phone: string | null
-          pincode: string | null
-          reason_for_unemployment: string | null
-          rejection_reason: string | null
-          separation_reason:
-            | Database["public"]["Enums"]["separation_reason"]
-            | null
-          severance_amount: number | null
-          severance_package: boolean | null
-          ssn: string | null
-          state: string | null
-          updated_at: string | null
-          user_id: string | null
-        }
-        Insert: {
-          age?: number | null
-          claim_date?: string | null
-          claim_status?: Database["public"]["Enums"]["claim_status"] | null
-          created_at?: string | null
-          documents?: Json | null
-          email?: string | null
-          employer_name?: string | null
-          employment_end_date?: string | null
-          employment_start_date?: string | null
-          first_name?: string | null
-          id?: string | null
-          last_name?: string | null
-          middle_name?: string | null
-          phone?: string | null
-          pincode?: string | null
-          reason_for_unemployment?: string | null
-          rejection_reason?: string | null
-          separation_reason?:
-            | Database["public"]["Enums"]["separation_reason"]
-            | null
-          severance_amount?: number | null
-          severance_package?: boolean | null
-          ssn?: string | null
-          state?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          age?: number | null
-          claim_date?: string | null
-          claim_status?: Database["public"]["Enums"]["claim_status"] | null
-          created_at?: string | null
-          documents?: Json | null
-          email?: string | null
-          employer_name?: string | null
-          employment_end_date?: string | null
-          employment_start_date?: string | null
-          first_name?: string | null
-          id?: string | null
-          last_name?: string | null
-          middle_name?: string | null
-          phone?: string | null
-          pincode?: string | null
-          reason_for_unemployment?: string | null
-          rejection_reason?: string | null
-          separation_reason?:
-            | Database["public"]["Enums"]["separation_reason"]
-            | null
-          severance_amount?: number | null
-          severance_package?: boolean | null
-          ssn?: string | null
-          state?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Relationships: []
-      }
-      todays_claims: {
-        Row: {
-          age: number | null
-          claim_date: string | null
-          claim_id: string | null
-          claim_status: Database["public"]["Enums"]["claim_status"] | null
-          created_at: string | null
-          documents: Json | null
-          email: string | null
-          employer_name: string | null
-          employment_end_date: string | null
-          employment_start_date: string | null
-          first_name: string | null
-          last_name: string | null
-          middle_name: string | null
-          phone: string | null
-          pincode: string | null
-          reason_for_unemployment: string | null
-          separation_reason:
-            | Database["public"]["Enums"]["separation_reason"]
-            | null
-          severance_amount: number | null
-          severance_package: boolean | null
-          ssn: string | null
-          state: string | null
-          updated_at: string | null
-          user_id: string | null
-        }
-        Insert: {
-          age?: number | null
-          claim_date?: string | null
-          claim_id?: string | null
-          claim_status?: Database["public"]["Enums"]["claim_status"] | null
-          created_at?: string | null
-          documents?: Json | null
-          email?: string | null
-          employer_name?: string | null
-          employment_end_date?: string | null
-          employment_start_date?: string | null
-          first_name?: string | null
-          last_name?: string | null
-          middle_name?: string | null
-          phone?: string | null
-          pincode?: string | null
-          reason_for_unemployment?: string | null
-          separation_reason?:
-            | Database["public"]["Enums"]["separation_reason"]
-            | null
-          severance_amount?: number | null
-          severance_package?: boolean | null
-          ssn?: string | null
-          state?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          age?: number | null
-          claim_date?: string | null
-          claim_id?: string | null
-          claim_status?: Database["public"]["Enums"]["claim_status"] | null
-          created_at?: string | null
-          documents?: Json | null
-          email?: string | null
-          employer_name?: string | null
-          employment_end_date?: string | null
-          employment_start_date?: string | null
-          first_name?: string | null
-          last_name?: string | null
-          middle_name?: string | null
-          phone?: string | null
-          pincode?: string | null
-          reason_for_unemployment?: string | null
-          separation_reason?:
-            | Database["public"]["Enums"]["separation_reason"]
-            | null
-          severance_amount?: number | null
-          severance_package?: boolean | null
-          ssn?: string | null
-          state?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       binary_quantize:
@@ -679,6 +376,7 @@ export type Database = {
     Enums: {
       claim_status: "initial_review" | "in_progress" | "rejected"
       claim_status_type: "initial_review" | "in_progress" | "rejected"
+      old_claim_status: "initial_review" | "in_progress" | "rejected"
       separation_reason:
         | "resignation"
         | "termination_misconduct"
@@ -712,7 +410,7 @@ export type Database = {
         phone: string | null
         employer_name: string | null
         claim_date: string | null
-        claim_status: Database["public"]["Enums"]["claim_status"] | null
+        claim_status: Database["public"]["Enums"]["old_claim_status"] | null
         separation_reason:
           | Database["public"]["Enums"]["separation_reason"]
           | null

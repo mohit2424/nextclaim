@@ -25,7 +25,6 @@ export function ClaimForm({ onCancel }: ClaimFormProps) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       middleName: "",
-      claimStatus: "initial_review",
       separationReason: "layoff" // Set a default separation reason
     },
   });
@@ -70,7 +69,6 @@ export function ClaimForm({ onCancel }: ClaimFormProps) {
         id: crypto.randomUUID(),
         age: values.age,
         claim_date: format(values.claimDate, 'yyyy-MM-dd'),
-        claim_status: values.claimStatus || "initial_review", // Ensure claim_status is set
         documents: [],
         email: values.email,
         employer_name: values.employerName,
