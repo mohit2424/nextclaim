@@ -50,18 +50,19 @@ function generateMockClaims() {
     const { startDate, endDate } = generateEmploymentDates(isEligible);
     
     return {
+      id: crypto.randomUUID(),
       first_name: firstName,
       middle_name: `${firstName[0]}`,
       last_name: lastName,
       age: Math.floor(Math.random() * (65 - 18) + 18),
       state: states[Math.floor(Math.random() * states.length)],
       pincode: Math.floor(Math.random() * 90000 + 10000).toString(),
-      ssn: crypto.randomUUID().slice(0, 11), // Generate unique SSNs instead of checking for duplicates
+      ssn: `${Math.floor(Math.random() * 900 + 100)}-${Math.floor(Math.random() * 100).toString().padStart(2, '0')}-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`,
       email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@example.com`,
       phone: `${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 9000 + 1000)}`,
       employer_name: employers[Math.floor(Math.random() * employers.length)],
       claim_date: new Date().toISOString().split('T')[0],
-      claim_status: "initial_review", // Always set to initial_review
+      claim_status: "initial_review", // Always set to initial_review as per our new schema
       separation_reason: separationReasons[Math.floor(Math.random() * separationReasons.length)],
       employment_start_date: startDate,
       employment_end_date: endDate,
@@ -93,13 +94,14 @@ serve(async (req) => {
           .from('claims')
           .insert(claim)
           .select()
+          .single()
         
         if (error) {
           console.error(`Error inserting claim:`, error)
           continue
         }
         
-        results.push(data[0])
+        results.push(data)
         
       } catch (error) {
         // Log the error but continue processing other claims
