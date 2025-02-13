@@ -39,7 +39,6 @@ export interface Claim {
   severance_package: boolean;
   severance_amount: number | null;
   reason_for_unemployment: string | null;
-  last_day_of_work: string | null;
   user_id: string;
 }
 
@@ -71,9 +70,10 @@ export default function ClaimDetails() {
       const formattedClaim: Claim = {
         ...data,
         documents: data.documents || [],
-        last_day_of_work: data.last_day_of_work || null,
         severance_amount: data.severance_amount || null,
-        reason_for_unemployment: data.reason_for_unemployment || null
+        reason_for_unemployment: data.reason_for_unemployment || null,
+        middle_name: data.middle_name || null,
+        rejection_reason: data.rejection_reason || null
       };
       setClaim(formattedClaim);
       setEditedClaim(formattedClaim);
