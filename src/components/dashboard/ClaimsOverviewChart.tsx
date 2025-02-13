@@ -22,82 +22,124 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { startOfMonth, endOfMonth, format, subMonths, startOfYear, endOfYear, subYears } from "date-fns";
+import { toast } from "sonner";
 
 const fetchMonthlyData = async (year: string) => {
-  const startDate = `${year}-01-01`;
-  const endDate = `${year}-12-31`;
-  
-  const { data: claims } = await supabase
-    .from('claims')
-    .select('created_at')
-    .gte('created_at', startDate)
-    .lte('created_at', endDate);
+  try {
+    const startDate = `${year}-01-01`;
+    const endDate = `${year}-12-31`;
+    
+    const { data: claims, error } = await supabase
+      .from('claims')
+      .select('created_at')
+      .gte('created_at', startDate)
+      .lte('created_at', endDate);
 
-  if (!claims) return [];
+    if (error) {
+      console.error('Error fetching claims:', error);
+      throw error;
+    }
 
-  // Initialize all months with 0
-  const monthsData = Array.from({ length: 12 }, (_, i) => ({
-    month: format(new Date(parseInt(year), i), 'MMM'),
-    claims: 0
-  }));
+    if (!claims) return [];
 
-  // Count claims per month
-  claims.forEach(claim => {
-    const monthIndex = new Date(claim.created_at).getMonth();
-    monthsData[monthIndex].claims++;
-  });
+    // Initialize all months with 0
+    const monthsData = Array.from({ length: 12 }, (_, i) => ({
+      month: format(new Date(parseInt(year), i), 'MMM'),
+      claims: 0
+    }));
 
-  return monthsData;
+    // Count claims per month
+    claims.forEach(claim => {
+      const monthIndex = new Date(claim.created_at).getMonth();
+      monthsData[monthIndex].claims++;
+    });
+
+    return monthsData;
+  } catch (error) {
+    console.error('Error in fetchMonthlyData:', error);
+    throw error;
+  }
 };
 
 const fetchYearlyData = async () => {
-  const currentYear = new Date().getFullYear();
-  const fiveYearsAgo = currentYear - 4;
-  
-  const { data: claims } = await supabase
-    .from('claims')
-    .select('created_at')
-    .gte('created_at', `${fiveYearsAgo}-01-01`);
+  try {
+    const currentYear = new Date().getFullYear();
+    const fiveYearsAgo = currentYear - 4;
+    
+    const { data: claims, error } = await supabase
+      .from('claims')
+      .select('created_at')
+      .gte('created_at', `${fiveYearsAgo}-01-01`);
 
-  if (!claims) return [];
-
-  // Initialize years with 0
-  const yearsData = Array.from({ length: 5 }, (_, i) => ({
-    year: (fiveYearsAgo + i).toString(),
-    claims: 0
-  }));
-
-  // Count claims per year
-  claims.forEach(claim => {
-    const year = new Date(claim.created_at).getFullYear();
-    const yearIndex = year - fiveYearsAgo;
-    if (yearIndex >= 0 && yearIndex < 5) {
-      yearsData[yearIndex].claims++;
+    if (error) {
+      console.error('Error fetching claims:', error);
+      throw error;
     }
-  });
 
-  return yearsData;
+    if (!claims) return [];
+
+    // Initialize years with 0
+    const yearsData = Array.from({ length: 5 }, (_, i) => ({
+      year: (fiveYearsAgo + i).toString(),
+      claims: 0
+    }));
+
+    // Count claims per year
+    claims.forEach(claim => {
+      const year = new Date(claim.created_at).getFullYear();
+      const yearIndex = year - fiveYearsAgo;
+      if (yearIndex >= 0 && yearIndex < 5) {
+        yearsData[yearIndex].claims++;
+      }
+    });
+
+    return yearsData;
+  } catch (error) {
+    console.error('Error in fetchYearlyData:', error);
+    throw error;
+  }
 };
 
 export function ClaimsOverviewChart() {
   const [isMonthly, setIsMonthly] = useState(true);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
 
-  const { data: monthlyData = [], isLoading: isLoadingMonthly } = useQuery({
+  const { data: monthlyData = [], isLoading: isLoadingMonthly, error: monthlyError } = useQuery({
     queryKey: ['monthlyClaimsData', selectedYear],
     queryFn: () => fetchMonthlyData(selectedYear),
-    enabled: isMonthly
+    enabled: isMonthly,
+    retry: 3,
+    onError: (error) => {
+      console.error('Error fetching monthly data:', error);
+      toast.error('Failed to load monthly claims data');
+    }
   });
 
-  const { data: yearlyData = [], isLoading: isLoadingYearly } = useQuery({
+  const { data: yearlyData = [], isLoading: isLoadingYearly, error: yearlyError } = useQuery({
     queryKey: ['yearlyClaimsData'],
     queryFn: fetchYearlyData,
-    enabled: !isMonthly
+    enabled: !isMonthly,
+    retry: 3,
+    onError: (error) => {
+      console.error('Error fetching yearly data:', error);
+      toast.error('Failed to load yearly claims data');
+    }
   });
 
   const data = isMonthly ? monthlyData : yearlyData;
   const xAxisKey = isMonthly ? "month" : "year";
   const isLoading = isMonthly ? isLoadingMonthly : isLoadingYearly;
+  const error = isMonthly ? monthlyError : yearlyError;
+
+  if (error) {
+    return (
+      <Card className="p-6">
+        <div className="text-center text-red-500">
+          Failed to load claims data. Please try again later.
+        </div>
+      </Card>
+    );
+  }
 
   if (isLoading) {
     return (
