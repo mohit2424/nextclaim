@@ -22,12 +22,15 @@ export type Database = {
           employment_start_date: string
           first_name: string
           id: string
+          last_day_of_work: string | null
           last_name: string
           middle_name: string | null
           phone: string
           pincode: string
+          reason_for_unemployment: string | null
           rejection_reason: string | null
           separation_reason: Database["public"]["Enums"]["separation_reason"]
+          severance_amount: number | null
           severance_package: boolean | null
           ssn: string
           state: string
@@ -46,12 +49,15 @@ export type Database = {
           employment_start_date: string
           first_name: string
           id: string
+          last_day_of_work?: string | null
           last_name: string
           middle_name?: string | null
           phone: string
           pincode: string
+          reason_for_unemployment?: string | null
           rejection_reason?: string | null
           separation_reason: Database["public"]["Enums"]["separation_reason"]
+          severance_amount?: number | null
           severance_package?: boolean | null
           ssn: string
           state: string
@@ -70,12 +76,15 @@ export type Database = {
           employment_start_date?: string
           first_name?: string
           id?: string
+          last_day_of_work?: string | null
           last_name?: string
           middle_name?: string | null
           phone?: string
           pincode?: string
+          reason_for_unemployment?: string | null
           rejection_reason?: string | null
           separation_reason?: Database["public"]["Enums"]["separation_reason"]
+          severance_amount?: number | null
           severance_package?: boolean | null
           ssn?: string
           state?: string
@@ -192,6 +201,75 @@ export type Database = {
           hr_representative?: string
           phone_number?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      user_profile: {
+        Row: {
+          auth_id: string | null
+          company_name: string | null
+          created_at: string | null
+          email: string | null
+          first_name: string | null
+          id: string
+          is_active: boolean | null
+          last_name: string | null
+          phone: string | null
+          updated_at: string | null
+          user_type_id: string | null
+        }
+        Insert: {
+          auth_id?: string | null
+          company_name?: string | null
+          created_at?: string | null
+          email?: string | null
+          first_name?: string | null
+          id: string
+          is_active?: boolean | null
+          last_name?: string | null
+          phone?: string | null
+          updated_at?: string | null
+          user_type_id?: string | null
+        }
+        Update: {
+          auth_id?: string | null
+          company_name?: string | null
+          created_at?: string | null
+          email?: string | null
+          first_name?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_name?: string | null
+          phone?: string | null
+          updated_at?: string | null
+          user_type_id?: string | null
+        }
+        Relationships: []
+      }
+      user_types: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_internal: boolean | null
+          name: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id: string
+          is_internal?: boolean | null
+          name?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_internal?: boolean | null
+          name?: string | null
+          updated_at?: string | null
         }
         Relationships: []
       }

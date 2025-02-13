@@ -42,6 +42,14 @@ function generateMockClaims() {
       endDate: endDate.toISOString().split('T')[0]
     };
   };
+
+  // Generate SSN function
+  const generateUniqueSSN = () => {
+    const area = Math.floor(Math.random() * 900 + 100).toString();
+    const group = Math.floor(Math.random() * 90 + 10).toString();
+    const serial = Math.floor(Math.random() * 9000 + 1000).toString();
+    return `${area}-${group}-${serial}`;
+  };
   
   return Array.from({ length: 5 }, (_, i) => {
     const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
@@ -50,18 +58,19 @@ function generateMockClaims() {
     const { startDate, endDate } = generateEmploymentDates(isEligible);
     
     return {
+      id: crypto.randomUUID(), // Use crypto.randomUUID() for unique IDs
       first_name: firstName,
       middle_name: `${firstName[0]}`,
       last_name: lastName,
       age: Math.floor(Math.random() * (65 - 18) + 18),
       state: states[Math.floor(Math.random() * states.length)],
       pincode: Math.floor(Math.random() * 90000 + 10000).toString(),
-      ssn: `${Math.floor(Math.random() * 900 + 100)}-${Math.floor(Math.random() * 90 + 10)}-${Math.floor(Math.random() * 9000 + 1000)}`,
+      ssn: generateUniqueSSN(),
       email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@example.com`,
       phone: `${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 9000 + 1000)}`,
       employer_name: employers[Math.floor(Math.random() * employers.length)],
       claim_date: new Date().toISOString().split('T')[0],
-      claim_status: "initial_review", // Always set to initial_review
+      claim_status: "initial_review",
       separation_reason: separationReasons[Math.floor(Math.random() * separationReasons.length)],
       employment_start_date: startDate,
       employment_end_date: endDate,
@@ -87,29 +96,34 @@ serve(async (req) => {
     
     const results = []
     for (const claim of mockClaims) {
-      // Check if claim with this SSN already exists
-      const { data: existingClaim } = await supabaseClient
-        .from('claims')
-        .select('id')
-        .eq('ssn', claim.ssn)
-        .single()
+      try {
+        // Check if claim with this SSN already exists
+        const { data: existingClaim } = await supabaseClient
+          .from('claims')
+          .select('id')
+          .eq('ssn', claim.ssn)
+          .maybeSingle()
 
-      if (existingClaim) {
-        console.log(`Claim with SSN ${claim.ssn} already exists, skipping...`)
-        continue
-      }
+        if (existingClaim) {
+          console.log(`Claim with SSN ${claim.ssn} already exists, skipping...`)
+          continue
+        }
 
-      const { data, error } = await supabaseClient
-        .from('claims')
-        .insert(claim)
-        .select()
-      
-      if (error) {
-        console.error('Error inserting claim:', error)
-        throw error
+        const { data, error } = await supabaseClient
+          .from('claims')
+          .insert(claim)
+          .select()
+        
+        if (error) {
+          console.error('Error inserting claim:', error)
+          continue // Skip this claim but continue with others
+        }
+        
+        results.push(data[0])
+      } catch (insertError) {
+        console.error('Error processing claim:', insertError)
+        continue // Skip this claim but continue with others
       }
-      
-      results.push(data[0])
     }
 
     return new Response(
@@ -126,7 +140,11 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in naswa-claims function:', error)
     return new Response(
-      JSON.stringify({ success: false, error: error.message }),
+      JSON.stringify({ 
+        success: false, 
+        error: error.message,
+        details: 'An error occurred while processing the claims'
+      }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500
@@ -134,4 +152,3 @@ serve(async (req) => {
     )
   }
 })
-
