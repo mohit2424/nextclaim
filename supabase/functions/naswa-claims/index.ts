@@ -19,13 +19,6 @@ function generateMockClaims() {
     "Advanced Systems Corp"
   ];
   const separationReasons = ["layoff", "reduction_in_force", "constructive_discharge", "severance_agreement", "job_abandonment"];
-  const unemploymentReasons = [
-    "Company downsizing",
-    "Department restructuring",
-    "Position elimination",
-    "Business closure",
-    "Contract termination"
-  ];
   
   // Current date for reference
   const currentDate = new Date();
@@ -46,8 +39,7 @@ function generateMockClaims() {
     
     return {
       startDate: startDate.toISOString().split('T')[0],
-      endDate: endDate.toISOString().split('T')[0],
-      lastDayOfWork: endDate.toISOString().split('T')[0] // Adding last day of work
+      endDate: endDate.toISOString().split('T')[0]
     };
   };
   
@@ -55,10 +47,9 @@ function generateMockClaims() {
     const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
     const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
     const isEligible = i < 2; // First 2 claims will be eligible, last 3 won't
-    const { startDate, endDate, lastDayOfWork } = generateEmploymentDates(isEligible);
+    const { startDate, endDate } = generateEmploymentDates(isEligible);
     
     return {
-      id: crypto.randomUUID(),
       first_name: firstName,
       middle_name: `${firstName[0]}`,
       last_name: lastName,
@@ -74,12 +65,8 @@ function generateMockClaims() {
       separation_reason: separationReasons[Math.floor(Math.random() * separationReasons.length)],
       employment_start_date: startDate,
       employment_end_date: endDate,
-      last_day_of_work: lastDayOfWork,
-      reason_for_unemployment: unemploymentReasons[Math.floor(Math.random() * unemploymentReasons.length)],
       severance_package: Math.random() > 0.5,
-      severance_amount: Math.random() > 0.5 ? Math.floor(Math.random() * 50000 + 10000) : null,
-      documents: [],
-      rejection_reason: null
+      documents: []
     };
   });
 }
@@ -123,7 +110,10 @@ serve(async (req) => {
           continue // Skip this claim but continue with others
         }
         
-        results.push(data[0])
+        if (data && data.length > 0) {
+          results.push(data[0])
+          console.log('Successfully inserted claim:', data[0].id)
+        }
       } catch (insertError) {
         console.error('Error processing claim:', insertError)
         continue // Skip this claim but continue with others
