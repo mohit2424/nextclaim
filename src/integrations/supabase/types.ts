@@ -22,15 +22,12 @@ export type Database = {
           employment_start_date: string
           first_name: string
           id: string
-          last_day_of_work: string | null
           last_name: string
           middle_name: string | null
           phone: string
           pincode: string
-          reason_for_unemployment: string | null
           rejection_reason: string | null
           separation_reason: Database["public"]["Enums"]["separation_reason"]
-          severance_amount: number | null
           severance_package: boolean | null
           ssn: string
           state: string
@@ -49,15 +46,12 @@ export type Database = {
           employment_start_date: string
           first_name: string
           id: string
-          last_day_of_work?: string | null
           last_name: string
           middle_name?: string | null
           phone: string
           pincode: string
-          reason_for_unemployment?: string | null
           rejection_reason?: string | null
           separation_reason: Database["public"]["Enums"]["separation_reason"]
-          severance_amount?: number | null
           severance_package?: boolean | null
           ssn: string
           state: string
@@ -76,200 +70,17 @@ export type Database = {
           employment_start_date?: string
           first_name?: string
           id?: string
-          last_day_of_work?: string | null
           last_name?: string
           middle_name?: string | null
           phone?: string
           pincode?: string
-          reason_for_unemployment?: string | null
           rejection_reason?: string | null
           separation_reason?: Database["public"]["Enums"]["separation_reason"]
-          severance_amount?: number | null
           severance_package?: boolean | null
           ssn?: string
           state?: string
           updated_at?: string
           user_id?: string | null
-        }
-        Relationships: []
-      }
-      deadlines: {
-        Row: {
-          assigned_to: string
-          claim_id: string | null
-          claimant_name: string
-          created_at: string
-          description: string
-          due_date: string
-          employer_name: string
-          id: string
-          priority: string
-          status: string
-          type: string
-        }
-        Insert: {
-          assigned_to: string
-          claim_id?: string | null
-          claimant_name: string
-          created_at?: string
-          description: string
-          due_date: string
-          employer_name: string
-          id?: string
-          priority: string
-          status?: string
-          type: string
-        }
-        Update: {
-          assigned_to?: string
-          claim_id?: string | null
-          claimant_name?: string
-          created_at?: string
-          description?: string
-          due_date?: string
-          employer_name?: string
-          id?: string
-          priority?: string
-          status?: string
-          type?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "deadlines_claim_id_fkey"
-            columns: ["claim_id"]
-            isOneToOne: false
-            referencedRelation: "claims"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "deadlines_claim_id_fkey"
-            columns: ["claim_id"]
-            isOneToOne: false
-            referencedRelation: "in_progress_claims"
-            referencedColumns: ["claim_id"]
-          },
-          {
-            foreignKeyName: "deadlines_claim_id_fkey"
-            columns: ["claim_id"]
-            isOneToOne: false
-            referencedRelation: "invalid_employment_dates"
-            referencedColumns: ["claim_id"]
-          },
-          {
-            foreignKeyName: "deadlines_claim_id_fkey"
-            columns: ["claim_id"]
-            isOneToOne: false
-            referencedRelation: "rejected_claims"
-            referencedColumns: ["claim_id"]
-          },
-          {
-            foreignKeyName: "deadlines_claim_id_fkey"
-            columns: ["claim_id"]
-            isOneToOne: false
-            referencedRelation: "todays_claims"
-            referencedColumns: ["claim_id"]
-          },
-        ]
-      }
-      employer_details: {
-        Row: {
-          company_name: string
-          created_at: string
-          email_address: string
-          employer_address: string
-          employer_id: string
-          hr_representative: string
-          phone_number: string
-          updated_at: string
-        }
-        Insert: {
-          company_name: string
-          created_at?: string
-          email_address: string
-          employer_address?: string
-          employer_id?: string
-          hr_representative: string
-          phone_number: string
-          updated_at?: string
-        }
-        Update: {
-          company_name?: string
-          created_at?: string
-          email_address?: string
-          employer_address?: string
-          employer_id?: string
-          hr_representative?: string
-          phone_number?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      user_profile: {
-        Row: {
-          auth_id: string | null
-          company_name: string | null
-          created_at: string | null
-          email: string | null
-          first_name: string | null
-          id: string
-          is_active: boolean | null
-          last_name: string | null
-          phone: string | null
-          updated_at: string | null
-          user_type_id: string | null
-        }
-        Insert: {
-          auth_id?: string | null
-          company_name?: string | null
-          created_at?: string | null
-          email?: string | null
-          first_name?: string | null
-          id: string
-          is_active?: boolean | null
-          last_name?: string | null
-          phone?: string | null
-          updated_at?: string | null
-          user_type_id?: string | null
-        }
-        Update: {
-          auth_id?: string | null
-          company_name?: string | null
-          created_at?: string | null
-          email?: string | null
-          first_name?: string | null
-          id?: string
-          is_active?: boolean | null
-          last_name?: string | null
-          phone?: string | null
-          updated_at?: string | null
-          user_type_id?: string | null
-        }
-        Relationships: []
-      }
-      user_types: {
-        Row: {
-          created_at: string | null
-          description: string | null
-          id: string
-          is_internal: boolean | null
-          name: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          description?: string | null
-          id: string
-          is_internal?: boolean | null
-          name?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          is_internal?: boolean | null
-          name?: string | null
-          updated_at?: string | null
         }
         Relationships: []
       }

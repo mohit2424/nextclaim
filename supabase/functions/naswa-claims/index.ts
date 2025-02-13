@@ -19,6 +19,13 @@ function generateMockClaims() {
     "Advanced Systems Corp"
   ];
   const separationReasons = ["layoff", "reduction_in_force", "constructive_discharge", "severance_agreement", "job_abandonment"];
+  const unemploymentReasons = [
+    "Company downsizing",
+    "Department restructuring",
+    "Position elimination",
+    "Business closure",
+    "Contract termination"
+  ];
   
   // Current date for reference
   const currentDate = new Date();
@@ -39,7 +46,8 @@ function generateMockClaims() {
     
     return {
       startDate: startDate.toISOString().split('T')[0],
-      endDate: endDate.toISOString().split('T')[0]
+      endDate: endDate.toISOString().split('T')[0],
+      lastDayOfWork: endDate.toISOString().split('T')[0] // Adding last day of work
     };
   };
   
@@ -47,9 +55,10 @@ function generateMockClaims() {
     const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
     const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
     const isEligible = i < 2; // First 2 claims will be eligible, last 3 won't
-    const { startDate, endDate } = generateEmploymentDates(isEligible);
+    const { startDate, endDate, lastDayOfWork } = generateEmploymentDates(isEligible);
     
     return {
+      id: crypto.randomUUID(),
       first_name: firstName,
       middle_name: `${firstName[0]}`,
       last_name: lastName,
@@ -61,12 +70,16 @@ function generateMockClaims() {
       phone: `${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 9000 + 1000)}`,
       employer_name: employers[Math.floor(Math.random() * employers.length)],
       claim_date: new Date().toISOString().split('T')[0],
-      claim_status: "initial_review", // Always set to initial_review
+      claim_status: "initial_review",
       separation_reason: separationReasons[Math.floor(Math.random() * separationReasons.length)],
       employment_start_date: startDate,
       employment_end_date: endDate,
+      last_day_of_work: lastDayOfWork,
+      reason_for_unemployment: unemploymentReasons[Math.floor(Math.random() * unemploymentReasons.length)],
       severance_package: Math.random() > 0.5,
-      documents: []
+      severance_amount: Math.random() > 0.5 ? Math.floor(Math.random() * 50000 + 10000) : null,
+      documents: [],
+      rejection_reason: null
     };
   });
 }
@@ -87,29 +100,34 @@ serve(async (req) => {
     
     const results = []
     for (const claim of mockClaims) {
-      // Check if claim with this SSN already exists
-      const { data: existingClaim } = await supabaseClient
-        .from('claims')
-        .select('id')
-        .eq('ssn', claim.ssn)
-        .single()
+      try {
+        // Check if claim with this SSN already exists
+        const { data: existingClaim } = await supabaseClient
+          .from('claims')
+          .select('id')
+          .eq('ssn', claim.ssn)
+          .maybeSingle()
 
-      if (existingClaim) {
-        console.log(`Claim with SSN ${claim.ssn} already exists, skipping...`)
-        continue
-      }
+        if (existingClaim) {
+          console.log(`Claim with SSN ${claim.ssn} already exists, skipping...`)
+          continue
+        }
 
-      const { data, error } = await supabaseClient
-        .from('claims')
-        .insert(claim)
-        .select()
-      
-      if (error) {
-        console.error('Error inserting claim:', error)
-        throw error
+        const { data, error } = await supabaseClient
+          .from('claims')
+          .insert(claim)
+          .select()
+        
+        if (error) {
+          console.error('Error inserting claim:', error)
+          continue // Skip this claim but continue with others
+        }
+        
+        results.push(data[0])
+      } catch (insertError) {
+        console.error('Error processing claim:', insertError)
+        continue // Skip this claim but continue with others
       }
-      
-      results.push(data[0])
     }
 
     return new Response(
@@ -126,7 +144,11 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in naswa-claims function:', error)
     return new Response(
-      JSON.stringify({ success: false, error: error.message }),
+      JSON.stringify({ 
+        success: false, 
+        error: error.message,
+        details: 'An error occurred while processing the claims'
+      }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500
@@ -134,4 +156,3 @@ serve(async (req) => {
     )
   }
 })
-
