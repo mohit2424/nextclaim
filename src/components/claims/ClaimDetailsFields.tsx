@@ -187,7 +187,10 @@ export function ClaimDetailsFields({ form }: ClaimDetailsFieldsProps) {
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
-                <SelectItem value="initial_review">Initial Review</SelectItem>                
+                <SelectItem value="initial_review">Initial Review</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="approved">Approved</SelectItem>
+                <SelectItem value="rejected">Rejected</SelectItem>
               </SelectContent>
             </Select>
             <FormMessage />
