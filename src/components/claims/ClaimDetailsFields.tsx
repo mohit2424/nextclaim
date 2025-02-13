@@ -1,3 +1,4 @@
+
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -39,21 +40,7 @@ export function ClaimDetailsFields({ form }: ClaimDetailsFieldsProps) {
           <FormItem>
             <FormLabel>SSN</FormLabel>
             <FormControl>
-              <Input 
-                placeholder="123-45-6789" 
-                {...field} 
-                onChange={(e) => {
-                  const value = e.target.value;
-                  const cleaned = value.replace(/\D/g, '');
-                  const matches = cleaned.match(/^(\d{3})(\d{2})(\d{4})$/);
-                  
-                  if (matches) {
-                    field.onChange(`${matches[1]}-${matches[2]}-${matches[3]}`);
-                  } else {
-                    field.onChange(value);
-                  }
-                }}
-              />
+              <Input placeholder="123-45-6789" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -182,6 +169,27 @@ export function ClaimDetailsFields({ form }: ClaimDetailsFieldsProps) {
                 />
               </PopoverContent>
             </Popover>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="claimStatus"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Claim Status</FormLabel>
+            <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <FormControl>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                <SelectItem value="initial_review">Initial Review</SelectItem>                
+              </SelectContent>
+            </Select>
             <FormMessage />
           </FormItem>
         )}

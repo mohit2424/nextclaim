@@ -1,3 +1,4 @@
+
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -36,12 +37,6 @@ const getStatusColor = (status: ClaimStatus) => {
     rejected: "bg-red-100 text-red-800 border-red-200",
   };
   return colors[status] || "bg-gray-100 text-gray-800 border-gray-200";
-};
-
-const maskSSN = (ssn: string) => {
-  const cleanSSN = ssn.replace(/-/g, '');
-  const lastFour = cleanSSN.slice(-4);
-  return `XXX-XX-${lastFour}`;
 };
 
 export function ClaimsTable({ claims, onStatusUpdate }: ClaimsTableProps) {
@@ -96,7 +91,7 @@ export function ClaimsTable({ claims, onStatusUpdate }: ClaimsTableProps) {
                   </TableCell>
                   <TableCell>{claim.employer_name}</TableCell>
                   <TableCell>{new Date(claim.claim_date).toLocaleDateString()}</TableCell>
-                  <TableCell>{maskSSN(claim.ssn)}</TableCell>
+                  <TableCell>{claim.ssn}</TableCell>
                   <TableCell>{formatSeparationReason(claim.separation_reason)}</TableCell>
                   <TableCell>
                     <div className="flex gap-2">

@@ -9,4 +9,6 @@
   font-family: 'Inter', sans-serif;
 }
 
-/* Remove the login class that was causing left alignment */
+.login{
+  margin-left:500px;
+}
