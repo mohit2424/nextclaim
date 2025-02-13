@@ -22,9 +22,11 @@ export const fetchClaims = async (
   if (searchQuery) {
     const cleanSearchQuery = searchQuery.replace(/-/g, '');
     if (/^\d+$/.test(cleanSearchQuery)) {
-      query = query.ilike('ssn', `%${cleanSearchQuery}%`);
+      // For SSN search, match from the beginning
+      query = query.ilike('ssn', `${cleanSearchQuery}%`);
     } else {
-      query = query.or(`first_name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%,id.ilike.%${searchQuery}%`);
+      // For name search, match from the beginning of first or last name
+      query = query.or(`first_name.ilike.${searchQuery}%,last_name.ilike.${searchQuery}%,id.eq.${searchQuery}`);
     }
   }
 
@@ -39,7 +41,6 @@ export const fetchClaims = async (
         query = query.eq('claim_status', 'rejected');
         break;
       case 'today':
-        // Only show initial_review claims from today
         query = query
           .eq('claim_status', 'initial_review')
           .gte('created_at', today);
@@ -68,6 +69,6 @@ export const useClaimsList = (
     queryFn: () => fetchClaims(searchQuery, status, currentPage),
     staleTime: 0,
     refetchOnWindowFocus: true,
-    refetchInterval: 5000, // Poll every 5 seconds for real-time updates
+    refetchInterval: 5000,
   });
 };

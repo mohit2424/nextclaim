@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -30,7 +29,6 @@ export const formSchema = z.object({
   employmentEndDate: z.date({
     required_error: "Employment end date is required",
   }),
-  claimStatus: z.enum(["initial_review", "pending", "approved", "rejected"]),
   separationReason: z.enum([
     "resignation",
     "termination_misconduct",
