@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { EligibilityCheckDialog } from "./EligibilityCheckDialog";
 
 export type ClaimStatus = "initial_review" | "in_progress" | "rejected";
+export type SeparationReason = "resignation" | "termination_misconduct" | "layoff" | "reduction_in_force" | "constructive_discharge" | "job_abandonment" | "severance_agreement";
 
 type Claim = {
   id: string;
@@ -20,6 +21,8 @@ type Claim = {
   ssn: string;
   employment_start_date: string | null;
   employment_end_date: string | null;
+  separation_reason: SeparationReason;
+  rejection_reason?: string | null;
 };
 
 interface ClaimsTableProps {
@@ -44,6 +47,12 @@ export function ClaimsTable({ claims, onStatusUpdate }: ClaimsTableProps) {
     setSelectedClaim(claim);
   };
 
+  const formatSeparationReason = (reason: SeparationReason) => {
+    return reason.split('_').map(word => 
+      word.charAt(0).toUpperCase() + word.slice(1)
+    ).join(' ');
+  };
+
   return (
     <>
       <div className="bg-white rounded-lg border shadow-sm w-full">
@@ -59,6 +68,7 @@ export function ClaimsTable({ claims, onStatusUpdate }: ClaimsTableProps) {
                 <TableHead className="font-semibold text-gray-700">Employer</TableHead>
                 <TableHead className="font-semibold text-gray-700">Due Date</TableHead>
                 <TableHead className="font-semibold text-gray-700">SSN</TableHead>
+                <TableHead className="font-semibold text-gray-700">Separation Reason</TableHead>
                 <TableHead className="font-semibold text-gray-700 w-[200px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -82,6 +92,7 @@ export function ClaimsTable({ claims, onStatusUpdate }: ClaimsTableProps) {
                   <TableCell>{claim.employer_name}</TableCell>
                   <TableCell>{new Date(claim.claim_date).toLocaleDateString()}</TableCell>
                   <TableCell>{claim.ssn}</TableCell>
+                  <TableCell>{formatSeparationReason(claim.separation_reason)}</TableCell>
                   <TableCell>
                     <div className="flex gap-2">
                       <Button
@@ -115,14 +126,9 @@ export function ClaimsTable({ claims, onStatusUpdate }: ClaimsTableProps) {
           employmentStartDate={selectedClaim.employment_start_date}
           employmentEndDate={selectedClaim.employment_end_date}
           onClose={() => setSelectedClaim(null)}
-          onStatusUpdate={() => {
-            if (onStatusUpdate) {
-              onStatusUpdate();
-            }
-          }}
+          onStatusUpdate={onStatusUpdate}
         />
       )}
     </>
   );
 }
-
