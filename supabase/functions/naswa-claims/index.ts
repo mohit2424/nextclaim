@@ -64,12 +64,12 @@ function generateMockClaims() {
       age: Math.floor(Math.random() * (65 - 18) + 18),
       state: states[Math.floor(Math.random() * states.length)],
       pincode: Math.floor(Math.random() * 90000 + 10000).toString(),
-      ssn: generateUniqueSSN(), // Ensure unique SSN
+      ssn: generateUniqueSSN(),
       email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@example.com`,
       phone: `${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 9000 + 1000)}`,
       employer_name: employers[Math.floor(Math.random() * employers.length)],
       claim_date: new Date().toISOString().split('T')[0],
-      claim_status: "initial_review", // Always set to initial_review
+      claim_status: "initial_review",
       separation_reason: separationReasons[Math.floor(Math.random() * separationReasons.length)],
       employment_start_date: startDate,
       employment_end_date: endDate,
@@ -94,7 +94,7 @@ serve(async (req) => {
     const mockClaims = generateMockClaims();
     console.log(`Generated ${mockClaims.length} mock claims`)
     
-    // Insert all claims at once
+    // Insert all claims at once - the trigger will handle ID generation
     const { data, error } = await supabaseClient
       .from('claims')
       .insert(mockClaims)
