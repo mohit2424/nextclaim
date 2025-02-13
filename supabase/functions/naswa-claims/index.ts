@@ -61,7 +61,7 @@ function generateMockClaims() {
       phone: `${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 9000 + 1000)}`,
       employer_name: employers[Math.floor(Math.random() * employers.length)],
       claim_date: new Date().toISOString().split('T')[0],
-      claim_status: "initial_review", // Always set to initial_review
+      claim_status: "initial_review",
       separation_reason: separationReasons[Math.floor(Math.random() * separationReasons.length)],
       employment_start_date: startDate,
       employment_end_date: endDate,
@@ -87,29 +87,34 @@ serve(async (req) => {
     
     const results = []
     for (const claim of mockClaims) {
-      // Check if claim with this SSN already exists
-      const { data: existingClaim } = await supabaseClient
-        .from('claims')
-        .select('id')
-        .eq('ssn', claim.ssn)
-        .single()
+      try {
+        // Check if claim with this SSN already exists
+        const { data: existingClaim } = await supabaseClient
+          .from('claims')
+          .select('id')
+          .eq('ssn', claim.ssn)
+          .maybeSingle()
 
-      if (existingClaim) {
-        console.log(`Claim with SSN ${claim.ssn} already exists, skipping...`)
+        if (existingClaim) {
+          console.log(`Claim with SSN ${claim.ssn} already exists, skipping...`)
+          continue
+        }
+
+        const { data, error } = await supabaseClient
+          .from('claims')
+          .insert([claim])
+          .select()
+          .single()
+        
+        if (error) throw error
+        
+        console.log('Successfully inserted claim:', data.id)
+        results.push(data)
+      } catch (error) {
+        console.error('Error processing claim:', error)
+        // Continue with next claim instead of failing entire batch
         continue
       }
-
-      const { data, error } = await supabaseClient
-        .from('claims')
-        .insert(claim)
-        .select()
-      
-      if (error) {
-        console.error('Error inserting claim:', error)
-        throw error
-      }
-      
-      results.push(data[0])
     }
 
     return new Response(
@@ -134,4 +139,3 @@ serve(async (req) => {
     )
   }
 })
-
