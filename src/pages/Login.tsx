@@ -64,7 +64,6 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="absolute top-8 left-8 right-8 flex justify-between items-center">
         <h2 className="text-2xl font-bold text-blue-600">NextClaim</h2>
-        <Button variant="outline" size="sm">Contact Us</Button>
       </div>
 
       <div className="max-w-md w-full space-y-8 login">
@@ -74,7 +73,7 @@ export default function Login() {
               Welcome Back
             </h1>
             <p className="text-gray-600">
-              Sign in to manage your unemployment claims
+              Sign in to manage unemployment claims
             </p>
           </div>
 
