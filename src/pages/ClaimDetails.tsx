@@ -38,12 +38,13 @@ export type Claim = {
   claim_status: string;
   separation_reason: "resignation" | "termination_misconduct" | "layoff" | "reduction_in_force" | "constructive_discharge" | "job_abandonment" | "severance_agreement";
   documents: ClaimDocument[];
-  last_day_of_work: string | null;
-  severance_package: boolean | null;
-  severance_amount: number | null;
-  reason_for_unemployment: string | null;
   employment_start_date: string | null;
   employment_end_date: string | null;
+  severance_package: boolean | null;
+  created_at?: string;
+  updated_at?: string;
+  user_id?: string | null;
+  rejection_reason?: string | null;
 };
 
 export default function ClaimDetails() {
@@ -118,9 +119,7 @@ export default function ClaimDetails() {
           separation_reason: editedClaim.separation_reason,
           employment_start_date: editedClaim.employment_start_date,
           employment_end_date: editedClaim.employment_end_date,
-          reason_for_unemployment: editedClaim.reason_for_unemployment,
           severance_package: editedClaim.severance_package,
-          severance_amount: editedClaim.severance_amount,
         })
         .eq('id', id);
 
@@ -255,4 +254,3 @@ export default function ClaimDetails() {
     </DashboardLayout>
   );
 }
-
