@@ -19,22 +19,13 @@ interface ClaimsListProps {
 export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps) {
   const [searchParams, setSearchParams] = useSearchParams();
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
-  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(initialSearchQuery);
+  const [localSearchQuery, setLocalSearchQuery] = useState(initialSearchQuery);
   const statusParam = searchParams.get('status') || 'all';
   const itemsPerPage = 10;
   const queryClient = useQueryClient();
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearchQuery(searchQuery);
-    }, 500); // Delay search by 500ms
-
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
-
   const { data: claimsData = { data: [], count: 0 }, isLoading } = useClaimsList(
-    debouncedSearchQuery,
+    localSearchQuery,
     statusParam,
     currentPage
   );
@@ -93,10 +84,10 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
             <div className="relative w-full md:w-96">
               <Input
                 type="text"
-                placeholder="Search by SSN (XXX-XX-XXXX) or Name"
-                value={searchQuery}
+                placeholder="Search by SSN (XXX-XX-XXXX)"
+                value={localSearchQuery}
                 onChange={(e) => {
-                  setSearchQuery(e.target.value);
+                  setLocalSearchQuery(e.target.value);
                   setCurrentPage(1);
                 }}
                 className="pl-10"
@@ -104,7 +95,7 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
               <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
             </div>
             <ClaimsStatusFilter 
-              status={statusParam}
+              status={statusParam as any}
               onStatusChange={handleStatusChange}
             />
           </div>
@@ -130,3 +121,4 @@ export function ClaimsList({ searchQuery: initialSearchQuery }: ClaimsListProps)
     </DashboardLayout>
   );
 }
+

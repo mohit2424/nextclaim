@@ -47,7 +47,6 @@ export type FormValues = z.infer<typeof formSchema>;
 export default function NewClaim() {
   const navigate = useNavigate();
   const [isDialogOpen, setIsDialogOpen] = useState(true);
-  const [ssn, setSSN] = useState("");
 
   useEffect(() => {
     checkUser();
@@ -61,16 +60,11 @@ export default function NewClaim() {
     }
   };
 
-  const handleNewClaim = (ssn: string) => {
-    setSSN(ssn);
-  };
-
   return (
     <DashboardLayout>
       <SSNSearchDialog 
         isOpen={isDialogOpen} 
-        onOpenChange={setIsDialogOpen}
-        onNewClaim={handleNewClaim}
+        onOpenChange={setIsDialogOpen} 
       />
 
       <div className="container mx-auto py-6 overflow-y-auto overflow-x-hidden">
@@ -78,7 +72,7 @@ export default function NewClaim() {
           <h1 className="text-2xl font-bold">New Unemployment Claim</h1>
         </div>
         
-        <ClaimForm onCancel={() => navigate('/claims')} initialSSN={ssn} />
+        <ClaimForm onCancel={() => navigate('/claims')} />
       </div>
     </DashboardLayout>
   );

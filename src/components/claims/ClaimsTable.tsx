@@ -1,3 +1,4 @@
+
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -52,10 +53,6 @@ export function ClaimsTable({ claims, onStatusUpdate }: ClaimsTableProps) {
     ).join(' ');
   };
 
-  const maskSSN = (ssn: string) => {
-    return `XXX-XX-${ssn.slice(-4)}`;
-  };
-
   return (
     <>
       <div className="bg-white rounded-lg border shadow-sm w-full">
@@ -94,7 +91,7 @@ export function ClaimsTable({ claims, onStatusUpdate }: ClaimsTableProps) {
                   </TableCell>
                   <TableCell>{claim.employer_name}</TableCell>
                   <TableCell>{new Date(claim.claim_date).toLocaleDateString()}</TableCell>
-                  <TableCell>{maskSSN(claim.ssn)}</TableCell>
+                  <TableCell>{claim.ssn}</TableCell>
                   <TableCell>{formatSeparationReason(claim.separation_reason)}</TableCell>
                   <TableCell>
                     <div className="flex gap-2">
