@@ -66,7 +66,7 @@ export default function Login() {
         <h2 className="text-2xl font-bold text-blue-600">NextClaim</h2>
       </div>
 
-      <div className="max-w-md w-full space-y-8 login">
+      <div className="max-w-md w-full space-y-8" style={{ marginLeft: 400 }}>
         <div className="bg-white rounded-lg shadow-lg px-8 pt-8 pb-6">
           <div className="text-center mb-8">
             <h1 className="text-2xl font-semibold mb-2">
