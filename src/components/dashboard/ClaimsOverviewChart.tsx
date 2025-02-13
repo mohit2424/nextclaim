@@ -109,9 +109,8 @@ export function ClaimsOverviewChart() {
     queryFn: () => fetchMonthlyData(selectedYear),
     enabled: isMonthly,
     retry: 3,
-    onError: (error) => {
-      console.error('Error fetching monthly data:', error);
-      toast.error('Failed to load monthly claims data');
+    meta: {
+      errorMessage: 'Failed to load monthly claims data'
     }
   });
 
@@ -120,11 +119,15 @@ export function ClaimsOverviewChart() {
     queryFn: fetchYearlyData,
     enabled: !isMonthly,
     retry: 3,
-    onError: (error) => {
-      console.error('Error fetching yearly data:', error);
-      toast.error('Failed to load yearly claims data');
+    meta: {
+      errorMessage: 'Failed to load yearly claims data'
     }
   });
+
+  // Show error toast when there's an error
+  if (monthlyError || yearlyError) {
+    toast.error('Failed to load claims data');
+  }
 
   const data = isMonthly ? monthlyData : yearlyData;
   const xAxisKey = isMonthly ? "month" : "year";
