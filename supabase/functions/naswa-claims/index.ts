@@ -23,6 +23,14 @@ function generateMockClaims() {
   // Current date for reference
   const currentDate = new Date();
   
+  // Helper function to generate unique SSN
+  const generateUniqueSSN = () => {
+    const area = Math.floor(Math.random() * 900 + 100);
+    const group = Math.floor(Math.random() * 90 + 10);
+    const serial = Math.floor(Math.random() * 9000 + 1000);
+    return `${area}-${group}-${serial}`;
+  };
+  
   // Helper function to generate dates
   const generateEmploymentDates = (isEligible: boolean) => {
     const endDate = new Date(currentDate);
@@ -56,7 +64,7 @@ function generateMockClaims() {
       age: Math.floor(Math.random() * (65 - 18) + 18),
       state: states[Math.floor(Math.random() * states.length)],
       pincode: Math.floor(Math.random() * 90000 + 10000).toString(),
-      ssn: `${Math.floor(Math.random() * 900 + 100)}-${Math.floor(Math.random() * 90 + 10)}-${Math.floor(Math.random() * 9000 + 1000)}`,
+      ssn: generateUniqueSSN(), // Ensure unique SSN
       email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@example.com`,
       phone: `${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 9000 + 1000)}`,
       employer_name: employers[Math.floor(Math.random() * employers.length)],
@@ -84,39 +92,27 @@ serve(async (req) => {
 
     console.log('Generating and processing new mock claims...')
     const mockClaims = generateMockClaims();
+    console.log(`Generated ${mockClaims.length} mock claims`)
     
-    const results = []
-    for (const claim of mockClaims) {
-      // Check if claim with this SSN already exists
-      const { data: existingClaim } = await supabaseClient
-        .from('claims')
-        .select('id')
-        .eq('ssn', claim.ssn)
-        .single()
+    // Insert all claims at once
+    const { data, error } = await supabaseClient
+      .from('claims')
+      .insert(mockClaims)
+      .select()
 
-      if (existingClaim) {
-        console.log(`Claim with SSN ${claim.ssn} already exists, skipping...`)
-        continue
-      }
-
-      const { data, error } = await supabaseClient
-        .from('claims')
-        .insert(claim)
-        .select()
-      
-      if (error) {
-        console.error('Error inserting claim:', error)
-        throw error
-      }
-      
-      results.push(data[0])
+    if (error) {
+      console.error('Error inserting claims:', error)
+      throw error
     }
+
+    const successCount = data?.length || 0
+    console.log(`Successfully inserted ${successCount} claims`)
 
     return new Response(
       JSON.stringify({ 
         success: true, 
-        data: results,
-        message: results.length === 0 ? 'All claims already exist' : `Successfully imported ${results.length} new claims`
+        data: data,
+        message: `Successfully imported ${successCount} new claims`
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -134,4 +130,3 @@ serve(async (req) => {
     )
   }
 })
-
