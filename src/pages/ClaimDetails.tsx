@@ -6,9 +6,10 @@ import { toast } from "sonner";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { ClaimHeader } from "@/components/claims/ClaimHeader";
 import { ClaimTabs } from "@/components/claims/ClaimTabs";
+import type { Database } from "@/integrations/supabase/types";
 
 export type ClaimStatus = "initial_review" | "in_progress" | "rejected";
-export type SeparationReason = "resignation" | "termination_misconduct" | "layoff" | "reduction_in_force" | "constructive_discharge" | "job_abandonment" | "severance_agreement";
+export type SeparationReason = Database["public"]["Enums"]["separation_reason"];
 
 export interface Claim {
   id: string;
@@ -39,6 +40,7 @@ export interface Claim {
   severance_package: boolean;
   severance_amount: number | null;
   reason_for_unemployment: string | null;
+  last_day_of_work: string | null;
   user_id: string;
 }
 
@@ -73,7 +75,8 @@ export default function ClaimDetails() {
         severance_amount: data.severance_amount || null,
         reason_for_unemployment: data.reason_for_unemployment || null,
         middle_name: data.middle_name || null,
-        rejection_reason: data.rejection_reason || null
+        rejection_reason: data.rejection_reason || null,
+        last_day_of_work: data.last_day_of_work || null
       };
       setClaim(formattedClaim);
       setEditedClaim(formattedClaim);
