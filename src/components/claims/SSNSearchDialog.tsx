@@ -16,9 +16,10 @@ import {
 interface SSNSearchDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
+  onNewClaim?: (ssn: string) => void;
 }
 
-export function SSNSearchDialog({ isOpen, onOpenChange }: SSNSearchDialogProps) {
+export function SSNSearchDialog({ isOpen, onOpenChange, onNewClaim }: SSNSearchDialogProps) {
   const navigate = useNavigate();
   const [searchSsn, setSearchSsn] = useState("");
   const [isSearching, setIsSearching] = useState(false);
@@ -97,6 +98,13 @@ export function SSNSearchDialog({ isOpen, onOpenChange }: SSNSearchDialogProps) 
     }
   };
 
+  const handleAddNewClaim = () => {
+    if (onNewClaim) {
+      onNewClaim(searchSsn);
+    }
+    onOpenChange(false);
+  };
+
   const handleSsnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatSSN(e.target.value);
     setSearchSsn(formatted);
@@ -137,7 +145,7 @@ export function SSNSearchDialog({ isOpen, onOpenChange }: SSNSearchDialogProps) 
                   View Existing Claim
                 </Button>
               ) : (
-                <Button onClick={() => onOpenChange(false)}>
+                <Button onClick={handleAddNewClaim}>
                   Add New Claim
                 </Button>
               )}

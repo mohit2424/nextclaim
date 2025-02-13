@@ -17,15 +17,17 @@ import type { Database } from "@/integrations/supabase/types";
 
 interface ClaimFormProps {
   onCancel: () => void;
+  initialSSN?: string;
 }
 
-export function ClaimForm({ onCancel }: ClaimFormProps) {
+export function ClaimForm({ onCancel, initialSSN }: ClaimFormProps) {
   const navigate = useNavigate();
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       middleName: "",
-      claimStatus: "initial_review", // Set default but don't show in form
+      claimStatus: "initial_review",
+      ssn: initialSSN || "",
     },
   });
 
@@ -57,7 +59,7 @@ export function ClaimForm({ onCancel }: ClaimFormProps) {
         id: crypto.randomUUID(),
         age: values.age,
         claim_date: format(values.claimDate, 'yyyy-MM-dd'),
-        claim_status: "initial_review", // Always set to initial_review
+        claim_status: "initial_review",
         documents: [],
         email: values.email,
         employer_name: values.employerName,
