@@ -40,7 +40,7 @@ export function ClaimDetailsFields({ form }: ClaimDetailsFieldsProps) {
           <FormItem>
             <FormLabel>SSN</FormLabel>
             <FormControl>
-              <Input placeholder="123-45-6789" {...field} />
+              <Input placeholder="123-45-6789" {...field} readOnly />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -169,27 +169,6 @@ export function ClaimDetailsFields({ form }: ClaimDetailsFieldsProps) {
                 />
               </PopoverContent>
             </Popover>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={form.control}
-        name="claimStatus"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Claim Status</FormLabel>
-            <Select onValueChange={field.onChange} defaultValue={field.value}>
-              <FormControl>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                <SelectItem value="initial_review">Initial Review</SelectItem>                
-              </SelectContent>
-            </Select>
             <FormMessage />
           </FormItem>
         )}
