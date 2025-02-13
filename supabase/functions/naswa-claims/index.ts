@@ -99,6 +99,7 @@ serve(async (req) => {
         continue
       }
 
+      // Remove id field and let the database trigger generate it
       const { data, error } = await supabaseClient
         .from('claims')
         .insert(claim)
@@ -106,7 +107,7 @@ serve(async (req) => {
       
       if (error) {
         console.error('Error inserting claim:', error)
-        throw error
+        continue // Skip this claim and try the next one
       }
       
       results.push(data[0])
@@ -134,4 +135,3 @@ serve(async (req) => {
     )
   }
 })
-
