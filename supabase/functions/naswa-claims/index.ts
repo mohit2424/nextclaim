@@ -61,7 +61,7 @@ function generateMockClaims() {
       phone: `${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 900 + 100)}${Math.floor(Math.random() * 9000 + 1000)}`,
       employer_name: employers[Math.floor(Math.random() * employers.length)],
       claim_date: new Date().toISOString().split('T')[0],
-      claim_status: "initial_review",
+      claim_status: "initial_review", // Always set to initial_review
       separation_reason: separationReasons[Math.floor(Math.random() * separationReasons.length)],
       employment_start_date: startDate,
       employment_end_date: endDate,
@@ -87,37 +87,29 @@ serve(async (req) => {
     
     const results = []
     for (const claim of mockClaims) {
-      try {
-        // Check if claim with this SSN already exists
-        const { data: existingClaim } = await supabaseClient
-          .from('claims')
-          .select('id')
-          .eq('ssn', claim.ssn)
-          .maybeSingle()
+      // Check if claim with this SSN already exists
+      const { data: existingClaim } = await supabaseClient
+        .from('claims')
+        .select('id')
+        .eq('ssn', claim.ssn)
+        .single()
 
-        if (existingClaim) {
-          console.log(`Claim with SSN ${claim.ssn} already exists, skipping...`)
-          continue
-        }
-
-        const { data, error } = await supabaseClient
-          .from('claims')
-          .insert(claim)
-          .select()
-        
-        if (error) {
-          console.error('Error inserting claim:', error)
-          continue // Skip this claim but continue with others
-        }
-        
-        if (data && data.length > 0) {
-          results.push(data[0])
-          console.log('Successfully inserted claim:', data[0].id)
-        }
-      } catch (insertError) {
-        console.error('Error processing claim:', insertError)
-        continue // Skip this claim but continue with others
+      if (existingClaim) {
+        console.log(`Claim with SSN ${claim.ssn} already exists, skipping...`)
+        continue
       }
+
+      const { data, error } = await supabaseClient
+        .from('claims')
+        .insert(claim)
+        .select()
+      
+      if (error) {
+        console.error('Error inserting claim:', error)
+        throw error
+      }
+      
+      results.push(data[0])
     }
 
     return new Response(
@@ -134,11 +126,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in naswa-claims function:', error)
     return new Response(
-      JSON.stringify({ 
-        success: false, 
-        error: error.message,
-        details: 'An error occurred while processing the claims'
-      }),
+      JSON.stringify({ success: false, error: error.message }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500
@@ -146,3 +134,4 @@ serve(async (req) => {
     )
   }
 })
+

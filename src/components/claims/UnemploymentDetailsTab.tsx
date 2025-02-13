@@ -48,11 +48,11 @@ export function UnemploymentDetailsTab({ claim, isEditing, onUpdate }: Unemploym
           />
         </div>
         <div className="col-span-2">
-          <Label>Separation Reason</Label>
+          <Label>Reason for Unemployment</Label>
           <Input 
-            value={claim.separation_reason} 
+            value={claim.reason_for_unemployment || ''} 
             readOnly={!isEditing}
-            onChange={(e) => handleInputChange('separation_reason', e.target.value)}
+            onChange={(e) => handleInputChange('reason_for_unemployment', e.target.value)}
             className={!isEditing ? 'bg-gray-50' : ''}
           />
         </div>
@@ -64,6 +64,18 @@ export function UnemploymentDetailsTab({ claim, isEditing, onUpdate }: Unemploym
             onCheckedChange={(checked) => handleInputChange('severance_package', checked)}
           />
         </div>
+        {claim.severance_package && (
+          <div>
+            <Label>Severance Amount</Label>
+            <Input 
+              type="number"
+              value={claim.severance_amount || ''} 
+              readOnly={!isEditing}
+              onChange={(e) => handleInputChange('severance_amount', parseFloat(e.target.value))}
+              className={!isEditing ? 'bg-gray-50' : ''}
+            />
+          </div>
+        )}
       </div>
     </Card>
   );
