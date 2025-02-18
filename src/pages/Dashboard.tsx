@@ -56,7 +56,7 @@ export default function Dashboard() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
               <Input placeholder="Search claims..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-10" />
             </div>
-            <Button variant="outline" onClick={importNASWAClaims} disabled={isImporting} className="whitespace-nowrap bg-gray-900 hover:bg-gray-800 text-slate-50">
+            <Button variant="outline" onClick={importNASWAClaims} disabled={isImporting} className="whitespace-nowrap text-slate-50 bg-blue-700 hover:bg-blue-600">
               {isImporting ? 'Importing...' : 'Import NASWA Claims'}
             </Button>
             <Button onClick={() => navigate("/claims/new")} className="whitespace-nowrap">
